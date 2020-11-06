@@ -1,0 +1,17 @@
+insert into airline values ('China Eastern');
+insert into airport values ('JFK', 'NYC');
+insert into airport values ('PVG', 'Shanghai');
+insert into customer values ('alison@gmail.com', 'Alison Yao', '123456', 'Taylor Building', 'Cornelia Street', 'L.A.', 'California', '18939704386', 'X12345678', '2025-01-01', 'China', '2000-08-21');
+insert into customer values ('clark@gmail.com', 'Clark Kent', 'IAmSuperman', 'Krypton Building', 'Lois Lane', 'Metropolis', 'New York', '18962468253', 'S19380418', '2035-01-01', 'US', '1988-02-29');
+insert into airplane values ('China Eastern', 'B5167', 366);
+insert into airplane values ('China Eastern', 'A8163', 853);
+insert into airline_staff values ('Janet', 'theGoodPlace', 'Janet', 'Robot', '1978-02-05', 'China Eastern');
+insert into flight values ('China Eastern', 'F6268', 'B5167', '2020-04-13 11:32:23', 'JFK', '2020-04-14 05:38:43', 'PVG', '5400', 'upcoming');
+insert into flight values ('China Eastern', 'F8765', 'A8163', '2020-11-09 10:21:56', 'PVG', '2020-04-14 02:25:31', 'JFK', '3400', 'delayed');
+insert into ticket values ('12345', 'China Eastern', 'F6268');
+insert into ticket values ('74373', 'China Eastern', 'F6268');
+insert into ticket values ('63627', 'China Eastern', 'F8765');
+insert into ticket values ('02758', 'China Eastern', 'F8765');
+insert into booking_agent values ('Dani@gmail.com', 'Jamie123', 'D1234');
+insert into purchase values ('12345', 'alison@gmail.com', 'Dani@gmail.com', '2020-01-01 12:34:21', 'D1234');
+insert into purchase values ('63627', 'clark@gmail.com', null, '2020-01-01 11:45:23', null);
