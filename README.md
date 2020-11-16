@@ -6,13 +6,13 @@ CSCI-SHU 213 Databases | Fall2020 | Final project
 
 The project consists of three homeworks throughout the semester.
 
-## hw1 (Oct.11)
+## Part1 (Oct.11)
 
 STEP 1: Design RE diagram.
 
-## hw2 (Nov.8)
+## Part2 (Nov.8)
 
 STEP 2: Design relational diagram.
 STEP 3: Create database & insert dummy data according to the relational diagram.
 
-## hw3 **By Alison Yuhan Yao & Xue Bai**
+## Part3 **By Alison Yuhan Yao & Xue Bai**

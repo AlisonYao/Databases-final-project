@@ -1,5 +1,3 @@
-#!C:/Users/lx615/AppData/Local/Programs/Python/Python38-32/python
-
 #Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect, flash
 import mysql.connector
@@ -103,7 +101,7 @@ def home():
 @app.route('/post', methods=['GET', 'POST'])
 def post():
 	username = session['username']
-	cursor = conn.cursor();
+	cursor = conn.cursor()
 	blog = request.form['blog']
 	query = "INSERT INTO blog (blog_post, username) VALUES(\'{}\', \'{}\')"
 	cursor.execute(query.format(blog, username))
