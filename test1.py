@@ -10,19 +10,41 @@ app = Flask(__name__)
 #Configure MySQL
 conn = mysql.connector.connect(host='localhost',
                        user='root',
-                       password='root',
-                       database='air')
+                       password='86466491@Alison',
+                       database='temp')
 
 
 #Define a route to hello function
 @app.route('/')
-def hello():
-	cursor = conn.cursor()
-	query = "SELECT airplane_id, flight_num, departure_airport, arrival_airport, departure_time, arrival_time, status FROM flight"
-	cursor.execute(query)
-	flightinfo = cursor.fetchall()
-	cursor.close()
-	return render_template('testindex.html', posts = flightinfo)
+def publicHome():
+	return render_template('publicHome.html')
+
+@app.route('/publicSearchFlight', methods=['GET', 'POST'])
+def publicSearchFlight():
+    departure_city = request.form['departure_city']
+    departure_airport = request.form['departure_airport']
+    arrival_city = request.form['arrival_city']
+    arrival_airport = request.form['arrival_airport']
+
+    cursor = conn.cursor()
+    query = "select * \
+            from airport as D, flight, airport as A \
+            where D.airport_name = flight.departure_airport and flight.arrival_airport = A.airport_name and \
+            D.airport_name = \'{}\' and A.airport_name = \'{}\'"
+    cursor.execute(query.format(departure_airport, arrival_airport))
+    data = cursor.fetchall() 
+    cursor.close()
+    
+    error = None
+    if (data): # has data
+        return render_template('publicHome.html', upcoming_flights=data)
+    else: # does not have data
+        error = 'Sorry ... Cannot find this flight!'
+        return render_template('publicHome.html', error=error)
+
+# @app.route('/publicSearchStatus', methods=['GET', 'POST'])
+# def publicSearchFlight():
+# 	pass
 
 #Define route for login
 @app.route('/cuslogin')
