@@ -10,7 +10,7 @@ app = Flask(__name__)
 #Configure MySQL
 conn = mysql.connector.connect(host='localhost',
                        user='root',
-                       password='',
+                       password='root',
                        database='air')
 
 
@@ -64,10 +64,6 @@ def publicSearchStatus():
     else: # does not have data
         error = 'Sorry ... Cannot find this flight!'
         return render_template('publicHome.html', error2=error)
-
-# @app.route('/publicSearchStatus', methods=['GET', 'POST'])
-# def publicSearchFlight():
-# 	pass
 
 #Define route for login
 @app.route('/cuslogin')
@@ -379,7 +375,17 @@ def addinfo():
 
 @app.route('/edit_status', methods=['GET', 'POST'])
 def edit_status():
-	return render_template('addinfo.html')
+	status = request.form['edit_status']
+
+	flight_num = request.form['flight_num']
+	
+	cursor = conn.cursor()
+	#executes query
+	upd = "UPDATE flight set status = \'{}\' WHERE flight_num = \'{}\'"
+	cursor.execute(upd.format(status, flight_num))
+	conn.commit()
+	cursor.close()
+	return redirect(url_for('staffhome'))
 
 @app.route('/creat_flight', methods=['GET', 'POST'])
 def creat_flight():

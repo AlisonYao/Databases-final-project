@@ -13,20 +13,37 @@
 	<th>departure_time</th>
 	<th>arrival_time</th>
 	<th>status</th>
+
 	<!-- <form action="/editstatus" method="POST">
 		<input type="submit" value = edit_status />
 	</form> -->
 
-{% for line in posts %}
+{% for line in posts %}		
+	<!-- airplane_id = {{line[0]}}
+	flight_num = {{line[1]}} -->
 	<tr>
-		<td>{{line[0]}}</td>
+		<!-- <td>{{line[0]}}</td>
 		<td>{{line[1]}}</td>
 		<td>{{line[2]}}</td>
 		<td>{{line[3]}}</td>
 		<td>{{line[4]}}</td>
 		<td>{{line[5]}}</td>
-		<td>{{line[6]}}</td>
-		<td><input type = "button" id = 'edit_status' value= 'edit_status'> </td>
+		<td>{{line[6]}}</td> -->			
+
+		<form action="/edit_status" method="POST">
+
+			<td>{{line[0]}}</td>
+			<td>{{line[1]}}</td>
+			<td>{{line[2]}}</td>
+			<td>{{line[3]}}</td>
+			<td>{{line[4]}}</td>
+			<td>{{line[5]}}</td>
+			<td>{{line[6]}}</td>
+
+			<td><input type="text" name = "flight_num" placeholder="flight_num" required/> </td>
+			<td><input type="text" name = "edit_status" placeholder="edit_status" required/> </td>
+			<td><input type="submit" value = edit_status></td>
+		</form>	
 	</tr>
 {% endfor %}
 </table>
