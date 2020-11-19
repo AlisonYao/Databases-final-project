@@ -7,39 +7,16 @@
 
 <body>
 {% with message = get_flashed_messages() %}
-	<!-- {% if not message %} -->
+	{% if not message %}
 		<a href="/cuslogin">CusLogin</a>
 		<a href="/cusregister">CusRegister</a>
 		<a href="/agentlogin">AgentLogin</a>
 		<a href="/agentregister">AgentRegister</a>
 		<a href="/stafflogin">StaffLogin</a>
 		<a href="/staffregister">StaffRegister</a>
-		<!-- <a href="/filghtinfo">View flights</a> -->
-		<table>
-			<th>airplane_id</th>
-			<th>flight_num</th>
-			<th>arrival_airport</th>
-			<th>departure_airport</th>
-			<th>arrival_time</th>
-			<th>departure_time</th>
-			<th>status</th>
-		
-		{% for line in posts%}
-			<tr>
-				<td>{{line[0]}}</td>
-				<td>{{line[1]}}</td>
-				<td>{{line[2]}}</td>
-				<td>{{line[3]}}</td>
-				<td>{{line[4]}}</td>
-				<td>{{line[5]}}</td>
-				<td>{{line[6]}}</td>
-			
-			</tr>
-		{% endfor %}
+	{% endif %}
 
-	<!-- {% endif %} -->
-
-	<!-- {% if message %}
+	{% if message %}
 		<a href="/logout">Logout</a>
 		<a href="/remove_account">Remove Account</a>
 		<p class="message">{{message}} You have {{num}} follower(s)</p> </br>
@@ -55,7 +32,7 @@
 	        	<p>{{line}}</p>
 	        	<hr>
 		{% endfor %}
-	{% endif %} -->
+	{% endif %}
 {% endwith %}
 </body>
 

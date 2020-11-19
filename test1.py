@@ -17,7 +17,12 @@ conn = mysql.connector.connect(host='localhost',
 #Define a route to hello function
 @app.route('/')
 def hello():
-	return render_template('testindex.html')
+	cursor = conn.cursor()
+	query = "SELECT airplane_id, flight_num, departure_airport, arrival_airport, departure_time, arrival_time, status FROM flight"
+	cursor.execute(query)
+	flightinfo = cursor.fetchall()
+	cursor.close()
+	return render_template('testindex.html', posts = flightinfo)
 
 #Define route for login
 @app.route('/cuslogin')
@@ -323,6 +328,13 @@ def staffhome():
 	cursor.close()
 	return render_template('staffhome.html', username=username, posts=data1)
 
+@app.route('/addinfo')
+def addinfo():
+	return render_template('addinfo.html')
+
+@app.route('/edit_status', methods=['GET', 'POST'])
+def edit_status():
+	return render_template('addinfo.html')
 
 @app.route('/creat_flight', methods=['GET', 'POST'])
 def creat_flight():
@@ -354,7 +366,7 @@ def creat_flight():
 	if(data):
 		#If the previous query returns data, then user exists
 		error = "This flight already exists"
-		return render_template('staffhome.html', error = error)
+		return render_template('addinfo.html', error = error)
 
 	#executes query
 	query = "SELECT username, airline_name FROM airline_staff WHERE username = \'{}\' and airline_name = \'{}\'"
@@ -370,12 +382,12 @@ def creat_flight():
 		conn.commit()
 
 		flash("New flight added")
-		return redirect(url_for('staffhome'))
+		return render_template('addinfo.html', error = error)
 	else:
 		#If the previous query returns data, then user exists
 		error = "Wrong airline"
 		cursor.close()
-		return render_template('staffhome.html', error = error)
+		return render_template('addinfo.html', error = error)
 
 @app.route('/add_airplane', methods=['GET', 'POST'])
 def add_airplane():
@@ -400,11 +412,11 @@ def add_airplane():
 	if(data):
 		#If the previous query returns data, then user exists
 		error = "This airplane already exists"
-		return render_template('staffhome.html', error = error)
+		return render_template('addinfo.html', error = error)
 
 	#executes query
-	query = "SELECT airline_name FROM airline_staff WHERE username = \'{}\' and airline_name = \'{}\'"
-	cursor.execute(query.format(airline_name))
+	query = "SELECT username, airline_name FROM airline_staff WHERE username = \'{}\' and airline_name = \'{}\'"
+	cursor.execute(query.format(username, airline_name))
 	#stores the results in a variable
 	data = cursor.fetchone()
 	#use fetchall() if you are expecting more than 1 data row
@@ -416,12 +428,45 @@ def add_airplane():
 		conn.commit()
 
 		flash("New airplane added")
-		return redirect(url_for('staffhome'))
+		return render_template('addinfo.html', error = error)
 	else:
 		#If the previous query returns data, then user exists
 		error = "Wrong airline"
 		cursor.close()
-		return render_template('staffhome.html', error = error)
+		return render_template('addinfo.html', error = error)
+
+@app.route('/add_airport', methods=['GET', 'POST'])
+def add_airport():
+	username = session['username']
+	#grabs information from the forms
+	airport_name = request.form['airport_name']
+	airport_city = request.form['airport_city']
+	# seats = request.form['seats']
+#	if not len(password) >= 4:
+#                flash("Password length must be at least 4 characters")
+ #               return redirect(request.url)
+
+	#cursor used to send queries
+	cursor = conn.cursor()
+	#executes query
+	query = "SELECT airport_name FROM airport"
+	cursor.execute(query.format(airport_name))
+	#stores the results in a variable
+	data = cursor.fetchone()
+	#use fetchall() if you are expecting more than 1 data row
+	error = None
+	if(data):
+		#If the previous query returns data, then user exists
+		error = "This airport already exists"
+		return render_template('addinfo.html', error = error)
+
+	else:
+		ins = "INSERT INTO airplane VALUES(\'{}\', \'{}\')"
+		cursor.execute(ins.format(airport_name, airport_city))
+		conn.commit()
+
+		flash("New airport added")
+		return render_template('addinfo.html', error = error)
 
 @app.route('/logout')
 def logout():
