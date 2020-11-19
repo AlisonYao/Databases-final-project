@@ -7,16 +7,41 @@
     <title>AgentLogin</title>
 </head>
 <body>
-<form action="/agentloginAuth" method="POST">
-	<input type="email" name = "email" placeholder="email" required/> </br>
-	<input type="password" name = "password" placeholder="password" required/></br>
-	<input type="submit" value = Login />
-	{% if error %}
-		<p class="error"><strong>Error:</strong> {{error}}</p>
-	{% endif %}
-</form>
+	<nav>
+        <div style="text-align: right;">
+            <a href="/">HOME</a>
+            |
+            <a href="/cusregister">REGISTER</a>
+        </div>
+	</nav>
+	<hr>
+	
+	<h1 style="text-align: center;">Login As</h1>
+	</br>
 
-<a href="/">Go back</a>
+	<div style="text-align: center;">
+		<a class="text-secondary" href="/cuslogin">Customer</a>
+		|
+		<a href="/agentlogin">Booking Agent</a>
+		|
+		<a class="text-secondary" href="/stafflogin">Airline Staff</a>
+	</div>
+	</br>
+
+	<form action="/agentloginAuth" method="POST" style="text-align: center;">
+		<input type="email" name = "email" placeholder="email" required/> </br>
+		<input type="password" name = "password" placeholder="password" required/> </br>
+		</br>
+		<button type="button" class="btn btn-secondary">Login</button>
+		{% if error %}
+			<p class="error"><strong>Error:</strong> {{error}}</p>
+		{% endif %}
+	</form>
+	</br>
+
+	<div style="text-align: center;">
+		<a href="/agentregister">Don't have an account? Register here!</a>
+	</div>
 
 </body>
 

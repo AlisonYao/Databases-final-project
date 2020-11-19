@@ -7,19 +7,44 @@
     <title>StaffRegister</title>
 </head>
 <body>
-<form action="/staffregisterAuth" method="POST">
-	<input type="text" name = "username" placeholder="username" required/> </br>
-	<input type="password" name = "password" placeholder="password" required/></br>
-	<input type="text" name = "first_name" placeholder="first_name" required/></br>
-	<input type="text" name = "last_name" placeholder="last_name" required/></br>
-	<input type="text" name = "date_of_birth" placeholder="date_of_birth" onfocus="(this.type='date')"  onblur="(this.type='text')" required/></br>
-	<input type="text" name = "airline_name" placeholder="airline_name" required/></br>
+	<nav>
+        <div style="text-align: right;">
+            <a href="/">HOME</a>
+            |
+            <a href="/agentlogin">LOGIN</a>
+        </div>
+	</nav>
+	<hr>
+	
+	<h1 style="text-align: center;">Registration As</h1>
+	</br>
 
-	<input type="submit" value = Register />
-	{% if error %}
-		<p class="error"><strong>Error:</strong> {{error}}</p>
-	{% endif %}
-</form>
-<a href="/">Go back</a>
+	<div style="text-align: center;">
+		<a class="text-secondary" href="/cusregister">Customer</a>
+		|
+		<a class="text-secondary" href="/agentregister">Booking Agent</a>
+		|
+		<a href="/staffregister">Airline Staff</a>
+	</div>
+	</br>
+
+	<form action="/staffregisterAuth" method="POST" style="text-align: center;">
+		<input type="text" name = "username" placeholder="username" required/> </br>
+		<input type="password" name = "password" placeholder="password" required/></br>
+		<input type="text" name = "first_name" placeholder="first_name" required/></br>
+		<input type="text" name = "last_name" placeholder="last_name" required/></br>
+		<input type="text" name = "date_of_birth" placeholder="date_of_birth" onfocus="(this.type='date')"  onblur="(this.type='text')" required/></br>
+		<input type="text" name = "airline_name" placeholder="airline_name" required/></br>
+		</br>
+		<button type="button" class="btn btn-secondary">Login</button>
+		{% if error %}
+			<p class="error"><strong>Error:</strong> {{error}}</p>
+		{% endif %}
+	</form>
+	</br>
+
+	<div style="text-align: center;">
+		<a href="/stafflogin">Already have an account? Login here!</a>
+	</div>
 </body>
 </html>

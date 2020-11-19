@@ -7,7 +7,28 @@
     <title>CustomerRegister</title>
 </head>
 <body>
-	<form action="/cusregisterAuth" method="POST">
+	<nav>
+        <div style="text-align: right;">
+            <a href="/">HOME</a>
+            |
+            <a href="/cuslogin">LOGIN</a>
+        </div>
+	</nav>
+	<hr>
+	
+	<h1 style="text-align: center;">Registration As</h1>
+	</br>
+
+	<div style="text-align: center;">
+		<a href="/cusregister">Customer</a>
+		|
+		<a class="text-secondary" href="/agentregister">Booking Agent</a>
+		|
+		<a class="text-secondary" href="/staffregister">Airline Staff</a>
+	</div>
+	</br>
+
+	<form action="/cusregisterAuth" method="POST" style="text-align: center;">
 		<input type="email" name = "email" placeholder="email" required/> </br>
 		<input type="text" name = "name" placeholder="name" required/> </br>
 		<input type="password" name = "password" placeholder="password" required/></br>
@@ -20,12 +41,16 @@
 		<input type="text" name = "passport_expiration" placeholder="passport_expiration" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
 		<input type="text" name = "passport_country" placeholder="passport_country" required/> </br>
 		<input type="text" name = "date_of_birth" placeholder="date_of_birth" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
-
-		<input type="submit" value = Register />
+		</br>
+		<button type="button" class="btn btn-secondary">Register</button>
 		{% if error %}
 			<p class="error"><strong>Error:</strong> {{error}}</p>
 		{% endif %}
 	</form>
-	<a href="/">Go back</a>
+	</br>
+
+	<div style="text-align: center;">
+		<a href="/cuslogin">Already have an account? Login here!</a>
+	</div>
 </body>
 </html>
