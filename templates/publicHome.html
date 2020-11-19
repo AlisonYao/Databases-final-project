@@ -45,35 +45,38 @@
             <input type="date" name = "arrival_date" placeholder="arrival_date" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
             <button type="submit" class="btn btn-primary">Search</button>
             {% if error1 %}
-            <p class="error"><strong>No Result:</strong> {{error1}}</p>
+            <p class="text-danger"><strong>No Result:</strong> {{error1}}</p>
             {% endif %}
         </form>
 
         {% if upcoming_flights %}
-        <h3>Search result:</h3>
-        <table>
-            <th>airline_name</th>
-            <th>flight_num</th>
-            <th>airplane_id</th>
-            <th>departure_airport</th>
-            <th>departure_time</th>
-            <th>arrival_airport</th>
-            <th>arrival_time</th>
-            <th>price</th>
+        </br>
+        <table class="table table-bordered">
+            <thead>
+                <th>airline_name</th>
+                <th>flight_num</th>
+                <th>airplane_id</th>
+                <th>departure_airport</th>
+                <th>departure_time</th>
+                <th>arrival_airport</th>
+                <th>arrival_time</th>
+                <th>price</th>
+            </thead>
 
-        {% for line in upcoming_flights %}
-            <tr>
-                <td>{{line[0]}}</td>
-                <td>{{line[1]}}</td>
-                <td>{{line[8]}}</td>
-                <td>{{line[2]}}</td>
-                <td>{{line[3]}}</td>
-                <td>{{line[4]}}</td>
-                <td>{{line[5]}}</td>
-                <td>{{line[6]}}</td>
-                
-            </tr>
-        {% endfor %}
+            <tbody>
+            {% for line in upcoming_flights %}
+                <tr>
+                    <td>{{line[0]}}</td>
+                    <td>{{line[1]}}</td>
+                    <td>{{line[8]}}</td>
+                    <td>{{line[2]}}</td>
+                    <td>{{line[3]}}</td>
+                    <td>{{line[4]}}</td>
+                    <td>{{line[5]}}</td>
+                    <td>{{line[6]}}</td>  
+                </tr>
+            {% endfor %}
+            </tbody>
         </table>
         {% endif %}
     </div>
@@ -90,37 +93,38 @@
             <input type="date" name = "departure_date" placeholder="departure_date" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
             <button type="submit" class="btn btn-primary">Search</button>
             {% if error2 %}
-            <p class="error"><strong>No Result:</strong> {{error2}}</p>
+            <p class="text-danger"><strong>No Result:</strong> {{error2}}</p>
             {% endif %}
         </form>
 
         {% if statuses %}
-        <h3>Search result:</h3>
-        <table>
-            <th>airline_name</th>
-            <th>flight_num</th>
-            <th>airplane_id</th>
-            <th>departure_airport</th>
-            <th>departure_time</th>
-            <th>arrival_airport</th>
-            <th>arrival_time</th>
-            <th>status</th>
+        </br>
+        <table class="table table-bordered">
+            <thead>
+                <th>airline_name</th>
+                <th>flight_num</th>
+                <th>airplane_id</th>
+                <th>departure_airport</th>
+                <th>departure_time</th>
+                <th>arrival_airport</th>
+                <th>arrival_time</th>
+                <th>status</th>
+            </thead>
             
-        
-        {% for status in statuses %}
-            <tr>
-                <td>{{status[0]}}</td>
-                <td>{{status[1]}}</td>
-                <td>{{status[8]}}</td>
-                <td>{{status[2]}}</td>
-                <td>{{status[3]}}</td>
-                <td>{{status[4]}}</td>
-                <td>{{status[5]}}</td>
-                <td>{{status[7]}}</td>
-                
-                
-            </tr>
-        {% endfor %}
+            <tbody>
+            {% for status in statuses %}
+                <tr>
+                    <td>{{status[0]}}</td>
+                    <td>{{status[1]}}</td>
+                    <td>{{status[8]}}</td>
+                    <td>{{status[2]}}</td>
+                    <td>{{status[3]}}</td>
+                    <td>{{status[4]}}</td>
+                    <td>{{status[5]}}</td>
+                    <td>{{status[7]}}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
         </table>
         {% endif %}
     </div>

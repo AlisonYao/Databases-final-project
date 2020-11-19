@@ -10,8 +10,8 @@ app = Flask(__name__)
 #Configure MySQL
 conn = mysql.connector.connect(host='localhost',
                        user='root',
-                       password='',
-                       database='air')
+                       password='86466491@Alison',
+                       database='temp')
 
 
 #Define a route to hello function
@@ -33,8 +33,9 @@ def publicSearchFlight():
             from airport as D, flight, airport as A \
             where D.airport_name = flight.departure_airport and flight.arrival_airport = A.airport_name and \
             D.airport_name = \'{}\' and A.airport_name = \'{}\' and flight.status = 'upcoming' and \
+			D.airport_city = \'{}\' and A.airport_city = \'{}\' and \
             date(flight.departure_time) = \'{}\' and date(flight.arrival_time) = \'{}\'"
-    cursor.execute(query.format(departure_airport, arrival_airport, departure_date, arrival_date))
+    cursor.execute(query.format(departure_airport, arrival_airport, departure_city, arrival_city, departure_date, arrival_date))
     data = cursor.fetchall() 
     cursor.close()
     
@@ -122,15 +123,10 @@ def cusregisterAuth():
 	passport_country = request.form['passport_country']
 	date_of_birth = request.form['date_of_birth']
 
-
-#	if not len(password) >= 4:
-#                flash("Password length must be at least 4 characters")
- #               return redirect(request.url)
-
 	#cursor used to send queries
 	cursor = conn.cursor()
 	#executes query
-	query = "SELECT email FROM customer WHERE email = \'{}\'"
+	query = "SELECT * FROM customer WHERE email = \'{}\'"
 	cursor.execute(query.format(email))
 	#stores the results in a variable
 	data = cursor.fetchone()
@@ -178,7 +174,8 @@ def agentloginAuth():
 		#creates a session for the the user
 		#session is a built in
 		session['email'] = email
-		return redirect(url_for('agenthome'))
+		# return redirect(url_for('agenthome'))
+		return render_template('agenthome.html', email=email)
 	else:
 		#returns an error message to the html page
 		error = 'Invalid login or email'
@@ -192,14 +189,10 @@ def agentregisterAuth():
 	password = request.form['password']
 	booking_agent_id = request.form['booking_agent_id']
 
-#	if not len(password) >= 4:
-#                flash("Password length must be at least 4 characters")
- #               return redirect(request.url)
-
 	#cursor used to send queries
 	cursor = conn.cursor()
 	#executes query
-	query = "SELECT email FROM booking_agent WHERE email = \'{}\'"
+	query = "SELECT * FROM booking_agent WHERE email = \'{}\'"
 	cursor.execute(query.format(email))
 	#stores the results in a variable
 	data = cursor.fetchone()
@@ -215,7 +208,7 @@ def agentregisterAuth():
 		conn.commit()
 		cursor.close()
 		flash("You are logged in")
-		return render_template('testindex.html')
+		return render_template('agenthome.html', email=email)
 
 @app.route('/stafflogin')
 def stafflogin():
@@ -520,6 +513,11 @@ def add_airport():
 @app.route('/logout')
 def logout():
 	session.pop('username')
+	return redirect('/')
+
+@app.route('/logoutEmail')
+def logoutEmail():
+	session.pop('email')
 	return redirect('/')
 
 app.secret_key = 'some key that you will never guess'

@@ -43,8 +43,9 @@
 		<input type="text" name = "date_of_birth" placeholder="date_of_birth" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
 		</br>
 		<input type="submit" value = Register />
+		</br>
 		{% if error %}
-			<p class="error"><strong>Error:</strong> {{error}}</p>
+			<p class="text-danger"><strong>Error:</strong> {{error}}</p>
 		{% endif %}
 	</form>
 	</br>
