@@ -10,8 +10,8 @@ app = Flask(__name__)
 #Configure MySQL
 conn = mysql.connector.connect(host='localhost',
                        user='root',
-                       password='86466491@Alison',
-                       database='temp')
+                       password='',
+                       database='air')
 
 
 #Define a route to hello function
