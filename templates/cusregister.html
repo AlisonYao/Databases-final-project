@@ -42,7 +42,7 @@
 		<input type="text" name = "passport_country" placeholder="passport_country" required/> </br>
 		<input type="text" name = "date_of_birth" placeholder="date_of_birth" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
 		</br>
-		<button type="button" class="btn btn-secondary">Register</button>
+		<input type="submit" value = Register />
 		{% if error %}
 			<p class="error"><strong>Error:</strong> {{error}}</p>
 		{% endif %}
@@ -50,7 +50,7 @@
 	</br>
 
 	<div style="text-align: center;">
-		<a href="/cuslogin">Already have an account? Login here!</a>
+		<a href="/cuslogin">Already have an account? Login</a>
 	</div>
 </body>
 </html>

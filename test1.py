@@ -10,8 +10,8 @@ app = Flask(__name__)
 #Configure MySQL
 conn = mysql.connector.connect(host='localhost',
                        user='root',
-                       password='86466491@Alison',
-                       database='temp')
+                       password='',
+                       database='air')
 
 
 #Define a route to hello function
@@ -264,14 +264,10 @@ def staffregisterAuth():
 	date_of_birth = request.form['date_of_birth']
 	airline_name = request.form['airline_name']
 
-#	if not len(password) >= 4:
-#                flash("Password length must be at least 4 characters")
- #               return redirect(request.url)
-
 	#cursor used to send queries
 	cursor = conn.cursor()
 	#executes query
-	query = "SELECT username FROM airline_staff WHERE username = \'{}\'"
+	query = "SELECT * FROM airline_staff WHERE username = \'{}\'"
 	cursor.execute(query.format(username))
 	#stores the results in a variable
 	data = cursor.fetchone()
@@ -282,7 +278,6 @@ def staffregisterAuth():
 		error = "This user already exists"
 		return render_template('staffregister.html', error = error)
 	
-
 	#executes query
 	query = "SELECT airline_name FROM airline WHERE airline_name = \'{}\'"
 	cursor.execute(query.format(airline_name))
@@ -295,9 +290,9 @@ def staffregisterAuth():
 		ins = "INSERT INTO airline_staff VALUES(\'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\')"
 		cursor.execute(ins.format(username, password, first_name, last_name, date_of_birth, airline_name))
 		conn.commit()
-		
+		cursor.close()
 		flash("You are logged in")
-		return render_template('staffhome.html')
+		return render_template('staffhome.html', username=username)
 	else:
 		#If the previous query returns data, then user exists
 		error = "This airline doesn't exist"

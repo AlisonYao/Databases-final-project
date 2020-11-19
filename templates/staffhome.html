@@ -7,8 +7,17 @@
     <title>StaffHome</title>
 </head>
 <body>
+	<nav>
+		<div style="text-align: right;">
+			<a href="/logout">Logout</a>
+		</div>
+	</nav>
+	<hr>
+
 	<h1>Welcome {{username}}</h1>
-	<a href="/addinfo">Add information</a>
+	</br>
+
+	<a href="/addinfo">Add New Flight</a>
 	<table>
 		<th>airplane_id</th>
 		<th>flight_num</th>
@@ -51,8 +60,6 @@
 		</tr>
 	{% endfor %}
 	</table>
-
-	<a href="/logout">Logout</a>
 
 </body>
 

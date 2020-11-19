@@ -36,9 +36,9 @@
 		<input type="text" name = "date_of_birth" placeholder="date_of_birth" onfocus="(this.type='date')"  onblur="(this.type='text')" required/></br>
 		<input type="text" name = "airline_name" placeholder="airline_name" required/></br>
 		</br>
-		<button type="button" class="btn btn-secondary">Login</button>
+		<input type="submit" value = Register />
 		{% if error %}
-			<p class="error"><strong>Error:</strong> {{error}}</p>
+			<p class="error" class="text-danger"><strong>Error:</strong> {{error}}</p>
 		{% endif %}
 	</form>
 	</br>
