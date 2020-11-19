@@ -14,8 +14,31 @@ conn = mysql.connector.connect(host='localhost',
 
 #Define a route to hello function
 @app.route('/')
-def hello():
-	return render_template('index.html')
+def publicHome():
+	return render_template('publicHome.html')
+
+@app.route('/publicSearchFlight', methods=['GET', 'POST'])
+def publicSearchFlight():
+    departure_city = request.form['departure_city']
+    departure_airport = request.form['departure_airport']
+    arrival_city = request.form['arrival_city']
+    arrival_airport = request.form['arrival_airport']
+
+    cursor = conn.cursor()
+    query = "select * \
+            from airport as D, flight, airport as A \
+            where D.airport_name = flight.departure_airport and flight.arrival_airport = A.airport_name and \
+            D.airport_name = \'{}\' and A.airport_name = \'{}\'"
+    cursor.execute(query.format(departure_airport, arrival_airport))
+    data = cursor.fetchall() 
+    cursor.close()
+    
+    error = None
+    if (data): # has data
+        return render_template('publicHome.html', upcoming_flights=data)
+    else: # does not have data
+        error = 'Sorry ... Cannot find this flight!'
+        return render_template('publicHome.html', error=error)
 
 #Define route for login
 @app.route('/login')
@@ -88,7 +111,6 @@ def registerAuth():
 
 @app.route('/home')
 def home():
-    
     username = session['username']
     cursor = conn.cursor();
     query = "SELECT ts, blog_post FROM blog WHERE username = \'{}\' ORDER BY ts DESC"
@@ -97,7 +119,6 @@ def home():
     cursor.close()
     return render_template('home.html', username=username, posts=data1)
 
-		
 @app.route('/post', methods=['GET', 'POST'])
 def post():
 	username = session['username']
