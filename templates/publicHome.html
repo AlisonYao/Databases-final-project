@@ -8,12 +8,15 @@
 </head>
 <body>
     <nav>
-        <a href="/cuslogin">CustomerLogin</a>
-		<a href="/cusregister">CustomerRegister</a>
-		<a href="/agentlogin">BookingAgentLogin</a>
-		<a href="/agentregister">BookingAgentRegister</a>
-		<a href="/stafflogin">AirlineStaffLogin</a>
-        <a href="/staffregister">AirlineStaffRegister</a>
+        <div style="text-align: left;">
+            <a href="/cuslogin">CustomerLogin</a>
+            <a href="/cusregister">CustomerRegister</a>
+            <a href="/agentlogin">BookingAgentLogin</a>
+            <a href="/agentregister">BookingAgentRegister</a>
+            <a href="/stafflogin">AirlineStaffLogin</a>
+            <a href="/staffregister">AirlineStaffRegister</a>
+        </div>
+
         <div style="text-align: right;">
             <a href="/login">LOGIN</a>
             |
@@ -22,8 +25,9 @@
     </nav>
     <hr>
 
-    <h1 style="text-align: center;">Welcome to the public page of AC Airline!</h1>
+    <h1 style="text-align: center;">Welcome to the public home of AC Airline!</h1>
 
+    </br>
     <div style="text-align: center;">
         <h2>Search for upcoming flight</h2>
         <form action="/publicSearchFlight" method="POST">
@@ -39,7 +43,7 @@
             <input type="text" name = "arrival_airport" placeholder="arrival_airport" required/></br>
             <label>Arrival Date:</label>
             <input type="date" name = "arrival_date" placeholder="arrival_date" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
-            <input type="submit" value = Search />
+            <button type="submit" class="btn btn-primary">Search</button>
             {% if error1 %}
             <p class="error"><strong>No Result:</strong> {{error1}}</p>
             {% endif %}
@@ -84,7 +88,7 @@
             <input type="date" name = "arrival_date" placeholder="arrival_date" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
             <label>Departure Date:</label>
             <input type="date" name = "departure_date" placeholder="departure_date" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
-            <input type="submit" value = Search />
+            <button type="submit" class="btn btn-primary">Search</button>
             {% if error2 %}
             <p class="error"><strong>No Result:</strong> {{error2}}</p>
             {% endif %}

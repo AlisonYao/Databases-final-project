@@ -68,7 +68,6 @@ def publicSearchStatus():
         error = 'Sorry ... Cannot find this flight!'
         return render_template('publicHome.html', error2=error)
 
-
 #Define route for login
 @app.route('/cuslogin')
 def cuslogin():
