@@ -10,8 +10,8 @@ app = Flask(__name__)
 #Configure MySQL
 conn = mysql.connector.connect(host='localhost',
                        user='root',
-                       password='root',
-                       database='air')
+                       password='86466491@Alison',
+                       database='temp')
 
 
 #Define a route to hello function
@@ -25,13 +25,16 @@ def publicSearchFlight():
     departure_airport = request.form['departure_airport']
     arrival_city = request.form['arrival_city']
     arrival_airport = request.form['arrival_airport']
+    departure_date = request.form['departure_date']
+    arrival_date = request.form['arrival_date']
 
     cursor = conn.cursor()
     query = "select * \
             from airport as D, flight, airport as A \
             where D.airport_name = flight.departure_airport and flight.arrival_airport = A.airport_name and \
-            D.airport_name = \'{}\' and A.airport_name = \'{}\'"
-    cursor.execute(query.format(departure_airport, arrival_airport))
+            D.airport_name = \'{}\' and A.airport_name = \'{}\' and flight.status = 'upcoming' and \
+            date(flight.departure_time) = \'{}\' and date(flight.arrival_time) = \'{}\'"
+    cursor.execute(query.format(departure_airport, arrival_airport, departure_date, arrival_date))
     data = cursor.fetchall() 
     cursor.close()
     
@@ -64,6 +67,7 @@ def publicSearchStatus():
     else: # does not have data
         error = 'Sorry ... Cannot find this flight!'
         return render_template('publicHome.html', error2=error)
+
 
 #Define route for login
 @app.route('/cuslogin')
