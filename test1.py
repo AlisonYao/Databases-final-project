@@ -40,7 +40,30 @@ def publicSearchFlight():
         return render_template('publicHome.html', upcoming_flights=data)
     else: # does not have data
         error = 'Sorry ... Cannot find this flight!'
-        return render_template('publicHome.html', error=error)
+        return render_template('publicHome.html', error1=error)
+
+@app.route('/publicSearchStatus', methods=['GET', 'POST'])
+def publicSearchStatus():
+    flight_num = request.form['flight_num']
+    arrival_date = request.form['arrival_date']
+    departure_date = request.form['departure_date']
+
+    cursor = conn.cursor()
+    query = "select * \
+            from flight \
+            where flight_num = \'{}\' \
+                and date(departure_time) = \'{}\' \
+                and date(arrival_time) = \'{}\'"
+    cursor.execute(query.format(flight_num, arrival_date, departure_date))
+    data = cursor.fetchall() 
+    cursor.close()
+    
+    error = None
+    if (data): # has data
+        return render_template('publicHome.html', statuses=data)
+    else: # does not have data
+        error = 'Sorry ... Cannot find this flight!'
+        return render_template('publicHome.html', error2=error)
 
 # @app.route('/publicSearchStatus', methods=['GET', 'POST'])
 # def publicSearchFlight():
