@@ -429,16 +429,45 @@ def agentCommission():
 	return render_template('agentCommission.html', email=email, total_com=total_com, avg_com=avg_com, count_ticket=count_ticket, duration=duration)
 
 # TODO: anyway to avoid JS cuz I do not know how to pass variables
-# TODO: how to draw a bar chart???
-# TODO-Alison: why the fudge can't I separate JS and HTML?????? see agentTopCustomers
 @app.route('/agentTopCustomers')
 def agentTopCustomers():
-	# data = {'emails': ['Alison1234', 'alison', 'clark', '123', '321'], 'num': [5, 1, 1, 0, 0]}
-	data = {'emails': 'haha', 'num': '3'}
 	email = session['email']
-	return render_template('agentTopCustomers.html', data=data, email=email)
-	# email = session['email'] 
-	# return render_template('agentTopCustomers.html', email=email)
+	cursor = conn.cursor()
+	query = "select customer_email, count(ticket_id) from agent_commission where email = \'{}\' group by customer_email order by count(ticket_id) desc"
+	cursor.execute(query.format(email))
+	ticket_data = cursor.fetchall() # [('alison@gmail.com', 5), ('Alison1234@gmail.com', 2), ('clark@gmail.com', 1)]
+	cursor.close()
+
+	l = len(ticket_data)
+	if l >= 5:
+		ppl1 = [ticket_data[i][0] for i in range(5)]
+		tickets = [ticket_data[i][1] for i in range(5)]
+	else:
+		ppl1 = [ticket_data[i][0] for i in range(l)]
+		tickets = [ticket_data[i][1] for i in range(l)]
+		for i in range(5 - l):
+			ppl1.append(' ')
+			tickets.append(0)
+	
+	cursor = conn.cursor()
+	query2 = "select customer_email, sum(ticket_price) from agent_commission where email = \'{}\' group by customer_email order by sum(ticket_price) desc"
+	cursor.execute(query2.format(email))
+	commission_data = cursor.fetchall()
+	cursor.close()
+
+	l2 = len(commission_data)
+	if l2 >= 5:
+		ppl2 = [commission_data[i][0] for i in range(5)]
+		commissions = [commission_data[i][1] for i in range(5)]
+	else:
+		ppl2 = [commission_data[i][0] for i in range(l2)]
+		commissions = [int(commission_data[i][1]) for i in range(l2)]
+		for i in range(5 - l):
+			ppl2.append(' ')
+			commissions.append(0)
+
+	print(commissions)
+	return render_template('agentTopCustomers.html', email=email, ppl1=ppl1, ppl2=ppl2, tickets=tickets, commissions=commissions)
 
 @app.route('/agentSearchFlight', methods=['GET', 'POST'])
 def agentSearchFlight():
