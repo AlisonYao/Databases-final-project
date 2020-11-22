@@ -10,9 +10,21 @@ insert into flight values ('China Eastern', '11111', 'JFK', '2020-04-13 11:32:23
 insert into flight values ('China Eastern', '22222', 'PVG', '2020-11-09 10:21:56', 'JFK', '2020-04-14 02:25:31', '3400', 'delayed', '20202');
 insert into ticket values ('12345', 'China Eastern', '11111');
 insert into ticket values ('74373', 'China Eastern', '11111');
+insert into ticket values ('20000', 'China Eastern', '11111');
+insert into ticket values ('30000', 'China Eastern', '11111');
 insert into ticket values ('63627', 'China Eastern', '22222');
 insert into ticket values ('02758', 'China Eastern', '22222');
 insert into ticket values ('10000', 'China Eastern', '22222');
+insert into ticket values ('40000', 'China Eastern', '22222');
 insert into booking_agent values ('Dani@gmail.com', 'Jamie123', '98765');
 insert into purchases values ('12345', 'alison@gmail.com', '98765', '2020-01-01 12:34:21');
 insert into purchases values ('63627', 'clark@gmail.com', null, '2020-01-01 11:45:23');
+
+insert into ticket values ('12545', 'China Eastern', '11111');
+insert into ticket values ('74371', 'China Eastern', '11111');
+insert into ticket values ('20300', 'China Eastern', '11111');
+insert into ticket values ('30005', 'China Eastern', '11111');
+insert into ticket values ('62627', 'China Eastern', '22222');
+insert into ticket values ('12758', 'China Eastern', '22222');
+insert into ticket values ('12000', 'China Eastern', '22222');
+insert into ticket values ('40080', 'China Eastern', '22222');

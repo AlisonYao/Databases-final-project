@@ -1,6 +1,10 @@
-# TODO: check SQL after everything is finished. View & Grant
-# TODO: Cross check each other's work
-# TODO: ...
+# NOTE-Cheryl: I have created new views, plz refer to DB_for_testing/create_view
+# TODO-both: check SQL after everything is finished. View & Grant
+# TODO-both: Cross check each other's work
+# BUG-Cheryl: datediff(CURDATE(), DATE(purchase_date)) should have CURDATE() as first arg, or your datediff is a negative number and is always < 30
+# TODO-Cheryl: Plz refer to agent page for inspiration lol
+# BUG-Cheryl: most of cus does not work lol
+# TODO-Alison: Resize all tables so that they fit in the screen
 
 #Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect, flash
@@ -24,7 +28,7 @@ conn = mysql.connector.connect(host='localhost',
 def publicHome():
 	return render_template('publicHome.html')
 
-# TODO: why is the freaking view not working????????? space & tab problems??????????
+# TODO-Alison: why is the freaking view not working????? space & tab problems?????
 @app.route('/publicSearchFlight', methods=['GET', 'POST'])
 def publicSearchFlight():
     departure_city = request.form['departure_city']
@@ -405,27 +409,49 @@ def agentSearchPurchase():
 	email = session['email'] 
 	return render_template('agentSearchPurchase.html', email=email)
 
-@app.route('/agentCommision')
-def agentCommision():
-	email = session['email'] 
-	return render_template('agentCommision.html', email=email)
+@app.route('/agentCommission', methods=['POST', 'GET'])
+def agentCommission():
+	email = session['email']
+	cursor = conn.cursor()
+	duration = request.form.get("duration")
+	if duration is None:
+		duration = "30"
+
+	query = 'select sum(ticket_price * 0.1), avg(ticket_price * 0.1), count(ticket_price * 0.1) from agent_commission where email = \'{}\' and (purchase_date between DATE_ADD(NOW(), INTERVAL -\'{}\' DAY) and NOW())'
+	cursor.execute(query.format(email, duration))
+	commission_data = cursor.fetchone()
+	total_com, avg_com, count_ticket = commission_data
+	cursor.close()
+	return render_template('agentCommission.html', email=email, total_com=total_com, avg_com=avg_com, count_ticket=count_ticket, duration=duration)
 
 @app.route('/agentTopCustomers')
 def agentTopCustomers():
 	email = session['email'] 
 	return render_template('agentTopCustomers.html', email=email)
 
-# TODO: how to check email for autorization?????????
 @app.route('/agentSearchFlight', methods=['GET', 'POST'])
 def agentSearchFlight():
+	email = session['email']
 	departure_city = request.form['departure_city']
 	departure_airport = request.form['departure_airport']
 	arrival_city = request.form['arrival_city']
 	arrival_airport = request.form['arrival_airport']
 	departure_date = request.form['departure_date']
 	arrival_date = request.form['arrival_date']
-	email = session['email']
 
+	# validate booking agent email
+	cursor = conn.cursor()
+	query = " select booking_agent_id from booking_agent where email = \'{}\'"
+	cursor.execute(query.format(email))
+	agent_data = cursor.fetchone() # tuple (98765,)
+	booking_agent_id = agent_data[0]
+	cursor.close()
+
+	if not (agent_data):
+		agent_id_error = 'You are not a booking agent'
+		return render_template('agentSearchPurchase.html', error1=agent_id_error)
+
+	# booking agent email validated
 	cursor = conn.cursor()
 	query = "SELECT airplane_id, flight_num, D.airport_city, departure_airport, A.airport_city, arrival_airport, departure_time, arrival_time, status, price \
 				FROM airport as D, flight, airport AS A \
@@ -440,19 +466,29 @@ def agentSearchFlight():
 	cursor.execute(query.format(departure_city, departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date, arrival_date))
 	data = cursor.fetchall()
 	
-	error = None
 	if (data): # has data
 		return render_template('agentSearchPurchase.html', email=email, upcoming_flights=data)
 	else: # does not have data
 		error = 'Sorry ... Cannot find this flight!'
 		return render_template('agentSearchPurchase.html', email=email, error1=error)
 
-# TODO: how to check email for autorization?????????
 @app.route('/agentBuyTickets', methods=['GET', 'POST'])
 def agentBuyTickets():
 	email = session['email']
-	flight_num = request.form['flight_num']
-	customer_email = request.form['customer_email'] # needs validation
+	flight_num = request.form.get("flight_num")
+	customer_email = request.form['customer_email']
+
+	# validate booking agent email
+	cursor = conn.cursor()
+	query = " select booking_agent_id from booking_agent where email = \'{}\'"
+	cursor.execute(query.format(email))
+	agent_data = cursor.fetchone() # tuple (98765,)
+	booking_agent_id = agent_data[0]
+	cursor.close()
+
+	if not (agent_data):
+		agent_id_error = 'You are not a booking agent'
+		return render_template('agentSearchPurchase.html', error2=agent_id_error)
 
 	# validate customer_email is registered
 	cursor = conn.cursor()
@@ -482,14 +518,15 @@ def agentBuyTickets():
 		return render_template('agentSearchPurchase.html', error2=ticket_error, email=email)
 	else:
 		cursor = conn.cursor()
-		ticket = int(ticket_data[0][0])
-		ins = "INSERT INTO purchases VALUES (\'{}\', \'{}\', NULL, CURDATE())"
-		cursor.execute(ins.format(ticket, email))
-		# cursor.execute(query.format(email))
+		ticket_id = int(ticket_data[0][0])
+		ins = "INSERT INTO purchases VALUES (\'{}\', \'{}\', \'{}\', CURDATE())"
+		cursor.execute(ins.format(ticket_id, customer_email, booking_agent_id))
 		conn.commit()
 		cursor.close()
-		
-		return redirect(url_for('agentSearchPurchase'))
+		message = 'Ticket bought successfully!'
+		return render_template('agentSearchPurchase.html', message=message, email=email)
+
+@app.route('/agentBuyTickets', methods=['GET', 'POST'])
 
 
 
@@ -824,7 +861,7 @@ def staffagent():
 	data = cursor.fetchall()
 	cursor.close()
 	# return render_template('staffhome.html', username=username, posts=data1)
-	return render_template('staffagent.html', commision = data1, month = data2, year = data3, posts = data)
+	return render_template('staffagent.html', commission = data1, month = data2, year = data3, posts = data)
 
 # @app.route('/edit_status', methods=['GET', 'POST'])
 # def edit_status():

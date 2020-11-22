@@ -22,7 +22,7 @@
 		<h1>Welcome {{email}}</h1>
 		<a href="/agentHome">My Flights</a>
 		<a href="/agentSearchPurchase" style="color: #2db2ff;">Search & Purchase Tickets</a>
-		<a href="/agentCommision">My Commision</a>
+		<a href="/agentCommission">My Commission</a>
 		<a href="/agentTopCustomers">Top Customers</a>
 	</div>
 	
@@ -90,15 +90,16 @@
 
 			<h3>Purchase Tickets</h3>
 			<form action="/agentBuyTickets" method="POST">
-				<label>Flight Number:</label>
-				<select name = "flight_num">
+				<label for="flight_num">Flight Number:</label>
+				<select name="flight_num" required>
 					<option value="" disabled>--please search first--</option>
 					{% if upcoming_flights%}
 					{% for line in upcoming_flights %}
-					<option value="">{{line[1]}}</option>
+					<option value="{{line[1]}}">{{line[1]}}</option>
 					{% endfor %}
 					{% endif %}
 				</select>
+
 				<label>Customer Email: </label>
 				<input type="text" name = "customer_email" placeholder="customer_email" required/>
 				<button type="submit" class="btn btn-primary">Buy</button>
@@ -106,6 +107,12 @@
 				<p class="text-danger"><strong>Sorry!</strong> {{error2}}</p>
 				{% endif %}
 			  </form>
+
+			  {% if message %}
+			  <p class="text-success">{{message}}</p>
+			  {% endif %}
+
+
 		</div>
 		
 		

@@ -10,3 +10,7 @@ create view public_search_flight as
 select flight_num, airline_name, airplane_id, D.airport_city as departure_city, departure_airport, departure_time, A.airport_city as arrival_city, arrival_airport, arrival_time, price, status
 from airport as D, flight, airport AS A
 where D.airport_name = departure_airport and A.airport_name = arrival_airport;
+
+create view agent_commission as 
+select email, purchases.ticket_id, customer_email, purchase_date, price as ticket_price
+from booking_agent natural join purchases natural join ticket natural join flight;

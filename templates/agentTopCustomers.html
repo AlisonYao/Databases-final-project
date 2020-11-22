@@ -22,14 +22,20 @@
 		<h1>Welcome {{email}}</h1>
 		<a href="/agentHome">My Flights</a>
 		<a href="/agentSearchPurchase">Search & Purchase Tickets</a>
-		<a href="/agentCommision">My Commision</a>
+		<a href="/agentCommission">My Commission</a>
 		<a href="/agentTopCustomers" style="color: #2db2ff;">Top Customers</a>
 	</div>
 	
 	<!-- Page content -->
 	<div class="main">
-		<h2>My Top Customers</h2>
+        <h2>My Top Customers</h2>
+        <div class="col-md-6">
+            <h6>is this showing?</h6>
+            <canvas id="myChart"></canvas>
+          </div>
 	</div>
 
+    <!-- <script src='../static/agentTopCustomer.js'></script> -->
+    <script src="{{ url_for('static', filename='agentTopCustomer.js') }}"></script>
 </body>
 </html>
