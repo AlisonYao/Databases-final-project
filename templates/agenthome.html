@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-	<link rel="stylesheet" href="../style/agenthome.css">
+	<link rel="stylesheet" href="../static/home.css">
 	<title>AgentHome</title>
 </head>
 <body>
@@ -20,15 +20,59 @@
 	<!-- Side navigation -->
 	<div class="sidenav">
 		<h1>Welcome {{email}}</h1>
-		<a href="#">View My Flights</a>
-		<a href="#">Search & Purchase Tickets</a>
-		<a href="#">View My Commision</a>
-		<a href="#">View Top Customers</a>
+		<a href="/agentHome" style="color: white;">My Flights</a>
+		<a href="/agentSearchPurchase">Search & Purchase Tickets</a>
+		<a href="#">My Commision</a>
+		<a href="#">Top Customers</a>
 	</div>
 	
 	<!-- Page content -->
 	<div class="main">
-		<h2>content here</h2>
+		<h2>View My Flights</h2>
+		
+		{% if view_my_flights %}
+        </br>
+        <table class="table table-bordered">
+            <thead>
+                <th>booking_agent_id</th>
+                <th>customer_email</th>
+                <th>purchase_date</th>
+                <th>ticket_id</th>
+                <th>airline_name</th>
+                <th>flight_num</th>
+                <th>departure_airport</th>
+				<th>departure_time</th>
+				<th>arrival_airport</th>
+				<th>arrival_time</th>
+				<th>price</th>
+				<th>status</th>
+            </thead>
+
+            <tbody>
+            {% for line in view_my_flights %}
+                <tr>
+                    <td>{{line[1]}}</td>
+                    <td>{{line[2]}}</td>
+                    <td>{{line[3]}}</td>
+                    <td>{{line[4]}}</td>
+                    <td>{{line[5]}}</td>
+					<td>{{line[6]}}</td>  
+					<td>{{line[7]}}</td>
+					<td>{{line[8]}}</td>
+					<td>{{line[9]}}</td>
+					<td>{{line[10]}}</td>
+					<td>{{line[11]}}</td>
+					<td>{{line[12]}}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+		</table>
+		
+		{% else %}
+		<h5>No Upcoming Flights</h5>
+
+        {% endif %}
+
 	</div>
 
 </body>
