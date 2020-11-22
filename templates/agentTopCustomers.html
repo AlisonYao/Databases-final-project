@@ -27,15 +27,52 @@
 	</div>
 	
 	<!-- Page content -->
-	<div class="main">
-        <h2>My Top Customers</h2>
-        <div class="col-md-6">
-            <h6>is this showing?</h6>
-            <canvas id="myChart"></canvas>
-          </div>
+	<div class="main" style="text-align: center;">
+		<h2>Top 5 Customers</h2>
+		<h2>not finished</h2>
+
+		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+		<div id="top_x_div" style="width: 400px; height: 300px;"></div>
+		
 	</div>
 
-    <!-- <script src='../static/agentTopCustomer.js'></script> -->
-    <script src="{{ url_for('static', filename='agentTopCustomer.js') }}"></script>
+	
+	<!-- using google charts -->
+	<script>
+		google.charts.load('current', {'packages':['bar']});
+		google.charts.setOnLoadCallback(drawBarChart1);
+
+		function drawBarChart1() {
+			var data = new google.visualization.arrayToDataTable([
+			['Tickets', '#tickets'],
+			["alison", 5],
+			["alison1234", 1],
+			["Clark", 1],
+			["123", 0],
+			['321', 0]
+			]);
+
+			var options = {
+			width: 400,
+			legend: { position: 'none' },
+			chart: {
+				title: 'Top 5 Customers',
+				subtitle: 'based on #tickets in the past 6 months' },
+			axes: {
+				x: {
+				0: { side: 'bottom', label: '#tickets in the past 6 months'}
+				}
+			},
+			bar: { groupWidth: "50%" }
+			};
+
+			var chart = new google.charts.Bar(document.getElementById('top_x_div'));
+			// Convert the Classic options to Material options.
+			chart.draw(data, google.charts.Bar.convertOptions(options));
+		};
+	</script>
+
+    <!-- <script src='../static/agentTopCustomer.js'></script>
+	<script src="{{ url_for('static', filename='agentTopCustomer.js') }}"></script> -->
 </body>
 </html>

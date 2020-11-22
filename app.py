@@ -1,4 +1,8 @@
+# NOTE: temp.py is just for debuging and testing py file. Just personal habit. The file is not important. 
 # NOTE-Cheryl: I have created new views, plz refer to DB_for_testing/create_view
+# also commission is spelled with 2 s's (Ive fixed it)
+# purchase not perchase (Ive fixed it)
+# there is a typo somewhere that says creat instead of create (I fixed the ones I have found)
 # TODO-both: check SQL after everything is finished. View & Grant
 # TODO-both: Cross check each other's work
 # BUG-Cheryl: datediff(CURDATE(), DATE(purchase_date)) should have CURDATE() as first arg, or your datediff is a negative number and is always < 30
@@ -424,10 +428,17 @@ def agentCommission():
 	cursor.close()
 	return render_template('agentCommission.html', email=email, total_com=total_com, avg_com=avg_com, count_ticket=count_ticket, duration=duration)
 
+# TODO: anyway to avoid JS cuz I do not know how to pass variables
+# TODO: how to draw a bar chart???
+# TODO-Alison: why the fudge can't I separate JS and HTML?????? see agentTopCustomers
 @app.route('/agentTopCustomers')
 def agentTopCustomers():
-	email = session['email'] 
-	return render_template('agentTopCustomers.html', email=email)
+	# data = {'emails': ['Alison1234', 'alison', 'clark', '123', '321'], 'num': [5, 1, 1, 0, 0]}
+	data = {'emails': 'haha', 'num': '3'}
+	email = session['email']
+	return render_template('agentTopCustomers.html', data=data, email=email)
+	# email = session['email'] 
+	# return render_template('agentTopCustomers.html', email=email)
 
 @app.route('/agentSearchFlight', methods=['GET', 'POST'])
 def agentSearchFlight():
