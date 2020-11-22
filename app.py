@@ -399,8 +399,7 @@ def agentregisterAuth():
 
 @app.route('/agentHome')
 def agentHome():
-	email = session['email'] 
-	# get view_my_flights info from db
+	email = session['email']
 	cursor = conn.cursor()
 	query = "SELECT * FROM agent_viewmyflight WHERE email = \'{}\'"
 	cursor.execute(query.format(email))
@@ -428,7 +427,6 @@ def agentCommission():
 	cursor.close()
 	return render_template('agentCommission.html', email=email, total_com=total_com, avg_com=avg_com, count_ticket=count_ticket, duration=duration)
 
-# TODO: anyway to avoid JS cuz I do not know how to pass variables
 @app.route('/agentTopCustomers')
 def agentTopCustomers():
 	email = session['email']

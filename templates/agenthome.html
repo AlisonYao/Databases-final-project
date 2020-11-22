@@ -29,21 +29,21 @@
 	<!-- Page content -->
 	<div class="main">
 		<h2>My Upcoming Flights</h2>
+	</br>
+		<h5>My booking_agent_id: {{view_my_flights[0][1]}}</h5>
 		
 		{% if view_my_flights %}
-        </br>
         <table class="table table-bordered">
             <thead>
-                <th>booking_agent_id</th>
-                <th>customer_email</th>
-                <th>purchase_date</th>
-                <th>ticket_id</th>
-                <th>airline_name</th>
-                <th>flight_num</th>
-                <th>departure_airport</th>
-				<th>departure_time</th>
-				<th>arrival_airport</th>
-				<th>arrival_time</th>
+				<th>ticket id</th>
+				<th>customer email</th>
+				<th>purchase date</th>
+                <th>airline name</th>
+                <th>flight num</th>
+                <th>departure airport</th>
+				<th>departure time</th>
+				<th>arrival airport</th>
+				<th>arrival time</th>
 				<th>price</th>
 				<th>status</th>
             </thead>
@@ -51,10 +51,11 @@
             <tbody>
             {% for line in view_my_flights %}
                 <tr>
-                    <td>{{line[1]}}</td>
-                    <td>{{line[2]}}</td>
-                    <td>{{line[3]}}</td>
-                    <td>{{line[4]}}</td>
+					<td>{{line[4]}}</td>
+					<td>{{line[2]}}</td>
+					<td>{{line[3]}}</td>
+					
+                    
                     <td>{{line[5]}}</td>
 					<td>{{line[6]}}</td>  
 					<td>{{line[7]}}</td>
