@@ -1,4 +1,6 @@
-#!C:/Users/lx615/AppData/Local/Programs/Python/Python38-32/python
+# TODO: check SQL after everything is finished. View & Grant
+# TODO: Cross check each other's work
+# TODO: ...
 
 #Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect, flash
@@ -22,6 +24,7 @@ conn = mysql.connector.connect(host='localhost',
 def publicHome():
 	return render_template('publicHome.html')
 
+# TODO: why is the freaking view not working????????? space & tab problems??????????
 @app.route('/publicSearchFlight', methods=['GET', 'POST'])
 def publicSearchFlight():
     departure_city = request.form['departure_city']
@@ -32,6 +35,15 @@ def publicSearchFlight():
     arrival_date = request.form['arrival_date']
 
     cursor = conn.cursor()
+	# query = "select * \
+	# 		from public_search_flight \
+    #         where departure_airport = if (\'{}\' = '', departure_airport, \'{}\') and \
+	# 			arrival_airport = if (\'{}\' = '', arrival_airport, \'{}\') and \
+	# 			status = 'upcoming' and \
+	# 			departure_city = if (\'{}\' = '', departure_city, \'{}\') and \
+	# 			arrival_city = if (\'{}\' = '', arrival_city, \'{}\') and \
+    #         	date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\') and \
+	# 			date(arrival_time) = if (\'{}\' = '', date(arrival_time), \'{}\')"
     query = "select * \
             from airport as D, flight, airport as A \
             where D.airport_name = flight.departure_airport and flight.arrival_airport = A.airport_name and \
@@ -308,12 +320,10 @@ def cus_buy_ticket():
 def agentlogin():
 	return render_template('agentlogin.html')
 
-#Define route for register
 @app.route('/agentregister')
 def agentregister():
 	return render_template('agentregister.html')
 
-#Authenticates the login
 @app.route('/agentloginAuth', methods=['GET', 'POST'])
 def agentloginAuth():
 	#grabs information from the forms
@@ -334,19 +344,18 @@ def agentloginAuth():
 		email = request.form['email']
 		# get view_my_flights info from db
 		cursor = conn.cursor()
-		query = "SELECT * FROM agent_viewMyFlight WHERE email = \'{}\'"
+		query = "SELECT * FROM agent_viewmyflight WHERE email = \'{}\'"
 		cursor.execute(query.format(email))
 		data2 = cursor.fetchall()
 		cursor.close()
 		session['email'] = email
-		return redirect(url_for('agentHome', email=email))
-		# return render_template('agenthome.html', email=email, view_my_flights=data2)
+		# return redirect(url_for('agentHome', email=email, view_my_flights=data2))
+		return render_template('agenthome.html', email=email, view_my_flights=data2)
 	else:
 		#returns an error message to the html page
 		error = 'Invalid login or email'
 		return render_template('agentlogin.html', error=error)
 
-#Authenticates the register
 @app.route('/agentregisterAuth', methods=['GET', 'POST'])
 def agentregisterAuth():
 	#grabs information from the forms
@@ -376,18 +385,112 @@ def agentregisterAuth():
 		cursor.execute(query.format(email))
 		data2 = cursor.fetchall()
 		cursor.close()
+		session['email'] = email
 		flash("You are logged in")
 		return render_template('agenthome.html', email=email, view_my_flights=data2)
 
 @app.route('/agentHome')
 def agentHome():
-	# session['email'] = email
-	# return redirect(url_for('agentHome'))
-	return render_template('agenthome.html')
+	email = session['email'] 
+	# get view_my_flights info from db
+	cursor = conn.cursor()
+	query = "SELECT * FROM agent_viewmyflight WHERE email = \'{}\'"
+	cursor.execute(query.format(email))
+	data2 = cursor.fetchall()
+	cursor.close()
+	return render_template('agenthome.html', email=email, view_my_flights=data2)
 
 @app.route('/agentSearchPurchase')
 def agentSearchPurchase():
-	return render_template('agentSearchPurchase.html')
+	email = session['email'] 
+	return render_template('agentSearchPurchase.html', email=email)
+
+@app.route('/agentCommision')
+def agentCommision():
+	email = session['email'] 
+	return render_template('agentCommision.html', email=email)
+
+@app.route('/agentTopCustomers')
+def agentTopCustomers():
+	email = session['email'] 
+	return render_template('agentTopCustomers.html', email=email)
+
+# TODO: how to check email for autorization?????????
+@app.route('/agentSearchFlight', methods=['GET', 'POST'])
+def agentSearchFlight():
+	departure_city = request.form['departure_city']
+	departure_airport = request.form['departure_airport']
+	arrival_city = request.form['arrival_city']
+	arrival_airport = request.form['arrival_airport']
+	departure_date = request.form['departure_date']
+	arrival_date = request.form['arrival_date']
+	email = session['email']
+
+	cursor = conn.cursor()
+	query = "SELECT airplane_id, flight_num, D.airport_city, departure_airport, A.airport_city, arrival_airport, departure_time, arrival_time, status, price \
+				FROM airport as D, flight, airport AS A \
+				WHERE D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\') and \
+				D.airport_name = departure_airport and \
+				departure_airport = if (\'{}\' = '', departure_airport, \'{}\') and \
+				A.airport_city = if (\'{}\' = '', A.airport_city, \'{}\')and \
+				A.airport_name = arrival_airport and \
+				arrival_airport =  if (\'{}\' = '', arrival_airport, \'{}\')and \
+				date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\')and \
+				date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\')"
+	cursor.execute(query.format(departure_city, departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date, arrival_date))
+	data = cursor.fetchall()
+	
+	error = None
+	if (data): # has data
+		return render_template('agentSearchPurchase.html', email=email, upcoming_flights=data)
+	else: # does not have data
+		error = 'Sorry ... Cannot find this flight!'
+		return render_template('agentSearchPurchase.html', email=email, error1=error)
+
+# TODO: how to check email for autorization?????????
+@app.route('/agentBuyTickets', methods=['GET', 'POST'])
+def agentBuyTickets():
+	email = session['email']
+	flight_num = request.form['flight_num']
+	customer_email = request.form['customer_email'] # needs validation
+
+	# validate customer_email is registered
+	cursor = conn.cursor()
+	query = " select * from customer where email = \'{}\'"
+	cursor.execute(query.format(customer_email))
+	cus_data = cursor.fetchone()
+	cursor.close()
+
+	if not (cus_data):
+		email_error = 'Your customer is not registered.'
+		return render_template('agentSearchPurchase.html', error2=email_error)
+
+	# customer_email is validated	
+	cursor = conn.cursor()
+	query = "SELECT ticket_id \
+			FROM flight NATURAL JOIN ticket\
+			WHERE flight_num = \'{}\' \
+			AND ticket_id NOT IN (SELECT ticket_id \
+									FROM flight NATURAL JOIN ticket NATURAL JOIN purchases)\
+			AND flight_num = \'{}\'"
+	cursor.execute(query.format(flight_num, flight_num))
+	ticket_data = cursor.fetchall()
+	cursor.close()
+
+	if not (ticket_data):
+		ticket_error = 'No ticket left'
+		return render_template('agentSearchPurchase.html', error2=ticket_error, email=email)
+	else:
+		cursor = conn.cursor()
+		ticket = int(ticket_data[0][0])
+		ins = "INSERT INTO purchases VALUES (\'{}\', \'{}\', NULL, CURDATE())"
+		cursor.execute(ins.format(ticket, email))
+		# cursor.execute(query.format(email))
+		conn.commit()
+		cursor.close()
+		
+		return redirect(url_for('agentSearchPurchase'))
+
 
 
 #####################################################################
@@ -560,8 +663,8 @@ def edit_status():
 	cursor.close()
 	return redirect(url_for('staffhome'))
 
-@app.route('/creat_flight', methods=['GET', 'POST'])
-def creat_flight():
+@app.route('/create_flight', methods=['GET', 'POST'])
+def create_flight():
 	username = session['username']
 	#grabs information from the forms
 	airline_name = request.form['airline_name']

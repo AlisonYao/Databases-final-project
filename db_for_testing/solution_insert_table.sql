@@ -12,6 +12,7 @@ insert into ticket values ('12345', 'China Eastern', '11111');
 insert into ticket values ('74373', 'China Eastern', '11111');
 insert into ticket values ('63627', 'China Eastern', '22222');
 insert into ticket values ('02758', 'China Eastern', '22222');
+insert into ticket values ('10000', 'China Eastern', '22222');
 insert into booking_agent values ('Dani@gmail.com', 'Jamie123', '98765');
 insert into purchases values ('12345', 'alison@gmail.com', '98765', '2020-01-01 12:34:21');
 insert into purchases values ('63627', 'clark@gmail.com', null, '2020-01-01 11:45:23');

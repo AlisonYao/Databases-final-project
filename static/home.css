@@ -1,3 +1,11 @@
+/* css files have to be put in static directory */
+
+/* required input */
+.required:after {
+  content: " *";
+  color: red;
+}
+
 /* The sidebar menu */
 .sidenav {
   height: 100%; /* Full-height: remove this if you want "auto" height */
@@ -30,7 +38,7 @@
 
 /* When you mouse over the navigation links, change their color */
 .sidenav a:hover {
-  color: #2db2ff;
+  color: white;
   /* margin-left: 10px;
   transition: 0.3s; */
 }

@@ -13,6 +13,9 @@ STEP 1: Design RE diagram.
 ## Part2 (Nov.8)
 
 STEP 2: Design relational diagram.
+
 STEP 3: Create database & insert dummy data according to the relational diagram.
 
 ## Part3 **By Alison Yuhan Yao & Xue Bai**
+
+Check out flask/Flask_for_class. It is very useful.
