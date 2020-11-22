@@ -4,20 +4,119 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-    <title>StaffHome</title>
+	<link rel="stylesheet" href="../style/staffhome.css">
+	<title>StaffHome</title>
 </head>
 <body>
-	<nav>
-		<div style="text-align: right;">
-			<a href="/logout">Logout</a>
-		</div>
-	</nav>
+	<div class='top-nav'>
+		<nav>
+			<div style="text-align: right;">
+				<a href="/logout">Logout</a>
+			</div>
+		</nav>
+	</div>
 	<hr>
 
-	<h1>Welcome {{username}}</h1>
-	</br>
+	<!-- Side navigation -->
+	<div class="sidenav">
+		<h1 style="text-align: center;">Welcome {{username}}!</h1>
+		<a href="/addinfo">Create flight/airplane/airport</a>
+		<a href="/staffagent">View booking agents</a>
+		<a href="/staffcus">View customers</a>
+		<a href="/staffreport">View reports</a>
+	</div>
+	
+	<!-- <form action="/edit_status" method="POST">
+		<td><input type="text" name = "flight_num" placeholder="flight_num" required/> </td>
+		<td><input type="text" name = "edit_status" placeholder="edit_status" required/> </td>
+		<td><input type="submit" value = edit_status></td>
+	</form> -->
 
-	<a href="/addinfo">Add New Flight</a>
+	<!-- Page content -->
+	<!-- <div class="main">
+		<h2>content here</h2>
+	</div> -->
+
+	<!-- <h1>Welcome {{username}}</h1>
+	<a href="/addinfo">Add information</a>	 -->
+	<hr>
+
+    
+
+    </br>
+    <div style="text-align: center;">
+        <h2>Search for flight</h2>
+        <form action="/staffSearchFlight" method="POST">
+            <label>Departure City:</label>
+            <input type="text" name = "departure_city" placeholder="departure_city"/> </br>
+            <label>Departure Airport:</label>
+            <input type="text" name = "departure_airport" placeholder="departure_airport" /></br>
+            <label>Departure Date:</label>
+            <input type="date" name = "departure_date" placeholder="departure_date" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br>
+            <label>Arrival City:</label>
+            <input type="text" name = "arrival_city" placeholder="arrival_city" /> </br>
+            <label>Arrival Airport:</label>
+            <input type="text" name = "arrival_airport" placeholder="arrival_airport" /></br>
+            <label>Arrival Date:</label>
+            <input type="date" name = "arrival_date" placeholder="arrival_date" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br>
+            <button type="submit" class="btn btn-primary">Search</button>
+            {% if error1 %}
+            <p class="text-danger"><strong>No Result:</strong> {{error1}}</p>
+            {% endif %}
+        </form>
+
+        {% if upcoming_flights %}
+        </br>
+        <table>
+            <thead>
+				<th>airplane_id</th>
+                <th>flight_num</th>
+                <th>departure_city</th>
+				<th>departure_airport</th>
+				<th>arrival_city</th>
+				<th>arrival_airport</th>
+                <th>departure_time</th>
+                <th>arrival_time</th>
+				<th>status</th>
+				<th>price</th>
+            </thead>
+
+            <tbody>
+            {% for line in upcoming_flights %}
+                <tr>
+                    <td>{{line[0]}}</td>
+                    <td>{{line[1]}}</td>
+                    <td>{{line[2]}}</td>
+                    <td>{{line[3]}}</td>
+                    <td>{{line[4]}}</td>
+                    <td>{{line[5]}}</td>
+					<td>{{line[6]}}</td>  
+					<td>{{line[7]}}</td> 
+					<td>{{line[8]}}</td>
+					<td>{{line[9]}}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+    <hr>
+
+    <div style="text-align: center;">
+        <h2>Change flight status</h2>
+        <form action="/edit_status" method="POST">
+            <label>Flight Number:</label>
+			<input type="text" name = "flight_num" placeholder="flight_num" required/>
+			<label>Change Status:</label>
+			<input type="text" name = "edit_status" placeholder="edit_status" required/>
+			<button type="submit" class="btn btn-primary">Change</button>
+            {% if error2 %}
+            <p class="text-danger"><strong>No Result:</strong> {{error2}}</p>
+            {% endif %}
+        </form>
+
+	</div>
+	
 	<table>
 		<th>airplane_id</th>
 		<th>flight_num</th>
@@ -27,36 +126,15 @@
 		<th>arrival_time</th>
 		<th>status</th>
 
-		<!-- <form action="/editstatus" method="POST">
-			<input type="submit" value = edit_status />
-		</form> -->
-
 	{% for line in posts %}		
-		<!-- airplane_id = {{line[0]}}
-		flight_num = {{line[1]}} -->
 		<tr>
-			<!-- <td>{{line[0]}}</td>
+			<td>{{line[0]}}</td>
 			<td>{{line[1]}}</td>
 			<td>{{line[2]}}</td>
 			<td>{{line[3]}}</td>
 			<td>{{line[4]}}</td>
 			<td>{{line[5]}}</td>
-			<td>{{line[6]}}</td> -->			
-
-			<form action="/edit_status" method="POST">
-
-				<td>{{line[0]}}</td>
-				<td>{{line[1]}}</td>
-				<td>{{line[2]}}</td>
-				<td>{{line[3]}}</td>
-				<td>{{line[4]}}</td>
-				<td>{{line[5]}}</td>
-				<td>{{line[6]}}</td>
-
-				<td><input type="text" name = "flight_num" placeholder="flight_num" required/> </td>
-				<td><input type="text" name = "edit_status" placeholder="edit_status" required/> </td>
-				<td><input type="submit" value = edit_status></td>
-			</form>	
+			<td>{{line[6]}}</td>	
 		</tr>
 	{% endfor %}
 	</table>

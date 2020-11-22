@@ -32,17 +32,17 @@
         <h2>Search for upcoming flight</h2>
         <form action="/publicSearchFlight" method="POST">
             <label>Departure City:</label>
-            <input type="text" name = "departure_city" placeholder="departure_city" required/> </br>
+            <input type="text" name = "departure_city" placeholder="departure_city" /> </br>
             <label>Departure Airport:</label>
-            <input type="text" name = "departure_airport" placeholder="departure_airport" required/></br>
+            <input type="text" name = "departure_airport" placeholder="departure_airport" /></br>
             <label>Departure Date:</label>
-            <input type="date" name = "departure_date" placeholder="departure_date" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
+            <input type="date" name = "departure_date" placeholder="departure_date" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br>
             <label>Arrival City:</label>
-            <input type="text" name = "arrival_city" placeholder="arrival_city" required/> </br>
+            <input type="text" name = "arrival_city" placeholder="arrival_city" /> </br>
             <label>Arrival Airport:</label>
-            <input type="text" name = "arrival_airport" placeholder="arrival_airport" required/></br>
+            <input type="text" name = "arrival_airport" placeholder="arrival_airport" /></br>
             <label>Arrival Date:</label>
-            <input type="date" name = "arrival_date" placeholder="arrival_date" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
+            <input type="date" name = "arrival_date" placeholder="arrival_date" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br>
             <button type="submit" class="btn btn-primary">Search</button>
             {% if error1 %}
             <p class="text-danger"><strong>No Result:</strong> {{error1}}</p>
