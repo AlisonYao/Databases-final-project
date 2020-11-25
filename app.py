@@ -1,14 +1,13 @@
 # NOTE: temp.py is just for debuging and testing py file. Just personal habit. The file is not important. 
 # NOTE-Cheryl: I have created new views, plz refer to DB_for_testing/create_view
 # also commission is spelled with 2 s's (Ive fixed it)
-# purchase not perchase (Ive fixed it)
 # there is a typo somewhere that says creat instead of create (I fixed the ones I have found)
 # TODO-both: check SQL after everything is finished. View & Grant
 # TODO-both: Cross check each other's work
 # BUG-Cheryl: datediff(CURDATE(), DATE(purchase_date)) should have CURDATE() as first arg, or your datediff is a negative number and is always < 30
 # TODO-Cheryl: Plz refer to agent page for inspiration lol
-# BUG-Cheryl: most of cus does not work lol
-# TODO-Alison: Resize all tables so that they fit in the screen
+# BUG-Cheryl: most of cus does not work for me why
+# TODO-Alison: prettier tables??
 
 #Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect, flash
@@ -199,7 +198,27 @@ def cushome():
     cursor.execute(query.format(email))
     data1 = cursor.fetchall() 
     cursor.close()
-    return render_template('cushome.html', email=email, posts=data1)
+    return render_template('cushome.html', email=email, view_my_flights=data1)
+
+@app.route('/cusSearchPurchase')
+def cusSearchPurchase():
+	email = session['email'] 
+	return render_template('cusSearchPurchase.html', email=email)
+
+@app.route('/cusSpending', methods=['POST', 'GET'])
+def cusSpending():
+	email = session['email']
+	# cursor = conn.cursor()
+	# duration = request.form.get("duration")
+	# if duration is None:
+	# 	duration = "30"
+
+	# query = 'select sum(ticket_price * 0.1), avg(ticket_price * 0.1), count(ticket_price * 0.1) from agent_commission where email = \'{}\' and (purchase_date between DATE_ADD(NOW(), INTERVAL -\'{}\' DAY) and NOW())'
+	# cursor.execute(query.format(email, duration))
+	# commission_data = cursor.fetchone()
+	# total_com, avg_com, count_ticket = commission_data
+	# cursor.close()
+	return render_template('cusSpending.html', email=email)
 
 @app.route('/cusSearchFlight', methods=['GET', 'POST'])
 def cusSearchFlight():
@@ -435,7 +454,7 @@ def agentCommission():
 def agentTopCustomers():
 	email = session['email']
 	cursor = conn.cursor()
-	query = "select customer_email, count(ticket_id) from agent_commission where email = \'{}\' group by customer_email order by count(ticket_id) desc"
+	query = "select customer_email, count(ticket_id) from agent_commission where email = \'{}\' and datediff(CURDATE(), DATE(purchase_date)) < 183 group by customer_email order by count(ticket_id) desc"
 	cursor.execute(query.format(email))
 	ticket_data = cursor.fetchall() # [('alison@gmail.com', 5), ('Alison1234@gmail.com', 2), ('clark@gmail.com', 1)]
 	cursor.close()
@@ -452,7 +471,7 @@ def agentTopCustomers():
 			tickets.append(0)
 	
 	cursor = conn.cursor()
-	query2 = "select customer_email, sum(ticket_price) from agent_commission where email = \'{}\' group by customer_email order by sum(ticket_price) desc"
+	query2 = "select customer_email, sum(ticket_price) from agent_commission where email = \'{}\' and datediff(CURDATE(), DATE(purchase_date)) < 365 group by customer_email order by sum(ticket_price) desc"
 	cursor.execute(query2.format(email))
 	commission_data = cursor.fetchall()
 	cursor.close()
@@ -567,9 +586,6 @@ def agentBuyTickets():
 		cursor.close()
 		message = 'Ticket bought successfully!'
 		return render_template('agentSearchPurchase.html', message=message, email=email)
-
-@app.route('/agentBuyTickets', methods=['GET', 'POST'])
-
 
 
 #####################################################################
