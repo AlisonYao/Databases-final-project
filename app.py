@@ -18,11 +18,15 @@ import mysql.connector
 app = Flask(__name__)
 
 #Configure MySQL
+# conn = mysql.connector.connect(host='localhost',
+#                        user='root',
+#                        password='86466491@Alison',
+#                        database='temp')
+
 conn = mysql.connector.connect(host='localhost',
                        user='root',
-                       password='86466491@Alison',
-                       database='temp')
-
+                       password='root',
+                       database='air')
 
 #####################################################################
 #                               PUBLIC                              #
