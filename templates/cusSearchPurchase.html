@@ -65,9 +65,9 @@
                         <th>arrival_airport</th>
                         <th>departure_time</th>
                         <th>arrival_time</th>
-                        <th>status</th>
                         <th>price</th>
-                        <th>ticket_left</th>
+						<th>status</th>
+						<th>tickets_left</th>
                     </thead>
 
                     <tbody>
@@ -83,8 +83,8 @@
                             <td>{{line[7]}}</td> 
                             <td>{{line[8]}}</td>
                             <td>{{line[9]}}</td>
-                            <td>{{line[10]}}</td>
-                            <td>{{line[11]}}</td>
+							<td>{{line[10]}}</td>
+							<td>{{line[11]}}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -94,15 +94,41 @@
             <hr>
 
             <div style="text-align: center;">
-                <h2>Purchase tickets</h2>
-                <form action="/cus_buy_ticket" method="POST">
-                    <label>Flight Number:</label>
-                    <input type="text" name = "flight_num" placeholder="flight_num" required/>
+				<h2>Purchase tickets</h2>
+				<form action="/cus_buy_ticket" method="POST">	
+					<label for="airline_name">Airline Name:</label>
+					<select name="airline_name" required>
+						<option value="" disabled>--please search first--</option>
+						{% if upcoming_flights%}
+						{% for line in upcoming_flights %}
+						<option value="{{line[0]}}">{{line[0]}}</option>
+						{% endfor %}
+						{% endif %}
+					</select>		
 
-                    <button type="submit" class="btn btn-primary">Buy</button>
+					<label for="flight_num">Flight Number:</label>
+					<select name="flight_num" required>
+						<option value="" disabled>--please search first--</option>
+						{% if upcoming_flights%}
+						{% for line in upcoming_flights %}
+						<option value="{{line[2]}}">{{line[2]}}</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+
+					<button type="submit" class="btn btn-primary">Buy</button>
+
+                  <!-- <form action="/cus_buy_ticket" method="POST">
+                    <label>Flight Number:</label>
+                    <input type="text" name = "flight_num" placeholder="flight_num" required/> -->
+
+                    
                     {% if error2 %}
                     <p class="text-danger"><strong>Sorry:</strong> {{error2}}</p>
-                    {% endif %}
+					{% endif %}
+					{% if message1 %}
+                    <p class="text-success">{{message1}}</p>
+                	{% endif %}
                 </form>
 
             </div>

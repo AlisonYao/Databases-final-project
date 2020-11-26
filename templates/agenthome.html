@@ -30,9 +30,11 @@
 	<div class="main">
 		<h2>My Upcoming Flights</h2>
 	</br>
-		<h5>My booking_agent_id: {{view_my_flights[0][1]}}</h5>
+		<h5>My email: {{email}}</h5>
+		
 		
 		{% if view_my_flights %}
+		<h5>My booking_agent_id: {{view_my_flights[0][1]}}</h5>
         <table class="table table-bordered">
             <thead>
 				<th>ticket id</th>
