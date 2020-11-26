@@ -23,7 +23,7 @@ function drawBarChart2() {
   ]);
 
   var options = {
-    width: 800,
+    // width: 800,
     legend: { position: "none" },
     chart: {
       title: "Top 5 Customers",

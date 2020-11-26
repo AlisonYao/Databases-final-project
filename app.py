@@ -1,8 +1,5 @@
 # TODO-both: check SQL after everything is finished. View & Grant
 # TODO-both: Cross check each other's work
-# BUG-Cheryl: datediff(CURDATE(), DATE(purchase_date)) should have CURDATE() as first arg, or your datediff is a negative number and is always < 30
-# BUG-Cheryl: most of cus does not work for me why
-# TODO-Alison: prettier tables??
 
 #Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect, flash
@@ -13,15 +10,15 @@ import datetime
 app = Flask(__name__)
 
 #Configure MySQL
-# conn = mysql.connector.connect(host='localhost',
-#                        user='root',
-#                        password='86466491@Alison',
-#                        database='temp')
-
 conn = mysql.connector.connect(host='localhost',
-					   user='root',
-					   password='86466491@Alison',
-					   database='temp')
+                       user='root',
+                       password='86466491@Alison',
+                       database='temp')
+
+# conn = mysql.connector.connect(host='localhost',
+# 					   user='root',
+# 					   password='root',
+# 					   database='air')
 
 #####################################################################
 #                               PUBLIC                              #
@@ -197,31 +194,55 @@ def cusSearchPurchase():
 def cusSpending():
 	email = session['email']
 	# show total spending in the past period of time
-	cursor = conn.cursor()
 	duration = request.form.get("duration")
 	if duration is None:
 		duration = "365"
-
+	cursor = conn.cursor()
 	query = 'select sum(price)\
 				from customer_spending \
 				where customer_email = \'{}\' and (purchase_date between DATE_ADD(NOW(), INTERVAL -\'{}\' DAY) and NOW())'
 	cursor.execute(query.format(email, duration))
-	spending_data = cursor.fetchone()
+	total_spending_data = cursor.fetchone()
 	cursor.close()
 
 	# show month-wise spending in the past 6 months
-	period = 6
+	period = request.form.get("period")
+	if period is None:
+		period = '6'
 	today = datetime.date.today()
 	past_day = today.day
-	past_month = (today.month - period) % 12
-	past_year = today.year + ((today.month - period) // 12)
-	############ could be from a form 
-	past_date = datetime.date(past_year, past_month, past_day)
-	starting_year = past_date.year
-	starting_month = (past_date.month + 1) % 12
+	past_month = (today.month - int(period)) % 12
+	past_year = today.year + ((today.month - int(period)) // 12)
+	past_date = datetime.date(past_year, past_month, past_day) # the day 6 months ago
 
+	cursor = conn.cursor()
+	query2 = "select year(purchase_date) as year, month(purchase_date) as month, sum(price) as monthly_spending \
+				from customer_spending \
+				where customer_email = \'{}\' and purchase_date >= \'{}\' \
+				group by year(purchase_date), month(purchase_date)"
+	cursor.execute(query2.format(email, past_date))
+	monthly_spending_data = cursor.fetchall()
+	cursor.close()
 
-	return render_template('cusSpending.html', email=email, emailName=email.split('@')[0], spending_data=spending_data[0], duration=duration)
+	months = []
+	monthly_spendings = []
+	for i in range(int(period)):
+		month = (past_date.month + i + 1) % 12
+		if month == 0:
+			month = 12
+		year = past_date.year + ((past_date.month + i) // 12)
+		flag = False
+		for one_month in monthly_spending_data:
+			if one_month[0] == year and one_month[1] == month:
+				flag = True
+				break
+		if flag:
+			monthly_spendings.append(int(one_month[2]))
+		else:
+			monthly_spendings.append(0)
+		months.append(str(year)+'-'+str(month))
+
+	return render_template('cusSpending.html', email=email, emailName=email.split('@')[0], total_spending_data=total_spending_data[0], duration=duration, period=period, months=months, monthly_spendings=monthly_spendings)
 
 @app.route('/cusSearchFlight', methods=['GET', 'POST'])
 def cusSearchFlight():
@@ -261,8 +282,8 @@ def cusSearchFlight():
 		error = 'Sorry ... Flight does not exist or tickets sold out!'
 		return render_template('cusSearchPurchase.html', email = email, emailName=email.split('@')[0], error1=error)
 
-@app.route('/cus_buy_ticket', methods=['GET', 'POST'])
-def cus_buy_ticket():
+@app.route('/cusBuyTickets', methods=['GET', 'POST'])
+def cusBuyTickets():
 	email = session['email']
 	# email = request.form['email']
 	flight_num = request.form['flight_num']
@@ -276,12 +297,8 @@ def cus_buy_ticket():
 	data = cursor.fetchall()
 	#use fetchall() if you are expecting more than 1 data row
 	cursor.close()
-	# error2 = None
 
 	if(data):
-		# email = session['email']
-		#creates a session for the the user
-		#session is a built in
 		cursor = conn.cursor()
 		ticket = int(data[0][0])
 		ins = "INSERT INTO purchases VALUES (\'{}\', \'{}\', NULL, CURDATE())"
@@ -294,16 +311,6 @@ def cus_buy_ticket():
 	else:
 		#returns an error message to the html page
 		error = 'No ticket'
-		# cursor = conn.cursor()
-		# query = "SELECT ticket_id, airline_name, airplane_id, flight_num, \
-		# D.airport_city, \
-		# departure_airport, A.airport_city, arrival_airport, departure_time, arrival_time, status \
-		# 	FROM flight NATURAL JOIN purchases NATURAL JOIN ticket, airport as D, airport as A\
-		# 		 WHERE customer_email = \'{}\' and status = 'upcoming' and \
-		# 		D.airport_name = departure_airport and A.airport_name = arrival_airport"
-		# cursor.execute(query.format(email))
-		# data1 = cursor.fetchall() 
-		# cursor.close()
 		return render_template('cusSearchPurchase.html', error2=error, email = email, emailName=email.split('@')[0])	
 
 
@@ -449,8 +456,6 @@ def agentTopCustomers():
 		for i in range(5 - l):
 			ppl2.append(' ')
 			commissions.append(0)
-
-	print(commissions)
 	return render_template('agentTopCustomers.html', email=email, emailName=email.split('@')[0], ppl1=ppl1, ppl2=ppl2, tickets=tickets, commissions=commissions)
 
 @app.route('/agentSearchFlight', methods=['GET', 'POST'])
@@ -580,7 +585,7 @@ def staffloginAuth():
 	data = cursor.fetchone()
 	#use fetchall() if you are expecting more than 1 data row
 
-	query1 = "SELECT username, airline_name, airplane_id, flight_num, departure_airport, arrival_airport, departure_time, arrival_time FROM flight NATURAL JOIN airline_staff WHERE username = \'{}\' and status = 'upcoming' and datediff(DATE(departure_time), CURDATE()) < 30 "
+	query1 = "SELECT username, airline_name, airplane_id, flight_num, departure_airport, arrival_airport, departure_time, arrival_time FROM flight NATURAL JOIN airline_staff WHERE username = \'{}\' and status = 'upcoming' and datediff(CURDATE(), DATE(departure_time)) < 30 "
 	cursor.execute(query1.format(username))
 	data1 = cursor.fetchall()
 	cursor.close()
@@ -652,7 +657,7 @@ def staffhome():
 	username = session['username']
 	# airline_name = session['airline_name']
 	cursor = conn.cursor();
-	query = "SELECT username, airline_name, airplane_id, flight_num, departure_airport, arrival_airport, departure_time, arrival_time FROM flight NATURAL JOIN airline_staff WHERE username = \'{}\' and status = 'upcoming' and datediff(DATE(departure_time), CURDATE()) < 30 "
+	query = "SELECT username, airline_name, airplane_id, flight_num, departure_airport, arrival_airport, departure_time, arrival_time FROM flight NATURAL JOIN airline_staff WHERE username = \'{}\' and status = 'upcoming' and datediff(CURDATE(), DATE(departure_time)) < 30 "
 	cursor.execute(query.format(username))
 	data1 = cursor.fetchall()
 	cursor.close()
@@ -669,18 +674,6 @@ def staffSearchFlight():
 	username = session['username']
 
 	cursor = conn.cursor()
-	# query = "SELECT airplane_id, flight_num, D.airport_city, departure_airport, A.airport_city, arrival_airport, departure_time, arrival_time, \
-	# 		status, price\
-	# 	FROM airport as D, flight NATURAL JOIN airline_staff, airport AS A WHERE \
-	# 	D.airport_city = \'{}\' and \
-	# 	D.airport_name = departure_airport and \
-	# 	departure_airport = \'{}\' and \
-	# 	A.airport_city = \'{}\'and \
-	# 	A.airport_name = arrival_airport and \
-	# 	arrival_airport =  \'{}\' and \
-	#     date(departure_time) = \'{}\' and \
-	# 	date(arrival_time) =  \'{}\' and \
-	# 	username = \'{}\'"
 	query = "SELECT airline_name, airplane_id, flight_num, D.airport_city, departure_airport, A.airport_city, arrival_airport, departure_time, arrival_time, \
 			status, price\
 		FROM airport as D, flight NATURAL JOIN airline_staff, airport AS A WHERE \
@@ -694,18 +687,10 @@ def staffSearchFlight():
 		date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\') and \
 		username = \'{}\'"
 
-	# cursor.execute(query.format(departure_city, departure_airport, arrival_city, arrival_airport, departure_date, arrival_date,username))
 	cursor.execute(query.format(departure_city, departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date,arrival_date,username))
-	# cursor.execute(query)
 	data = cursor.fetchall()
-
-	# query1 = "SELECT airplane_id, flight_num, departure_airport, arrival_airport, departure_time, arrival_time, status FROM flight NATURAL JOIN airline_staff WHERE username = \'{}\' and status = 'upcoming' and datediff(DATE(departure_time), CURDATE()) < 30 "
-	# cursor.execute(query1.format(username))
-	# data1 = cursor.fetchall()
-
 	cursor.close()
 	
-	error = None
 	if (data): # has data
 		return render_template('staffflight.html', username=username, upcoming_flights=data)
 	else: # does not have data
@@ -1221,50 +1206,6 @@ def logout():
 def logoutEmail():
 	session.pop('email')
 	return redirect('/cuslogin')
-
-# @app.route('/post', methods=['GET', 'POST'])
-# def post():
-# 	username = session['username']
-# 	cursor = conn.cursor()
-# 	blog = request.form['blog']
-# 	query = "INSERT INTO blog (blog_post, username) VALUES(\'{}\', \'{}\')"
-# 	cursor.execute(query.format(blog, username))
-# 	conn.commit()
-# 	cursor.close()
-# 	return redirect(url_for('cushome'))
-
-# @app.route('/logout')
-# def logout():
-# 	session.pop('email')
-# 	return redirect('/')
-
-# @app.route('/agenthome')
-# def home():
-	
-#     username = session['username']
-#     cursor = conn.cursor()
-#     query = "SELECT ts, blog_post FROM blog WHERE username = \'{}\' ORDER BY ts DESC"
-#     cursor.execute(query.format(username))
-#     data1 = cursor.fetchall() 
-#     cursor.close()
-#     return render_template('home.html', username=username, posts=data1)
-
-		
-# @app.route('/post', methods=['GET', 'POST'])
-# def post():
-# 	username = session['username']
-# 	cursor = conn.cursor()
-# 	blog = request.form['blog']
-# 	query = "INSERT INTO blog (blog_post, username) VALUES(\'{}\', \'{}\')"
-# 	cursor.execute(query.format(blog, username))
-# 	conn.commit()
-# 	cursor.close()
-# 	return redirect(url_for('home'))
-
-# @app.route('/logout')
-# def logout():
-# 	session.pop('username')
-# 	return redirect('/')
 
 
 app.secret_key = 'some key that you will never guess'

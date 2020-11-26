@@ -11,7 +11,7 @@
 	<div class='top-nav'>
 		<nav>
 			<div style="text-align: right;">
-				<a href="/logout">Logout</a>
+				<a href="/logout">LOGOUT</a>
 			</div>
 		</nav>
 	</div>
@@ -28,156 +28,45 @@
 		<a href="/staffreport">View Reports</a>
 	</div>
 	
-	<!-- <form action="/edit_status" method="POST">
-		<td><input type="text" name = "flight_num" placeholder="flight_num" required/> </td>
-		<td><input type="text" name = "edit_status" placeholder="edit_status" required/> </td>
-		<td><input type="submit" value = edit_status></td>
-	</form> -->
-
-	<!-- Page content -->
-	<!-- <div class="main">
-		<h2>content here</h2>
-	</div> -->  
-
-    <!-- <div class="main">
-		<div style="text-align: center;">
-			<h2>Search for flight</h2>
-			<form action="/staffSearchFlight" method="POST">
-				<label>Departure City:</label>
-				<input type="text" name = "departure_city" placeholder="departure_city"/> </br>
-				<label>Departure Airport:</label>
-				<input type="text" name = "departure_airport" placeholder="departure_airport" /></br>
-				<label>Departure Date:</label>
-				<input type="date" name = "departure_date" placeholder="departure_date" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br>
-				<label>Arrival City:</label>
-				<input type="text" name = "arrival_city" placeholder="arrival_city" /> </br>
-				<label>Arrival Airport:</label>
-				<input type="text" name = "arrival_airport" placeholder="arrival_airport" /></br>
-				<label>Arrival Date:</label>
-				<input type="date" name = "arrival_date" placeholder="arrival_date" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br>
-				<button type="submit" class="btn btn-primary">Search</button>
-				{% if error1 %}
-				<p class="text-danger"><strong>No Result:</strong> {{error1}}</p>
-				{% endif %}
-			</form>
-
-			{% if upcoming_flights %}
+	<div class="main">
+		{% if posts %}
 			</br>
-			<table>
-				<thead>
-					<th>airplane_id</th>
-					<th>flight_num</th>
-					<th>departure_city</th>
-					<th>departure_airport</th>
-					<th>arrival_city</th>
-					<th>arrival_airport</th>
-					<th>departure_time</th>
-					<th>arrival_time</th>
-					<th>status</th>
-					<th>price</th>
-				</thead>
+			<h2>Upcoming Flights by {{posts[0][1]}} Next 30 Days</h2>
+		{% else %}
+			<h2>Upcoming Flights  Next 30 Days</h2>
+		{% endif %}
 
-				<tbody>
-				{% for line in upcoming_flights %}
-					<tr>
-						<td>{{line[0]}}</td>
-						<td>{{line[1]}}</td>
-						<td>{{line[2]}}</td>
-						<td>{{line[3]}}</td>
-						<td>{{line[4]}}</td>
-						<td>{{line[5]}}</td>
-						<td>{{line[6]}}</td>  
-						<td>{{line[7]}}</td> 
-						<td>{{line[8]}}</td>
-						<td>{{line[9]}}</td>
-					</tr>
-				{% endfor %}
-				</tbody>
-			</table>
-			{% endif %}
-		</div>
-		<hr> -->
-
-		<!-- <div style="text-align: center;">
-			<h2>Change flight status</h2>
-			<form action="/edit_status" method="POST">
-				<label>Flight Number:</label>
-				<input type="text" name = "flight_num" placeholder="flight_num" required/>
-				<label>Change Status:</label>
-				<input type="text" name = "edit_status" placeholder="edit_status" required/>
-				<button type="submit" class="btn btn-primary">Change</button>
-				{% if error2 %}
-				<p class="text-danger"><strong>No Result:</strong> {{error2}}</p>
-				{% endif %}
-			</form>
-
-		</div> -->
-		<div class="main">
-			{% if posts %}
-				<h2>Upcoming Flights by {{posts[0][1]}} Next 30 Days</h2>
-			<!-- </br> -->
-				<h5>My username: {{posts[0][0]}}</h5>
-			{% else %}
-				<h2>Upcoming Flights  Next 30 Days</h2>
-				<h5>My username: {{username}}</h5>
-			{% endif %}
-
-			{% if posts %}
-			<table class="table table-bordered">
-				<thead>
-					<th>airplane_id</th>
-					<th>flight_num</th>
-					<th>departure_airport</th>
-					<th>arrival_airport</th>
-					<th>departure_time</th>
-					<th>arrival_time</th>
-				</thead>
-	
-				<tbody>
-				{% for line in posts %}
-					<tr>
-						<td>{{line[2]}}</td>
-						<td>{{line[3]}}</td>
-						<td>{{line[4]}}</td>
-						<td>{{line[5]}}</td>
-						<td>{{line[6]}}</td>
-						<td>{{line[7]}}</td>	
-					</tr>
-				{% endfor %}
-				</tbody>
-			</table>
-			
-			{% else %}
-			<h5>No Upcoming Flights</h5>
-	
-			{% endif %}
-	
-		</div>
-		<!-- <div style="text-align: center;">
-			<h2>Change flight status</h2>
-			<table>
+		{% if posts %}
+		<table class="table table-bordered table-sm">
+			<thead>
 				<th>airplane_id</th>
 				<th>flight_num</th>
 				<th>departure_airport</th>
 				<th>arrival_airport</th>
 				<th>departure_time</th>
 				<th>arrival_time</th>
-				<th>status</th>
+			</thead>
 
-			{% for line in posts %}		
+			<tbody>
+			{% for line in posts %}
 				<tr>
-					<td>{{line[0]}}</td>
-					<td>{{line[1]}}</td>
 					<td>{{line[2]}}</td>
 					<td>{{line[3]}}</td>
 					<td>{{line[4]}}</td>
 					<td>{{line[5]}}</td>
-					<td>{{line[6]}}</td>	
+					<td>{{line[6]}}</td>
+					<td>{{line[7]}}</td>	
 				</tr>
 			{% endfor %}
-			</table>
-		</div> -->
-	<!-- </div> -->
+			</tbody>
+		</table>
+		
+		{% else %}
+		<h5>No Upcoming Flights</h5>
+
+		{% endif %}
+
+	</div>
 </body>
 
 

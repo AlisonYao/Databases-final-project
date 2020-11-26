@@ -2,15 +2,16 @@ google.charts.load("current", { packages: ["bar"] });
 google.charts.setOnLoadCallback(drawBarChart2);
 
 const time1 = time[0];
+const time2 = time[1];
 
 const monthticket1 = monthticket[0];
-
+const monthticket2 = monthticket[1];
 
 function drawBarChart2() {
   var data = new google.visualization.arrayToDataTable([
     ["Tickets", "#tickets"],
-    [time1, monthticket1]
-
+    [time1, monthticket1],
+    [time2, monthticket2],
   ]);
 
   var options = {

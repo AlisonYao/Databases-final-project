@@ -12,7 +12,7 @@
     <div class='top-nav'>
         <nav>
             <div style="text-align: right;">
-                <a href="/logout">Logout</a>
+                <a href="/logout">LOGOUT</a>
             </div>
         </nav>
     </div>
@@ -55,7 +55,7 @@
         
             {% if ticket %}
                 </br>
-                <table class="table table-bordered">
+                <table class="table table-bordered table-sm">
                     <thead>
                         <th>year</th>
                         <th>month</th>
@@ -77,6 +77,9 @@
 
                 <div style="text-align: center;">
                     <h3>Amounts of Ticket Sold</h3>
+                    <h6>{{time}}</h6>
+                    <h6>{{monthticket}}</h6>
+
                     <div id="left" style="width: 800px; height: 300px;"></div>
                     <div id="right" style="width: 800px; height: 300px;"></div>   
                 
@@ -92,7 +95,7 @@
 
 
             <h3 style="text-align: center;">Top 3 Most Popular Destination Last 3 months</h3>
-            <table class="table table-bordered">
+            <table class="table table-bordered table-sm">
                 <th>city</th>
                 <th>number of ticket</th>
             {% for line in month %}		
@@ -104,7 +107,7 @@
             </table>
 
             <h3 style="text-align: center;">Top 3 Most Popular Destination Last Year</h3>
-            <table class="table table-bordered">
+            <table class="table table-bordered table-sm">
                 <th>city</th>
                 <th>number of ticket</th>
 

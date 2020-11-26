@@ -11,7 +11,7 @@
 	<div class='top-nav'>
 		<nav>
 			<div style="text-align: right;">
-				<a href="/logoutEmail">Logout</a>
+				<a href="/logoutEmail">LOGOUT</a>
 			</div>
 		</nav>
 	</div>
@@ -31,31 +31,29 @@
 	</br>
 		{% if view_my_flights %}
 		<div style="text-align: center;">
-		<table class="table table-bordered">
+		<table class="table table-bordered table-sm">
 			<thead>
+				<th>airline name</th>
 				<th>flight num</th>
 				<th>ticket id</th>
-				<th>airline name</th>
 				<th>airplane id</th>
 				<th>departure city&airport</th>
 				<th>departure time</th>
 				<th>arrival city&airport</th>
 				<th>arrival time</th>
-				<th>status</th>
 			</thead>
 
 			<tbody>
 			{% for line in view_my_flights %}
 				<tr>
+					<td>{{line[1]}}</td>
 					<td>{{line[3]}}</td>
 					<td>{{line[0]}}</td>
-					<td>{{line[1]}}</td>
 					<td>{{line[2]}}</td>
 					<td>{{line[4]}} {{line[5]}}</td>
 					<td>{{line[8]}}</td>
 					<td>{{line[6]}} {{line[7]}}</td>  
 					<td>{{line[9]}}</td>
-					<td>{{line[10]}}</td>
 				</tr>
 			{% endfor %}
 			</tbody>

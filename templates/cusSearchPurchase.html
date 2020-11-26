@@ -11,7 +11,7 @@
 	<div class='top-nav'>
 		<nav>
 			<div style="text-align: right;">
-				<a href="/logoutEmail">Logout</a>
+				<a href="/logoutEmail">LOGOUT</a>
 			</div>
 		</nav>
 	</div>
@@ -52,15 +52,14 @@
 
                 {% if upcoming_flights %}
                 </br>
-                <table class="table table-bordered">
+                <table class="table table-bordered table-sm">
                     <thead>
                         <th>airline name</th>
-                        <th>airplane id</th>
-                        <th>flight num</th>
+						<th>flight num</th>
+						<th>airplane id</th>
 						<th>departure city&airport</th>
 						<th>departure time</th>
                         <th>arrival city&airport</th>
-                        
                         <th>arrival time</th>
                         <th>price</th>
 						<th>status</th>
@@ -71,8 +70,8 @@
                     {% for line in upcoming_flights %}
                         <tr>
                             <td>{{line[0]}}</td>
-                            <td>{{line[1]}}</td>
-                            <td>{{line[2]}}</td>
+							<td>{{line[2]}}</td>
+							<td>{{line[1]}}</td>
 							<td>{{line[3]}} {{line[4]}}</td>
 							<td>{{line[7]}}</td>
                             <td>{{line[5]}} {{line[6]}}</td>
@@ -90,7 +89,7 @@
 
             <div style="text-align: center;">
 				<h2>Purchase tickets</h2>
-				<form action="/cus_buy_ticket" method="POST">	
+				<form action="/cusBuyTickets" method="POST">	
 					<label for="airline_name">Airline Name:</label>
 					<select name="airline_name" required>
 						<option value="" disabled>--please search first--</option>
@@ -112,11 +111,6 @@
 					</select>
 
 					<button type="submit" class="btn btn-primary">Buy</button>
-
-                  <!-- <form action="/cus_buy_ticket" method="POST">
-                    <label>Flight Number:</label>
-                    <input type="text" name = "flight_num" placeholder="flight_num" required/> -->
-
                     
                     {% if error2 %}
                     <p class="text-danger"><strong>Sorry:</strong> {{error2}}</p>
@@ -125,95 +119,8 @@
                     <p class="text-success">{{message1}}</p>
                 	{% endif %}
                 </form>
-
             </div>
         </div>
-
-		<!-- <div style="text-align: center;">
-			<h3>Search for Flight</h3>
-			<form action="/agentSearchFlight" method="POST">
-				<label>Departure City:</label>
-				<input type="text" name = "departure_city" placeholder="departure_city"/> </br>
-				<label>Departure Airport:</label>
-				<input type="text" name = "departure_airport" placeholder="departure_airport" /></br>
-				<label>Departure Date:</label>
-				<input type="date" name = "departure_date" placeholder="departure_date" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br>
-				<label >Arrival City:</label>
-				<input type="text" name = "arrival_city" placeholder="arrival_city" /> </br>
-				<label>Arrival Airport:</label>
-				<input type="text" name = "arrival_airport" placeholder="arrival_airport" /></br>
-				<label>Arrival Date:</label>
-				<input type="date" name = "arrival_date" placeholder="arrival_date" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br>
-				<button type="submit" class="btn btn-primary">Search</button>
-				{% if error1 %}
-				<p class="text-danger"><strong>No Result:</strong> {{error1}}</p>
-				{% endif %}
-			</form>
-
-			{% if upcoming_flights %}
-			</br>
-			<table class="table table-bordered">
-				<thead>
-					<th>flight_num</th>
-					<th>airplane_id</th>
-					<th>departure_city</th>
-					<th>departure_airport</th>
-					<th>departure_time</th>
-					<th>arrival_city</th>
-					<th>arrival_airport</th>
-					<th>arrival_time</th>
-					<th>status</th>
-					<th>price</th>
-				</thead>
-
-				<tbody>
-				{% for line in upcoming_flights %}
-					<tr>
-						<td>{{line[1]}}</td>
-						<td>{{line[0]}}</td>
-						<td>{{line[2]}}</td>
-						<td>{{line[3]}}</td>
-						<td>{{line[6]}}</td>  
-						<td>{{line[4]}}</td>
-						<td>{{line[5]}}</td>
-						<td>{{line[7]}}</td> 
-						<td>{{line[8]}}</td>
-						<td>{{line[9]}}</td>
-					</tr>
-				{% endfor %}
-				</tbody>
-			</table>
-			{% endif %}
-
-		<hr>
-
-			<h3>Purchase Tickets</h3>
-			<form action="/agentBuyTickets" method="POST">
-				<label for="flight_num">Flight Number:</label>
-				<select name="flight_num" required>
-					<option value="" disabled>--please search first--</option>
-					{% if upcoming_flights%}
-					{% for line in upcoming_flights %}
-					<option value="{{line[1]}}">{{line[1]}}</option>
-					{% endfor %}
-					{% endif %}
-				</select>
-
-				<label>Customer Email: </label>
-				<input type="text" name = "customer_email" placeholder="customer_email" required/>
-				<button type="submit" class="btn btn-primary">Buy</button>
-				{% if error2 %}
-				<p class="text-danger"><strong>Sorry!</strong> {{error2}}</p>
-				{% endif %}
-			  </form>
-
-			  {% if message %}
-			  <p class="text-success">{{message}}</p>
-			  {% endif %}
-
-
-		</div> -->
 	</div>
-
 </body>
 </html>
