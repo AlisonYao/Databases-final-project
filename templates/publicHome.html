@@ -8,15 +8,6 @@
 </head>
 <body>
     <nav>
-        <!-- <div style="text-align: left;">
-            <a href="/cuslogin">CustomerLogin</a>
-            <a href="/cusregister">CustomerRegister</a>
-            <a href="/agentlogin">BookingAgentLogin</a>
-            <a href="/agentregister">BookingAgentRegister</a>
-            <a href="/stafflogin">AirlineStaffLogin</a>
-            <a href="/staffregister">AirlineStaffRegister</a>
-        </div> -->
-
         <div style="text-align: right;">
             <a href="/cuslogin">LOGIN</a>
             |
@@ -25,9 +16,8 @@
     </nav>
     <hr>
 
-    <h1 style="text-align: center;">Welcome to the public home of AC Airline!</h1>
+    <h1>Public Home</h1>
 
-    </br>
     <div style="text-align: center;">
         <h2>Search for upcoming flight</h2>
         <form action="/publicSearchFlight" method="POST">
@@ -53,13 +43,13 @@
         </br>
         <table class="table table-bordered">
             <thead>
-                <th>airline_name</th>
-                <th>flight_num</th>
-                <th>airplane_id</th>
-                <th>departure_airport</th>
-                <th>departure_time</th>
-                <th>arrival_airport</th>
-                <th>arrival_time</th>
+                <th>airline name</th>
+                <th>flight num</th>
+                <th>airplane id</th>
+                <th>departure city&airport</th>
+                <th>departure time</th>
+                <th>arrival city&airport</th>
+                <th>arrival time</th>
                 <th>price</th>
             </thead>
 
@@ -68,12 +58,12 @@
                 <tr>
                     <td>{{line[0]}}</td>
                     <td>{{line[1]}}</td>
-                    <td>{{line[8]}}</td>
-                    <td>{{line[2]}}</td>
-                    <td>{{line[3]}}</td>
+                    <td>{{line[-1]}}</td>
+                    <td>{{line[2]}} {{line[3]}}</td>
                     <td>{{line[4]}}</td>
-                    <td>{{line[5]}}</td>
-                    <td>{{line[6]}}</td>  
+                    <td>{{line[5]}} {{line[6]}}</td>
+                    <td>{{line[7]}}</td>
+                    <td>{{line[8]}}</td>  
                 </tr>
             {% endfor %}
             </tbody>
@@ -85,6 +75,8 @@
     <div style="text-align: center;">
         <h2>Check flight status</h2>
         <form action="/publicSearchStatus" method="POST">
+            <label>Airline Name:</label>
+            <input type="text" name = "airline_name" placeholder="airline_name" required/> </br>
             <label>Flight Number:</label>
             <input type="text" name = "flight_num" placeholder="flight_num" required/> </br>
             <label>Arrival Date:</label>

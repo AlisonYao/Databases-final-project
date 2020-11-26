@@ -19,7 +19,7 @@
 
 	<!-- Side navigation -->
 	<div class="sidenav">
-		<h1>Welcome {{email}}</h1>
+		<h1>Welcome {{emailName}}</h1>
 		<a href="/agentHome">My Flights</a>
 		<a href="/agentSearchPurchase" style="color: #2db2ff;">Search & Purchase Tickets</a>
 		<a href="/agentCommission">My Commission</a>
@@ -55,16 +55,15 @@
 			</br>
 			<table class="table table-bordered">
 				<thead>
-					<th>flight_num</th>
-					<th>airplane_id</th>
-					<th>departure_city</th>
-					<th>departure_airport</th>
-					<th>departure_time</th>
-					<th>arrival_city</th>
-					<th>arrival_airport</th>
-					<th>arrival_time</th>
+					<th>flight num</th>
+					<th>airplane id</th>
+					<th>departure city&airport</th>
+					<th>departure time</th>
+					<th>arrival city&airport</th>
+					<th>arrival time</th>
 					<th>status</th>
 					<th>price</th>
+					<th>#tickets left</th>
 				</thead>
 
 				<tbody>
@@ -72,11 +71,9 @@
 					<tr>
 						<td>{{line[1]}}</td>
 						<td>{{line[0]}}</td>
-						<td>{{line[2]}}</td>
-						<td>{{line[3]}}</td>
+						<td>{{line[2]}} {{line[3]}}</td>
 						<td>{{line[6]}}</td>  
-						<td>{{line[4]}}</td>
-						<td>{{line[5]}}</td>
+						<td>{{line[4]}} {{line[5]}}</td>
 						<td>{{line[7]}}</td> 
 						<td>{{line[8]}}</td>
 						<td>{{line[9]}}</td>

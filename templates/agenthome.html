@@ -19,7 +19,7 @@
 
 	<!-- Side navigation -->
 	<div class="sidenav">
-		<h1>Welcome {{email}}</h1>
+		<h1>Welcome {{emailName}}</h1>
 		<a href="/agentHome" style="color: #2db2ff;">My Flights</a>
 		<a href="/agentSearchPurchase">Search & Purchase Tickets</a>
 		<a href="/agentCommission">My Commission</a>
@@ -29,12 +29,10 @@
 	<!-- Page content -->
 	<div class="main">
 		<h2>My Upcoming Flights</h2>
-	</br>
-		<h5>My email: {{email}}</h5>
-		
+		<h5>My booking_agent_id: {{booking_agent_id[0]}}</h5>
 		
 		{% if view_my_flights %}
-		<h5>My booking_agent_id: {{view_my_flights[0][1]}}</h5>
+		</br>
         <table class="table table-bordered">
             <thead>
 				<th>ticket id</th>
@@ -42,9 +40,9 @@
 				<th>purchase date</th>
                 <th>airline name</th>
                 <th>flight num</th>
-                <th>departure airport</th>
+				<th>departure city&airport</th>
 				<th>departure time</th>
-				<th>arrival airport</th>
+				<th>arrival city&airport</th>
 				<th>arrival time</th>
 				<th>price</th>
 				<th>status</th>
@@ -56,16 +54,14 @@
 					<td>{{line[4]}}</td>
 					<td>{{line[2]}}</td>
 					<td>{{line[3]}}</td>
-					
-                    
                     <td>{{line[5]}}</td>
-					<td>{{line[6]}}</td>  
-					<td>{{line[7]}}</td>
-					<td>{{line[8]}}</td>
+					<td>{{line[6]}}</td>
+					<td>{{line[7]}} {{line[8]}}</td>
 					<td>{{line[9]}}</td>
-					<td>{{line[10]}}</td>
-					<td>{{line[11]}}</td>
+					<td>{{line[10]}} {{line[11]}}</td>
 					<td>{{line[12]}}</td>
+					<td>{{line[13]}}</td>
+					<td>{{line[14]}}</td>
                 </tr>
             {% endfor %}
             </tbody>
