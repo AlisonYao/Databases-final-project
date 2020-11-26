@@ -16,6 +16,7 @@ insert into ticket values ('63627', 'China Eastern', '22222');
 insert into ticket values ('02758', 'China Eastern', '22222');
 insert into ticket values ('10000', 'China Eastern', '22222');
 insert into ticket values ('40000', 'China Eastern', '22222');
+
 insert into booking_agent values ('Dani@gmail.com', 'Jamie123', '98765');
 insert into purchases values ('12345', 'alison@gmail.com', '98765', '2020-01-01 12:34:21');
 insert into purchases values ('63627', 'clark@gmail.com', null, '2020-01-01 11:45:23');
@@ -28,3 +29,12 @@ insert into ticket values ('62627', 'China Eastern', '22222');
 insert into ticket values ('12758', 'China Eastern', '22222');
 insert into ticket values ('12000', 'China Eastern', '22222');
 insert into ticket values ('40080', 'China Eastern', '22222');
+
+insert into ticket values ('125425', 'China Eastern', '11111');
+insert into ticket values ('744371', 'China Eastern', '11111');
+insert into ticket values ('203100', 'China Eastern', '11111');
+insert into ticket values ('305005', 'China Eastern', '11111');
+insert into ticket values ('622627', 'China Eastern', '22222');
+insert into ticket values ('127758', 'China Eastern', '22222');
+insert into ticket values ('120010', 'China Eastern', '22222');
+insert into ticket values ('400880', 'China Eastern', '22222');

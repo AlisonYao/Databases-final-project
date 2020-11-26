@@ -76,13 +76,13 @@
         <h2>Check flight status</h2>
         <form action="/publicSearchStatus" method="POST">
             <label>Airline Name:</label>
-            <input type="text" name = "airline_name" placeholder="airline_name" required/> </br>
+            <input type="text" name = "airline_name" placeholder="airline_name" /> </br>
             <label>Flight Number:</label>
-            <input type="text" name = "flight_num" placeholder="flight_num" required/> </br>
+            <input type="text" name = "flight_num" placeholder="flight_num" /> </br>
             <label>Arrival Date:</label>
-            <input type="date" name = "arrival_date" placeholder="arrival_date" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
+            <input type="date" name = "arrival_date" placeholder="arrival_date" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br>
             <label>Departure Date:</label>
-            <input type="date" name = "departure_date" placeholder="departure_date" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
+            <input type="date" name = "departure_date" placeholder="departure_date" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br>
             <button type="submit" class="btn btn-primary">Search</button>
             {% if error2 %}
             <p class="text-danger"><strong>No Result:</strong> {{error2}}</p>

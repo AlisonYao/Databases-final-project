@@ -27,8 +27,8 @@
 	
 	<!-- Page content -->
 	<div class="main">
-        <h2>My Spending</h2>
-        <!-- <div style="text-align: center;">
+        <h2 style="color: red;">My Spending</h2>
+        <div style="text-align: center;">
             <h4>
                 <form action="/agentCommission" method="POST">
                     <label for="duration">Data collected from </label>
@@ -75,28 +75,33 @@
 
             <table class="table table-bordered">
                 <thead>
-                    <th>total commission</th>
-                    <th>avg commission per ticket</th>
-                    <th>num of tickets</th>
+                    <th>total spending</th>
                 </thead>
     
                 <tbody>
                     <tr>
-                        {% if total_com %}
-                        <td>{{total_com}}</td>
+                        {% if spending_data %}
+                        <td>{{spending_data}}</td>
                         {% else %}
                         <td>0</td>
                         {% endif %}
-                        {% if avg_com %}
-                        <td>{{avg_com}}</td>
-                        {% else %}
-                        <td>0</td>
-                        {% endif %}
-                        <td>{{count_ticket}}</td>
                     </tr>
                 </tbody>
             </table>
-        </div> -->
+            
+            <h2>Month-wise Spending</h2>
+
+        </div>
+
+            
+
+
+
+
+
+
+
+
 	</div>
 
 </body>

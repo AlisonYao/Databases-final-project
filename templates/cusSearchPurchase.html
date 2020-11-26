@@ -27,7 +27,7 @@
 	
 	<!-- Page content -->
 	<div class="main">
-        <h2>Search & Purchase Flights</h2>
+        <h2 style='color: red;'>Search & Purchase Flights</h2>
         
         <div style="text-align: center;">
             <h2>Search for flight</h2>
@@ -44,8 +44,6 @@
                     <input type="text" name = "arrival_airport" placeholder="arrival_airport" /></br>
                     <label>Arrival Date:</label>
                     <input type="date" name = "arrival_date" placeholder="arrival_date" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br>
-                    <!-- <label>Status:</label>
-                    <input type="text" name = "status" placeholder="status" /></br> -->
                     <button type="submit" class="btn btn-primary">Search</button>
                     {% if error1 %}
                     <p class="text-danger"><strong>No Result:</strong> {{error1}}</p>

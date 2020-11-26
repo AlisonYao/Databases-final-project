@@ -7,6 +7,7 @@
 #Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect, flash
 import mysql.connector
+import datetime
 
 #Initialize the app from Flask
 app = Flask(__name__)
@@ -44,8 +45,8 @@ def publicSearchFlight():
 	query = "select airline_name, flight_num, D.airport_city as departure_city, departure_airport, departure_time, A.airport_city as arrival_city, arrival_airport, arrival_time, price, status, airplane_id \
 			from airport as D, flight, airport as A \
 			where D.airport_name = flight.departure_airport and flight.arrival_airport = A.airport_name and \
-			D.airport_name = if (\'{}\' = '',D.airport_name, \'{}\') and \
-				A.airport_name = if (\'{}\' = '',A.airport_name, \'{}\') and \
+			D.airport_name = if (\'{}\' = '', D.airport_name, \'{}\') and \
+				A.airport_name = if (\'{}\' = '', A.airport_name, \'{}\') and \
 					flight.status = 'upcoming' and \
 			D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\')\
 				 and A.airport_city = if (\'{}\' = '',A.airport_city, \'{}\') and \
@@ -71,11 +72,11 @@ def publicSearchStatus():
 	cursor = conn.cursor()
 	query = "select * \
 			from flight \
-			where flight_num = \'{}\' \
-				and date(departure_time) = \'{}\' \
-				and date(arrival_time) = \'{}\' \
-				and airline_name = \'{}\'"
-	cursor.execute(query.format(flight_num, arrival_date, departure_date, airline_name))
+			where flight_num = if (\'{}\' = '', flight_num, \'{}\') \
+				and date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\') \
+				and date(arrival_time) = if (\'{}\' = '', date(arrival_time), \'{}\') \
+				and airline_name = if (\'{}\' = '', airline_name, \'{}\')"
+	cursor.execute(query.format(flight_num, flight_num, arrival_date, arrival_date, departure_date, departure_date, airline_name, airline_name))
 	data = cursor.fetchall() 
 	cursor.close()
 	
@@ -115,8 +116,15 @@ def cusloginAuth():
 	error = None
 	if(data):
 		session['email'] = email
-		# return redirect(url_for('cushome'))
-		return render_template('cushome.html', email=email, emailName=email.split('@')[0])
+		cursor = conn.cursor()
+		query = "SELECT ticket_id, airline_name, airplane_id, flight_num, D.airport_city, departure_airport, A.airport_city, arrival_airport, departure_time, arrival_time, status \
+			FROM flight NATURAL JOIN purchases NATURAL JOIN ticket, airport as D, airport as A\
+				 WHERE customer_email = \'{}\' and status = 'upcoming' and \
+				D.airport_name = departure_airport and A.airport_name = arrival_airport"
+		cursor.execute(query.format(email))
+		data1 = cursor.fetchall() 
+		cursor.close()
+		return render_template('cushome.html', email=email, emailName=email.split('@')[0], view_my_flights=data1)
 	else:
 		#returns an error message to the html page
 		error = 'Invalid login or email'
@@ -145,17 +153,25 @@ def cusregisterAuth():
 	data = cursor.fetchone()
 	error = None
 	if(data):
+		cursor.close()
 		error = "This user already exists"
 		return render_template('cusregister.html', error = error)
 	else:
 		ins = "INSERT INTO customer VALUES(\'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\')"
 		cursor.execute(ins.format(email, name, password, building_number, street, city, state, phone_number, passport_number, passport_expiration, passport_country, date_of_birth))
 		conn.commit()
+		query = "SELECT ticket_id, airline_name, airplane_id, flight_num, \
+			D.airport_city, \
+			departure_airport, A.airport_city, arrival_airport, departure_time, arrival_time, status \
+				FROM flight NATURAL JOIN purchases NATURAL JOIN ticket, airport as D, airport as A\
+					WHERE customer_email = \'{}\' and status = 'upcoming' and \
+					D.airport_name = departure_airport and A.airport_name = arrival_airport"
+		cursor.execute(query.format(email))
+		data1 = cursor.fetchall() 
 		cursor.close()
 		flash("You are logged in")
 		session['email'] = email
-		# return redirect(url_for('cushome'))
-		return render_template('cushome.html', email=email, emailName=email.split('@')[0])
+		return render_template('cushome.html', email=email, emailName=email.split('@')[0], view_my_flights=data1)
 
 @app.route('/cushome')
 def cushome():
@@ -180,17 +196,32 @@ def cusSearchPurchase():
 @app.route('/cusSpending', methods=['POST', 'GET'])
 def cusSpending():
 	email = session['email']
-	# cursor = conn.cursor()
-	# duration = request.form.get("duration")
-	# if duration is None:
-	# 	duration = "30"
+	# show total spending in the past period of time
+	cursor = conn.cursor()
+	duration = request.form.get("duration")
+	if duration is None:
+		duration = "365"
 
-	# query = 'select sum(ticket_price * 0.1), avg(ticket_price * 0.1), count(ticket_price * 0.1) from agent_commission where email = \'{}\' and (purchase_date between DATE_ADD(NOW(), INTERVAL -\'{}\' DAY) and NOW())'
-	# cursor.execute(query.format(email, duration))
-	# commission_data = cursor.fetchone()
-	# total_com, avg_com, count_ticket = commission_data
-	# cursor.close()
-	return render_template('cusSpending.html', email=email, emailName=email.split('@')[0])
+	query = 'select sum(price)\
+				from customer_spending \
+				where customer_email = \'{}\' and (purchase_date between DATE_ADD(NOW(), INTERVAL -\'{}\' DAY) and NOW())'
+	cursor.execute(query.format(email, duration))
+	spending_data = cursor.fetchone()
+	cursor.close()
+
+	# show month-wise spending in the past 6 months
+	period = 6
+	today = datetime.date.today()
+	past_day = today.day
+	past_month = (today.month - period) % 12
+	past_year = today.year + ((today.month - period) // 12)
+	############ could be from a form 
+	past_date = datetime.date(past_year, past_month, past_day)
+	starting_year = past_date.year
+	starting_month = (past_date.month + 1) % 12
+
+
+	return render_template('cusSpending.html', email=email, emailName=email.split('@')[0], spending_data=spending_data[0], duration=duration)
 
 @app.route('/cusSearchFlight', methods=['GET', 'POST'])
 def cusSearchFlight():
@@ -220,25 +251,7 @@ def cusSearchFlight():
 		GROUP BY airline_name, airplane_id, flight_num, D.airport_city, departure_airport, \
 		A.airport_city, arrival_airport, departure_time, arrival_time, price"
 	cursor.execute(query1.format(departure_city,departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date,arrival_date))
-	data1 = cursor.fetchall()
-	# flights with no tickets left
-	# query2 = "SELECT airline_name, airplane_id, flight_num, D.airport_city, departure_airport, \
-	# 	A.airport_city, arrival_airport, departure_time, arrival_time, \
-	# 		price, status, 0\
-	# 	FROM airport as D, flight NATURAL JOIN ticket, airport AS A WHERE \
-	# 	D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\') and \
-	# 	D.airport_name = departure_airport and \
-	# 	departure_airport = if (\'{}\' = '', departure_airport, \'{}\') and \
-	# 	A.airport_city = if (\'{}\' = '', A.airport_city, \'{}\')and \
-	# 	A.airport_name = arrival_airport and \
-	# 	arrival_airport =  if (\'{}\' = '', arrival_airport, \'{}\')and \
-	#     date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\')and \
-	# 	date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\') and \
-	# 	ticket_id not IN (SELECT ticket_id FROM flight NATURAL JOIN ticket NATURAL JOIN purchases)"
-	# cursor.execute(query2.format(departure_city,departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date,arrival_date))
-	# data2 = cursor.fetchall()
-	# data = data1 + data2
-	data = data1
+	data = cursor.fetchall()
 	cursor.close()
 	
 	if (data):
@@ -246,7 +259,7 @@ def cusSearchFlight():
 		# return redirect(url_for('cushome'), upcoming_flights=data)
 	else: # does not have data
 		error = 'Sorry ... Flight does not exist or tickets sold out!'
-		return render_template('cusSearchPurchase.html', email = email, emailName=email.split('@')[0], error1=error)	
+		return render_template('cusSearchPurchase.html', email = email, emailName=email.split('@')[0], error1=error)
 
 @app.route('/cus_buy_ticket', methods=['GET', 'POST'])
 def cus_buy_ticket():

@@ -1,14 +1,20 @@
-@app.route('/cusSpending', methods=['POST', 'GET'])
-def cusSpending():
-	email = session['email']
-	# cursor = conn.cursor()
-	# duration = request.form.get("duration")
-	# if duration is None:
-	# 	duration = "30"
+import datetime
 
-	# query = 'select sum(ticket_price * 0.1), avg(ticket_price * 0.1), count(ticket_price * 0.1) from agent_commission where email = \'{}\' and (purchase_date between DATE_ADD(NOW(), INTERVAL -\'{}\' DAY) and NOW())'
-	# cursor.execute(query.format(email, duration))
-	# commission_data = cursor.fetchone()
-	# total_com, avg_com, count_ticket = commission_data
-	# cursor.close()
-	return render_template('cusSpending.html', email=email)
+today = datetime.date.today()
+
+future_day = today.day
+future_month = (today.month + 6) % 12
+future_year = today.year + ((today.month + 6) // 12)
+
+six_months_later = datetime.date(future_year, future_month, future_day)
+
+# print(six_months_later)
+
+for i in range(6):
+	month = (today.month + i) % 12
+	if month == 0:
+		month = 12
+	year = today.year + ((today.month + i) // 12)
+	print(month, year)
+
+
