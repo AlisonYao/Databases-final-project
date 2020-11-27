@@ -44,7 +44,7 @@
                 <input type="text" name = "status" placeholder="status" required/> </br>
                 <input type="text" name = "airplane_id" placeholder="airplane_id" required/> </br>
             
-                <input type="submit" value = creat_flight />
+                <input type="submit" class="btn btn-primary" value = Creat_Flight />
                 {% if error1 %}
                     <p class="text-danger"><strong>Error:</strong> {{error1}}</p>
                 {% endif %}
@@ -61,7 +61,7 @@
                 <input type="text" name = "airplane_id" placeholder="airplane_id" required/> </br>
                 <input type="text" name = "seats" placeholder="seats" required/> </br>
             
-                <input type="submit" value = add_airplane />
+                <input type="submit" class="btn btn-primary" value = Add_Airplane />
                 {% if error2 %}
                     <p class="text-danger"><strong>Error:</strong> {{error2}}</p>
                 {% endif %}
@@ -101,7 +101,7 @@
                 <input type="text" name = "airport_name" placeholder="airport_name" required/> </br>
                 <input type="text" name = "airport_city" placeholder="airport_city" required/> </br>
 
-                <input type="submit" value = add_airport />
+                <input type="submit" class="btn btn-primary" value = Add_Airport />
                 {% if error3 %}
                     <p class="text-danger"><strong>Error:</strong> {{error3}}</p>
                 {% endif %}
