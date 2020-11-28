@@ -25,7 +25,8 @@
         <a href="/staffaddinfo" style="color: #2db2ff;">Create Flight & Airplane & Airport</a>
         <a href="/staffagent">View Booking Agents</a>
         <a href="/staffcus">View Customers</a>
-        <a href="/staffreport">View Reports</a>
+        <a href="/staffDestReve">View Revenue Earned & Top Destination</a>
+        <a href="/staffTickets">View Tickets Sold</a>
     </div>
 
     <div class="main">
@@ -44,7 +45,7 @@
                 <input type="text" name = "status" placeholder="status" required/> </br>
                 <input type="text" name = "airplane_id" placeholder="airplane_id" required/> </br>
             
-                <input type="submit" class="btn btn-primary" value = Creat_Flight />
+                <input type="submit" class="btn btn-primary" value = Create_Flight />
                 {% if error1 %}
                     <p class="text-danger"><strong>Error:</strong> {{error1}}</p>
                 {% endif %}

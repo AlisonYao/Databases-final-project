@@ -1057,8 +1057,8 @@ def staffflightcus():
 		# cursor.close()
 		return render_template('staffcus.html', error3 = error3, frequent = data1, username = username)
 	
-@app.route('/staffreport')
-def staffreport():
+@app.route('/staffDestReve')
+def staffDestReve():
 	username = session['username']
 	# # airline_name = session['airline_name']
 	cursor = conn.cursor();
@@ -1083,25 +1083,47 @@ def staffreport():
 	year = cursor.fetchall()
 
 	query3 = "SELECT sum(price)\
-		FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
-		WHERE username = \'{}\' AND booking_agent_id is NULL\
-		GROUP BY airline_name"
-	
+	FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
+	WHERE username = \'{}\' AND booking_agent_id is NULL AND MONTH(purchase_date) =  MONTH(CURDATE()) - 1\
+	GROUP BY airline_name"
+
 	cursor.execute(query3.format(username))
 	# cursor.execute(query1)
-	direct = cursor.fetchall()
+	mdirect = cursor.fetchall()
 
 	query4 = "SELECT sum(price)\
 	FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
-	WHERE username = \'{}\' AND booking_agent_id is NOT NULL\
+	WHERE username = \'{}\' AND booking_agent_id is NOT NULL AND MONTH(purchase_date) =  MONTH(CURDATE()) - 1\
 	GROUP BY airline_name"
 	
 	cursor.execute(query4.format(username))
 	# cursor.execute(query1)
-	indirect = cursor.fetchall()
+	mindirect = cursor.fetchall()
 
+	query5 = "SELECT sum(price)\
+	FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
+	WHERE username = \'{}\' AND booking_agent_id is NULL AND YEAR(purchase_date) =  YEAR(CURDATE()) - 1\
+	GROUP BY airline_name"
+	
+	cursor.execute(query5.format(username))
+	# cursor.execute(query1)
+	ydirect = cursor.fetchall()
+
+	query6 = "SELECT sum(price)\
+	FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
+	WHERE username = \'{}\' AND booking_agent_id is NOT NULL AND YEAR(purchase_date) =  YEAR(CURDATE()) - 1\
+	GROUP BY airline_name"
+	
+	cursor.execute(query6.format(username))
+	# cursor.execute(query1)
+	yindirect = cursor.fetchall()
+	
 	cursor.close()
-	return render_template('staffreport.html', month = month, year = year, direct = direct, indirect = indirect, username = username)
+	return render_template('staffDestReve.html', month = month, year = year, username = username, mdirect = mdirect, mindirect = mindirect, ydirect = ydirect, yindirect = yindirect)
+
+@app.route('/staffTickets')
+def staffTickets():
+	return render_template('staffTickets.html')
 
 @app.route('/staffticket', methods=['GET', 'POST'])
 def staffticket():
@@ -1139,44 +1161,41 @@ def staffticket():
 		# cursor.execute(query1)
 		allticket = cursor.fetchall()
 
-	query1 = "SELECT airport_city, count(ticket_id) AS ticket FROM \
-		purchases NATURAL JOIN ticket NATURAL JOIN flight, airport \
-		WHERE airport_name = arrival_airport and MONTH(purchase_date) >  MONTH(CURDATE()) - 3\
-		GROUP BY airport_city\
-		ORDER BY ticket DESC\
-			 LIMIT 3"
-	cursor.execute(query1)
-	# cursor.execute(query1)
-	month = cursor.fetchall()
-
-	cursor = conn.cursor();
-	query2 = "SELECT airport_city, count(ticket_id) AS ticket FROM \
-		purchases NATURAL JOIN ticket NATURAL JOIN flight, airport \
-		WHERE airport_name = arrival_airport and YEAR(purchase_date) =  YEAR(CURDATE()) - 1\
-			GROUP BY airport_city\
-		ORDER BY ticket DESC\
-			LIMIT 3"
-	cursor.execute(query2)
-	# cursor.execute(query1)
-	year = cursor.fetchall()
-
-	query3 = "SELECT sum(price)\
-	FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
-	WHERE username = \'{}\' AND booking_agent_id is NULL\
-	GROUP BY airline_name"
+	# query3 = "SELECT sum(price)\
+	# 	FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
+	# 	WHERE username = \'{}\' AND booking_agent_id is NULL AND MONTH(purchase_date) =  MONTH(CURDATE()) - 1\
+	# 	GROUP BY airline_name"
 	
-	cursor.execute(query3.format(username))
-	# cursor.execute(query1)
-	direct = cursor.fetchall()
+	# cursor.execute(query3.format(username))
+	# # cursor.execute(query1)
+	# mdirect = cursor.fetchall()
 
-	query4 = "SELECT sum(price)\
-	FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
-	WHERE username = \'{}\' AND booking_agent_id is NOT NULL\
-	GROUP BY airline_name"
+	# query4 = "SELECT sum(price)\
+	# FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
+	# WHERE username = \'{}\' AND booking_agent_id is NOT NULL AND MONTH(purchase_date) =  MONTH(CURDATE()) - 1\
+	# GROUP BY airline_name"
 	
-	cursor.execute(query4.format(username))
-	# cursor.execute(query1)
-	indirect = cursor.fetchall()
+	# cursor.execute(query4.format(username))
+	# # cursor.execute(query1)
+	# mindirect = cursor.fetchall()
+
+	# query5 = "SELECT sum(price)\
+	# FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
+	# WHERE username = \'{}\' AND booking_agent_id is NULL AND YEAR(purchase_date) =  YEAR(CURDATE()) - 1\
+	# GROUP BY airline_name"
+	
+	# cursor.execute(query5.format(username))
+	# # cursor.execute(query1)
+	# ydirect = cursor.fetchall()
+
+	# query6 = "SELECT sum(price)\
+	# FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
+	# WHERE username = \'{}\' AND booking_agent_id is NOT NULL AND YEAR(purchase_date) =  YEAR(CURDATE()) - 1\
+	# GROUP BY airline_name"
+	
+	# cursor.execute(query6.format(username))
+	# # cursor.execute(query1)
+	# yindirect = cursor.fetchall()
 
 	cursor.close()
 
@@ -1186,11 +1205,11 @@ def staffticket():
 		monthticket = [allticket[i][2] for i in range(len(allticket))]
 		# print(time)
 		# print(monthticket)
-		return render_template('staffreport.html', time = time, monthticket = monthticket, ticket = allticket, direct = direct, indirect = indirect, username = username, month = month, year = year)
+		return render_template('staffTickets.html', time = time, monthticket = monthticket, ticket = allticket, username = username)
 	else:
 		error = "No ticket sold"
 		# cursor.close()
-		return render_template('staffreport.html', error = error, direct = direct, indirect = indirect, username = username, month = month, year = year)
+		return render_template('staffTickets.html', error = error, username = username)
 
 
 #####################################################################
