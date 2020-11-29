@@ -25,7 +25,6 @@ conn = mysql.connector.connect(host='localhost',
 def publicHome():
 	return render_template('publicHome.html')
 
-# TODO-Alison: why is the freaking view not working????? space & tab problems?????
 @app.route('/publicSearchFlight', methods=['GET', 'POST'])
 def publicSearchFlight():
 	departure_city = request.form['departure_city']
@@ -273,8 +272,7 @@ def cusSearchFlight():
 	
 	if (data):
 		return render_template('cusSearchPurchase.html', email = email, emailName=email.split('@')[0], upcoming_flights=data)
-		# return redirect(url_for('cushome'), upcoming_flights=data)
-	else: # does not have data
+	else:
 		error = 'Sorry ... Flight does not exist or tickets sold out!'
 		return render_template('cusSearchPurchase.html', email = email, emailName=email.split('@')[0], error1=error)
 
@@ -344,7 +342,6 @@ def agentloginAuth():
 		session['email'] = email
 		return render_template('agenthome.html', email=email, emailName=email.split('@')[0], view_my_flights=data2, booking_agent_id=data1)
 	else:
-		#returns an error message to the html page
 		error = 'Invalid login or email'
 		return render_template('agentlogin.html', error=error)
 
@@ -1219,8 +1216,8 @@ def logoutEmail():
 
 
 app.secret_key = 'some key that you will never guess'
-#Run the app on localhost port 5000
-#debug = True -> you don't have to restart flask
-#for changes to go through, TURN OFF FOR PRODUCTION
+# Run the app on localhost port 5000
+# debug = True -> you don't have to restart flask
+# for changes to go through, TURN OFF FOR PRODUCTION
 if __name__ == "__main__":
 	app.run('127.0.0.1', 5000, debug = True)
