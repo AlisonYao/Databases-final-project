@@ -10,15 +10,15 @@ import datetime
 app = Flask(__name__)
 
 #Configure MySQL
-# conn = mysql.connector.connect(host='localhost',
-#                        user='root',
-#                        password='86466491@Alison',
-#                        database='temp')
-
 conn = mysql.connector.connect(host='localhost',
-					   user='root',
-					   password='root',
-					   database='air')
+                       user='root',
+                       password='86466491@Alison',
+                       database='temp')
+
+# conn = mysql.connector.connect(host='localhost',
+# 					   user='root',
+# 					   password='root',
+# 					   database='air')
 
 #####################################################################
 #                               PUBLIC                              #
@@ -106,11 +106,10 @@ def cusloginAuth():
 	password = request.form['password']
 
 	cursor = conn.cursor()
-	query = "SELECT email, password FROM customer WHERE email = \'{}\' and password = \'{}\'"
+	query = "SELECT * FROM customer WHERE email = \'{}\' and password = md5(\'{}\')"
 	cursor.execute(query.format(email, password))
 	data = cursor.fetchone()
 	cursor.close()
-	error = None
 	if(data):
 		session['email'] = email
 		cursor = conn.cursor()
@@ -154,7 +153,7 @@ def cusregisterAuth():
 		error = "This user already exists"
 		return render_template('cusregister.html', error = error)
 	else:
-		ins = "INSERT INTO customer VALUES(\'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\')"
+		ins = "INSERT INTO customer VALUES(\'{}\', \'{}\', md5(\'{}\'), \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\')"
 		cursor.execute(ins.format(email, name, password, building_number, street, city, state, phone_number, passport_number, passport_expiration, passport_country, date_of_birth))
 		conn.commit()
 		query = "SELECT ticket_id, airline_name, airplane_id, flight_num, \
@@ -332,11 +331,10 @@ def agentloginAuth():
 	password = request.form['password']
 
 	cursor = conn.cursor()
-	query = "SELECT email, password FROM booking_agent WHERE email = \'{}\' and password = \'{}\'"
+	query = "SELECT * FROM booking_agent WHERE email = \'{}\' and password = md5(\'{}\')"
 	cursor.execute(query.format(email, password))
 	data = cursor.fetchone()
 	cursor.close()
-	error = None
 	if(data):
 		cursor = conn.cursor()
 		query1 = "SELECT booking_agent_id FROM booking_agent WHERE email = \'{}\'"
@@ -362,17 +360,13 @@ def agentregisterAuth():
 	cursor = conn.cursor()
 	query = "SELECT * FROM booking_agent WHERE email = \'{}\'"
 	cursor.execute(query.format(email))
-	#stores the results in a variable
 	data = cursor.fetchone()
-	#use fetchall() if you are expecting more than 1 data row
-	error = None
 	if(data):
 		cursor.close()
-		#If the previous query returns data, then user exists
 		error = "This user already exists"
 		return render_template('agentregister.html', error = error)
 	else:
-		ins = "INSERT INTO booking_agent VALUES(\'{}\', \'{}\', \'{}\')"
+		ins = "INSERT INTO booking_agent VALUES(\'{}\', md5(\'{}\'), \'{}\')"
 		cursor.execute(ins.format(email, password, booking_agent_id))
 		conn.commit()
 		query1 = "SELECT booking_agent_id FROM booking_agent WHERE email = \'{}\'"
@@ -579,7 +573,7 @@ def staffloginAuth():
 	#cursor used to send queries
 	cursor = conn.cursor()
 	#executes query
-	query = "SELECT username, password FROM airline_staff WHERE username = \'{}\' and password = \'{}\'"
+	query = "SELECT * FROM airline_staff WHERE username = \'{}\' and password = md5(\'{}\')"
 	cursor.execute(query.format(username, password))
 	#stores the results in a variable
 	data = cursor.fetchone()
@@ -634,7 +628,7 @@ def staffregisterAuth():
 	error = None
 	
 	if(data):
-		ins = "INSERT INTO airline_staff VALUES(\'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\')"
+		ins = "INSERT INTO airline_staff VALUES(\'{}\', md5(\'{}\'), \'{}\', \'{}\', \'{}\', \'{}\')"
 		cursor.execute(ins.format(username, password, first_name, last_name, date_of_birth, airline_name))
 		conn.commit()
 
