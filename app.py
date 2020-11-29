@@ -1,6 +1,3 @@
-# TODO-both: check SQL after everything is finished. View & Grant
-# TODO-both: Cross check each other's work
-
 #Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect, flash
 import mysql.connector
