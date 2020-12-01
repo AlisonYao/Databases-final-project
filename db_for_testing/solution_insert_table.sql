@@ -6,8 +6,8 @@ insert into customer values ('clark@gmail.com', 'Clark Kent', md5('IAmSuperman')
 insert into airplane values ('China Eastern', '10101', 366);
 insert into airplane values ('China Eastern', '20202', 853);
 insert into airline_staff values ('Janet', md5('theGoodPlace'), 'Janet', 'Robot', '1978-02-05', 'China Eastern');
-insert into flight values ('China Eastern', '11111', 'JFK', '2020-04-13 11:32:23', 'PVG', '2020-04-14 05:38:43', '5400', 'upcoming', '10101');
-insert into flight values ('China Eastern', '22222', 'PVG', '2020-11-09 10:21:56', 'JFK', '2020-04-14 02:25:31', '3400', 'delayed', '20202');
+insert into flight values ('China Eastern', '11111', 'JFK', '2020-04-13 11:32:23', 'PVG', '2020-04-14 05:38:43', '5400', 'upcoming', '10101', 0);
+insert into flight values ('China Eastern', '22222', 'PVG', '2020-11-09 10:21:56', 'JFK', '2020-04-14 02:25:31', '3400', 'delayed', '20202', 0);
 insert into ticket values ('12345', 'China Eastern', '11111');
 insert into ticket values ('74373', 'China Eastern', '11111');
 insert into ticket values ('20000', 'China Eastern', '11111');

@@ -9,7 +9,7 @@ app = Flask(__name__)
 conn = mysql.connector.connect(host='localhost',
                        user='root',
                        password='86466491@Alison',
-                       database='temp')
+                       database='air')
 
 # conn = mysql.connector.connect(host='localhost',
 # 					   user='root',
@@ -20,7 +20,7 @@ conn = mysql.connector.connect(host='localhost',
 #####################################################################
 #                               HELPER                              #
 #####################################################################
-# for natural cases such as Dylan O'Brian and mallicious cases such as 2' or '1'='1
+# for natural cases such as Dylan O'Brian and malicious cases such as inputting 2' or '1'='1 on purpose
 # add a ' after every ' to escape so that SQL will not have any error
 def check_apostrophe(x):
 	if "'" not in x:
@@ -234,7 +234,9 @@ def cusSpending():
 	today = datetime.date.today()
 	past_day = today.day
 	past_month = (today.month - int(period)) % 12
-	past_year = today.year + ((today.month - int(period)) // 12)
+	if past_month == 0:
+		past_month = 12
+	past_year = today.year + ((today.month - int(period) - 1) // 12)
 	past_date = datetime.date(past_year, past_month, past_day) # the day 6 months ago
 
 	cursor = conn.cursor()
@@ -283,8 +285,8 @@ def cusSearchFlight():
 	# flights with tickets left
 	query1 = "SELECT airline_name, airplane_id, flight_num, D.airport_city, departure_airport, \
 		A.airport_city, arrival_airport, departure_time, arrival_time, \
-			price, status, count(ticket_id)\
-		FROM airport as D, flight NATURAL JOIN ticket, airport AS A WHERE \
+			price, status, num_tickets_left\
+		FROM airport as D, flight, airport AS A WHERE \
 		D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\') and \
 		D.airport_name = departure_airport and \
 		departure_airport = if (\'{}\' = '', departure_airport, \'{}\') and \
@@ -292,13 +294,27 @@ def cusSearchFlight():
 		A.airport_name = arrival_airport and \
 		arrival_airport =  if (\'{}\' = '', arrival_airport, \'{}\')and \
 		date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\')and \
-		date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\') and \
-		ticket_id NOT IN (SELECT ticket_id FROM flight NATURAL JOIN ticket NATURAL JOIN purchases) \
-		GROUP BY airline_name, airplane_id, flight_num, D.airport_city, departure_airport, \
-		A.airport_city, arrival_airport, departure_time, arrival_time, price"
+		date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\')"
+	# query1 = "SELECT airline_name, airplane_id, flight_num, D.airport_city, departure_airport, \
+	# 	A.airport_city, arrival_airport, departure_time, arrival_time, \
+	# 		price, status, count(ticket_id)\
+	# 	FROM airport as D, flight NATURAL JOIN ticket, airport AS A WHERE \
+	# 	D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\') and \
+	# 	D.airport_name = departure_airport and \
+	# 	departure_airport = if (\'{}\' = '', departure_airport, \'{}\') and \
+	# 	A.airport_city = if (\'{}\' = '', A.airport_city, \'{}\')and \
+	# 	A.airport_name = arrival_airport and \
+	# 	arrival_airport =  if (\'{}\' = '', arrival_airport, \'{}\')and \
+	# 	date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\')and \
+	# 	date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\') and \
+	# 	ticket_id NOT IN (SELECT ticket_id FROM flight NATURAL JOIN ticket NATURAL JOIN purchases) \
+	# 	GROUP BY airline_name, airplane_id, flight_num, D.airport_city, departure_airport, \
+	# 	A.airport_city, arrival_airport, departure_time, arrival_time, price"
+	# cursor.execute(query1.format(departure_city,departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date,arrival_date))
 	cursor.execute(query1.format(departure_city,departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date,arrival_date))
 	data = cursor.fetchall()
 	cursor.close()
+	print('###############', data)
 	
 	if (data):
 		return render_template('cusSearchPurchase.html', email = email, emailName=email.split('@')[0], upcoming_flights=data)
@@ -518,9 +534,9 @@ def agentSearchFlight():
 		agent_id_error = 'You are not a booking agent'
 		return render_template('agentSearchPurchase.html', error1=agent_id_error)
 
-	# booking agent email validated
+	# booking agent email has been validated
 	cursor = conn.cursor()
-	query = "SELECT airplane_id, flight_num, D.airport_city, departure_airport, A.airport_city, arrival_airport, departure_time, arrival_time, status, price \
+	query = "SELECT airplane_id, flight_num, D.airport_city, departure_airport, A.airport_city, arrival_airport, departure_time, arrival_time, status, price, airline_name, num_tickets_left \
 				FROM airport as D, flight, airport AS A \
 				WHERE D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\') and \
 				D.airport_name = departure_airport and \
@@ -1085,13 +1101,13 @@ def staffflightcus():
 	flag, db_username = check_apostrophe(username)
 	if not flag:
 		db_username = username
-	flight = request.form['flight_num']
+	flight_num = request.form['flight_num']
 
 	cursor = conn.cursor();
 	query3 = "SELECT DISTINCT email, name FROM customer, \
 				purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
 		WHERE flight_num = \'{}\' and email = customer_email and username = \'{}\'"
-	cursor.execute(query3.format(flight, db_username))
+	cursor.execute(query3.format(flight_num, db_username))
 	# cursor.execute(query2)
 	data3 = cursor.fetchall()
 
@@ -1111,7 +1127,7 @@ def staffflightcus():
 		cursor = conn.cursor();
 		cus = "SELECT flight_num FROM flight NATURAL JOIN airline_staff WHERE flight_num = \'{}\'\
 			AND username = \'{}\'"
-		cursor.execute(cus.format(flight, db_username))
+		cursor.execute(cus.format(flight_num, db_username))
 		# cursor.execute(query2)
 		cus = cursor.fetchone()
 		cursor.close()

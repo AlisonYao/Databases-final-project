@@ -22,12 +22,14 @@ Check out flask/Flask_for_class. It is very useful. It build a basic app where y
 
 Once you have a basic working webapp that you can see, it is time to move on to the security and optimization of the databases. After all, it is a databases class and there is no need to fixate on the frontend design too much. Though the frontend should be easy on the eye and usable.
 
+**create DB; insert tables; set triggers; insert dummy data; create views**
+
 ### TODO:
 
 Backend:
 
 - [x] password hashing
-- [ ] Stored procedures & stored functions & triggers
+- [x] Stored procedures & stored functions & triggers
 - [ ] clean up views & grants
 - [ ] enforcing complex constraints such as preventing unauthorized users to add flight information
 - [ ] prevent cross-site scripting vulnerabilities

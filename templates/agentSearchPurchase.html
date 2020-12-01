@@ -28,7 +28,7 @@
 	
 	<!-- Page content -->
 	<div class="main">
-		<h2 style='color: red;'>Search & Purchase Flights</h2>
+		<h2>Search & Purchase Flights</h2>
 
 		<div style="text-align: center;">
 			<h3>Search for Flight</h3>
@@ -55,6 +55,7 @@
 			</br>
 			<table class="table table-bordered table-sm">
 				<thead>
+					<th>airline name</th>
 					<th>flight num</th>
 					<th>airplane id</th>
 					<th>departure city&airport</th>
@@ -69,6 +70,7 @@
 				<tbody>
 				{% for line in upcoming_flights %}
 					<tr>
+						<td>{{line[10]}}</td>
 						<td>{{line[1]}}</td>
 						<td>{{line[0]}}</td>
 						<td>{{line[2]}} {{line[3]}}</td>
@@ -77,6 +79,7 @@
 						<td>{{line[7]}}</td> 
 						<td>{{line[8]}}</td>
 						<td>{{line[9]}}</td>
+						<td>{{line[11]}}</td>
 					</tr>
 				{% endfor %}
 				</tbody>
@@ -87,6 +90,15 @@
 
 			<h3>Purchase Tickets</h3>
 			<form action="/agentBuyTickets" method="POST">
+				<label for="airline_name">Airline Name:</label>
+				<select name="airline_name" required>
+					<option value="" disabled>--please search first--</option>
+					{% if upcoming_flights%}
+					{% for line in upcoming_flights %}
+					<option value="{{line[10]}}">{{line[10]}}</option>
+					{% endfor %}
+					{% endif %}
+				</select>
 				<label for="flight_num">Flight Number:</label>
 				<select name="flight_num" required>
 					<option value="" disabled>--please search first--</option>

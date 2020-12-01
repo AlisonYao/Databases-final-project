@@ -97,6 +97,7 @@ CREATE TABLE `flight` (
   `price` decimal(10,0) NOT NULL,
   `status` varchar(50) NOT NULL,
   `airplane_id` int(11) NOT NULL,
+  `num_tickets_left` int(11), -- added one column here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   PRIMARY KEY(`airline_name`, `flight_num`),
   FOREIGN KEY(`airline_name`, `airplane_id`) REFERENCES `airplane`(`airline_name`, `airplane_id`),
   FOREIGN KEY(`departure_airport`) REFERENCES `airport`(`airport_name`),
