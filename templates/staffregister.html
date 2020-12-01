@@ -29,12 +29,18 @@
 	</br>
 
 	<form action="/staffregisterAuth" method="POST" style="text-align: center;">
-		<input type="text" name = "username" placeholder="username" required/> </br>
-		<input type="password" name = "password" placeholder="password" required/></br>
-		<input type="text" name = "first_name" placeholder="first_name" required/></br>
-		<input type="text" name = "last_name" placeholder="last_name" required/></br>
+		<input type="text" name = "username" placeholder="username" maxlength="50" required/> </br>
+		<!-- <input type="password" name = "password" placeholder="password" required/></br> -->
+		<input type="password" name = "password" placeholder="password" maxlength="50" 
+				pattern="^[a-zA-Z0-9]{6,}$" required/></br>
+		<p style="font-size:80%; color: gray">
+			>= 6 characters; 
+			No special characters
+		</p>
+		<input type="text" name = "first_name" placeholder="first_name" maxlength="50" required/></br>
+		<input type="text" name = "last_name" placeholder="last_name" maxlength="50" required/></br>
 		<input type="text" name = "date_of_birth" placeholder="date_of_birth" onfocus="(this.type='date')"  onblur="(this.type='text')" required/></br>
-		<input type="text" name = "airline_name" placeholder="airline_name" required/></br>
+		<input type="text" name = "airline_name" placeholder="airline_name" maxlength="50" required/></br>
 		</br>
 		<input type="submit" value = Register />
 		{% if error %}

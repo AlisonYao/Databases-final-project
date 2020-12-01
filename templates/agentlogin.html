@@ -29,9 +29,13 @@
 	</br>
 
 	<form action="/agentloginAuth" method="POST" style="text-align: center;">
-		<input type="email" name = "email" placeholder="email" required/> </br>
-		<input type="password" name = "password" placeholder="password" required/></br>
-		</br>
+		<input type="email" name = "email" placeholder="email" maxlength="50" required/> </br>
+		<input type="password" name = "password" placeholder="password" maxlength="50" 
+				pattern="^[a-zA-Z0-9]{6,}$" required/></br>
+		<p style="font-size:80%; color: gray">
+			>= 6 characters; 
+			No special characters
+		</p>
 		<input type="submit" value = Login />
 		{% if error %}
 			<p class="text-danger"><strong>Error:</strong> {{error}}</p>

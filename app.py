@@ -1,4 +1,3 @@
-#Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect, flash
 import mysql.connector
 import datetime
@@ -57,23 +56,18 @@ def publicSearchFlight():
 
 @app.route('/publicSearchStatus', methods=['GET', 'POST'])
 def publicSearchStatus():
+	# do not need to check input bc if the input is wrong the worst is no reult
 	flight_num = request.form['flight_num']
 	arrival_date = request.form['arrival_date']
 	departure_date = request.form['departure_date']
 	airline_name = request.form['airline_name']
 
 	cursor = conn.cursor()
-	query = "select * \
-			from flight \
-			where flight_num = if (\'{}\' = '', flight_num, \'{}\') \
-				and date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\') \
-				and date(arrival_time) = if (\'{}\' = '', date(arrival_time), \'{}\') \
-				and airline_name = if (\'{}\' = '', airline_name, \'{}\')"
+	query = "select * from flight where flight_num = if (\'{}\' = '', flight_num, \'{}\') and date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\') and date(arrival_time) = if (\'{}\' = '', date(arrival_time), \'{}\') and airline_name = if (\'{}\' = '', airline_name, \'{}\')"
 	cursor.execute(query.format(flight_num, flight_num, arrival_date, arrival_date, departure_date, departure_date, airline_name, airline_name))
 	data = cursor.fetchall() 
 	cursor.close()
 	
-	error = None
 	if (data): # has data
 		return render_template('publicHome.html', statuses=data)
 	else: # does not have data
@@ -326,7 +320,7 @@ def agentloginAuth():
 	password = request.form['password']
 
 	cursor = conn.cursor()
-	query = "SELECT * FROM booking_agent WHERE email = \'{}\' and password = md5(\'{}\')"
+	query = "SELECT * FROM booking_agent WHERE email = \'{}\' and password = md5(\"{}\")"
 	cursor.execute(query.format(email, password))
 	data = cursor.fetchone()
 	cursor.close()
@@ -577,7 +571,6 @@ def staffloginAuth():
 	cursor.execute(query1.format(username))
 	data1 = cursor.fetchall()
 	cursor.close()
-	error = None
 	if(data):
 		#creates a session for the the user
 		#session is a built in

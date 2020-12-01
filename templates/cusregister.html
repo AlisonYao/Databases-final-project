@@ -29,17 +29,26 @@
 	</br>
 
 	<form action="/cusregisterAuth" method="POST" style="text-align: center;">
-		<input type="email" name = "email" placeholder="email" required/> </br>
-		<input type="text" name = "name" placeholder="name" required/> </br>
-		<input type="password" name = "password" placeholder="password" required/></br>
-		<input type="text" name = "building_number" placeholder="building_number" required/> </br>
-		<input type="text" name = "street" placeholder="street" required/> </br>
-		<input type="text" name = "city" placeholder="city" required/> </br>
-		<input type="text" name = "state" placeholder="state" required/> </br>
-		<input type="text" name = "phone_number" placeholder="phone_number" required/> </br>
-		<input type="text" name = "passport_number" placeholder="passport_number" required/> </br>
+		<input type="email" name = "email" placeholder="email" maxlength="50" required/> </br>
+		<input type="text" name = "name" placeholder="name" maxlength="50" required/> </br>
+		<input type="password" name = "password" placeholder="password" maxlength="50" pattern="^[a-zA-Z0-9]{6,}$" required/></br>
+		<p style="font-size:80%; color: gray;">
+			>= 6 characters; 
+			No special characters
+		</p>
+		<input type="text" name = "building_number" placeholder="building_number" maxlength="30" required/> </br>
+		<input type="text" name = "street" placeholder="street" maxlength="30" required/> </br>
+		<input type="text" name = "city" placeholder="city" maxlength="30" required/> </br>
+		<input type="text" name = "state" placeholder="state" maxlength="30" required/> </br>
+		<!-- <input type="text" name = "phone_number" placeholder="phone_number" required/> </br> -->
+		<input name="phone_number" 
+				oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" 
+				type = "number" placeholder="phone_number" 
+				maxlength = "9" 
+				required/></br>
+		<input type="text" name = "passport_number" placeholder="passport_number" maxlength="30" required/> </br>
 		<input type="text" name = "passport_expiration" placeholder="passport_expiration" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
-		<input type="text" name = "passport_country" placeholder="passport_country" required/> </br>
+		<input type="text" name = "passport_country" placeholder="passport_country" maxlength="50" required/> </br>
 		<input type="text" name = "date_of_birth" placeholder="date_of_birth" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
 		</br>
 		<input type="submit" value = Register />

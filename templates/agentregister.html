@@ -29,9 +29,18 @@
 	</br>
 	
 	<form action="/agentregisterAuth" method="POST" style="text-align: center;">
-		<input type="email" name = "email" placeholder="email" required/> </br>
-		<input type="password" name = "password" placeholder="password" required/></br>
-		<input type="text" name = "booking_agent_id" placeholder="booking_agent_id" required/></br>
+		<input type="email" name = "email" placeholder="email" maxlength="50" required/> </br>
+		<input type="password" name = "password" placeholder="password" maxlength="50" pattern="^[a-zA-Z0-9]{6,}$" required/></br>
+		<p style="font-size:80%; color: gray;">
+			>= 6 characters; 
+			No special characters
+		</p>
+		<!-- <input type="number" name = "booking_agent_id" placeholder="booking_agent_id" min='0' max="2147483647" required/></br> -->
+		<input name="booking_agent_id" 
+				oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" 
+				type = "number" placeholder="booking_agent_id" 
+				maxlength = "9" 
+				required/></br>
 		</br>
 		<input type="submit" value = Register />
 		{% if error %}

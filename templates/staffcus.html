@@ -51,7 +51,7 @@
                 <h3>Flights Taken by Customer</h3>
                 <form action="/staffcusflight" method="POST">
                     <label>Customer email:</label>
-                    <input type="text" name = "customer_email" placeholder="customer_email"/> </br>
+                    <input type="email" name = "customer_email" placeholder="customer_email" maxlength="50" required/> </br>
                     <!-- <label>Departure Airport:</label>
                     <input type="text" name = "departure_airport" placeholder="departure_airport" /></br>
                     <label>Departure Date:</label>
@@ -104,7 +104,12 @@
                 <h3>Customers on Flight</h3>
                 <form action="/staffflightcus" method="POST">
                     <label>Flight number:</label>
-                    <input type="text" name = "flight_num" placeholder="flight_num"/> </br>
+                    <!-- <input type="text" name = "flight_num" placeholder="flight_num"/> </br> -->
+                    <input name="flight_num" 
+                        oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" 
+                        type = "number" placeholder="flight_num" 
+                        maxlength = "9" 
+                        required/></br>
                     <!-- <label>Departure Airport:</label>
                     <input type="text" name = "departure_airport" placeholder="departure_airport" /></br>
                     <label>Departure Date:</label>
