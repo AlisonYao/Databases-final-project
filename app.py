@@ -16,6 +16,24 @@ conn = mysql.connector.connect(host='localhost',
 # 					   password='root',
 # 					   database='air')
 
+
+#####################################################################
+#                               HELPER                              #
+#####################################################################
+# for natural cases such as Dylan O'Brian and mallicious cases such as 2' or '1'='1
+# add a ' after every ' to escape so that SQL will not have any error
+def check_apostrophe(x):
+	if "'" not in x:
+		return False, None
+	db_x = ''
+	for i in x:
+		if i == "'":
+			db_x += "''"
+		else:
+			db_x += i
+	return True, db_x
+
+
 #####################################################################
 #                               PUBLIC                              #
 #                all operations from the public side                #
@@ -93,11 +111,14 @@ def cusregister():
 @app.route('/cusloginAuth', methods=['GET', 'POST'])
 def cusloginAuth():
 	email = request.form['email']
+	flag, db_email = check_apostrophe(email)
+	if not flag:
+		db_email = email
 	password = request.form['password']
 
 	cursor = conn.cursor()
 	query = "SELECT * FROM customer WHERE email = \'{}\' and password = md5(\'{}\')"
-	cursor.execute(query.format(email, password))
+	cursor.execute(query.format(db_email, password))
 	data = cursor.fetchone()
 	cursor.close()
 	if(data):
@@ -107,7 +128,7 @@ def cusloginAuth():
 			FROM flight NATURAL JOIN purchases NATURAL JOIN ticket, airport as D, airport as A\
 				 WHERE customer_email = \'{}\' and status = 'upcoming' and \
 				D.airport_name = departure_airport and A.airport_name = arrival_airport"
-		cursor.execute(query.format(email))
+		cursor.execute(query.format(db_email))
 		data1 = cursor.fetchall() 
 		cursor.close()
 		return render_template('cushome.html', email=email, emailName=email.split('@')[0], view_my_flights=data1)
@@ -121,7 +142,13 @@ def cusloginAuth():
 def cusregisterAuth():
 	#grabs information from the forms
 	email = request.form['email']
+	flag, db_email = check_apostrophe(email)
+	if not flag:
+		db_email = email
 	name = request.form['name']
+	flag, db_name = check_apostrophe(name)
+	if not flag:
+		db_name = name
 	password = request.form['password']
 	building_number = request.form['building_number']
 	street = request.form['street']
@@ -135,16 +162,15 @@ def cusregisterAuth():
 
 	cursor = conn.cursor()
 	query = "SELECT * FROM customer WHERE email = \'{}\'"
-	cursor.execute(query.format(email))
+	cursor.execute(query.format(db_email))
 	data = cursor.fetchone()
-	error = None
 	if(data):
 		cursor.close()
 		error = "This user already exists"
 		return render_template('cusregister.html', error = error)
 	else:
 		ins = "INSERT INTO customer VALUES(\'{}\', \'{}\', md5(\'{}\'), \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\')"
-		cursor.execute(ins.format(email, name, password, building_number, street, city, state, phone_number, passport_number, passport_expiration, passport_country, date_of_birth))
+		cursor.execute(ins.format(db_email, db_name, password, building_number, street, city, state, phone_number, passport_number, passport_expiration, passport_country, date_of_birth))
 		conn.commit()
 		query = "SELECT ticket_id, airline_name, airplane_id, flight_num, \
 			D.airport_city, \
@@ -152,7 +178,7 @@ def cusregisterAuth():
 				FROM flight NATURAL JOIN purchases NATURAL JOIN ticket, airport as D, airport as A\
 					WHERE customer_email = \'{}\' and status = 'upcoming' and \
 					D.airport_name = departure_airport and A.airport_name = arrival_airport"
-		cursor.execute(query.format(email))
+		cursor.execute(query.format(db_email))
 		data1 = cursor.fetchall() 
 		cursor.close()
 		flash("You are logged in")
@@ -162,6 +188,9 @@ def cusregisterAuth():
 @app.route('/cushome')
 def cushome():
 	email = session['email']
+	flag, db_email = check_apostrophe(email)
+	if not flag:
+		db_email = email
 	cursor = conn.cursor()
 	query = "SELECT ticket_id, airline_name, airplane_id, flight_num, \
 		D.airport_city, \
@@ -169,7 +198,7 @@ def cushome():
 			FROM flight NATURAL JOIN purchases NATURAL JOIN ticket, airport as D, airport as A\
 				 WHERE customer_email = \'{}\' and status = 'upcoming' and \
 				D.airport_name = departure_airport and A.airport_name = arrival_airport"
-	cursor.execute(query.format(email))
+	cursor.execute(query.format(db_email))
 	data1 = cursor.fetchall() 
 	cursor.close()
 	return render_template('cushome.html', email=email, emailName=email.split('@')[0], view_my_flights=data1)
@@ -182,6 +211,10 @@ def cusSearchPurchase():
 @app.route('/cusSpending', methods=['POST', 'GET'])
 def cusSpending():
 	email = session['email']
+	flag, db_email = check_apostrophe(email)
+	if not flag:
+		db_email = email
+
 	# show total spending in the past period of time
 	duration = request.form.get("duration")
 	if duration is None:
@@ -190,7 +223,7 @@ def cusSpending():
 	query = 'select sum(price)\
 				from customer_spending \
 				where customer_email = \'{}\' and (purchase_date between DATE_ADD(NOW(), INTERVAL -\'{}\' DAY) and NOW())'
-	cursor.execute(query.format(email, duration))
+	cursor.execute(query.format(db_email, duration))
 	total_spending_data = cursor.fetchone()
 	cursor.close()
 
@@ -209,7 +242,7 @@ def cusSpending():
 				from customer_spending \
 				where customer_email = \'{}\' and purchase_date >= \'{}\' \
 				group by year(purchase_date), month(purchase_date)"
-	cursor.execute(query2.format(email, past_date))
+	cursor.execute(query2.format(db_email, past_date))
 	monthly_spending_data = cursor.fetchall()
 	cursor.close()
 
@@ -236,6 +269,9 @@ def cusSpending():
 @app.route('/cusSearchFlight', methods=['GET', 'POST'])
 def cusSearchFlight():
 	email = session['email']
+	flag, db_email = check_apostrophe(email)
+	if not flag:
+		db_email = email
 	departure_city = request.form['departure_city']
 	departure_airport = request.form['departure_airport']
 	arrival_city = request.form['arrival_city']
@@ -273,7 +309,9 @@ def cusSearchFlight():
 @app.route('/cusBuyTickets', methods=['GET', 'POST'])
 def cusBuyTickets():
 	email = session['email']
-	# email = request.form['email']
+	flag, db_email = check_apostrophe(email)
+	if not flag:
+		db_email = email
 	flight_num = request.form['flight_num']
 	cursor = conn.cursor()
 	query = "SELECT ticket_id FROM flight NATURAL JOIN ticket\
@@ -290,8 +328,7 @@ def cusBuyTickets():
 		cursor = conn.cursor()
 		ticket = int(data[0][0])
 		ins = "INSERT INTO purchases VALUES (\'{}\', \'{}\', NULL, CURDATE())"
-		cursor.execute(ins.format(ticket, email))
-		# cursor.execute(query.format(email))
+		cursor.execute(ins.format(ticket, db_email))
 		conn.commit()
 		cursor.close()
 		message1 = 'Ticket bought successfully!'
@@ -317,20 +354,23 @@ def agentregister():
 @app.route('/agentloginAuth', methods=['GET', 'POST'])
 def agentloginAuth():
 	email = request.form['email']
+	flag, db_email = check_apostrophe(email)
+	if not flag:
+		db_email = email
 	password = request.form['password']
 
 	cursor = conn.cursor()
-	query = "SELECT * FROM booking_agent WHERE email = \'{}\' and password = md5(\"{}\")"
-	cursor.execute(query.format(email, password))
+	query = "SELECT * FROM booking_agent WHERE email = \'{}\' and password = md5(\'{}\')"
+	cursor.execute(query.format(db_email, password))
 	data = cursor.fetchone()
 	cursor.close()
 	if(data):
 		cursor = conn.cursor()
 		query1 = "SELECT booking_agent_id FROM booking_agent WHERE email = \'{}\'"
-		cursor.execute(query1.format(email))
+		cursor.execute(query1.format(db_email))
 		data1 = cursor.fetchone()
 		query2 = "SELECT * FROM agent_view_flight WHERE email = \'{}\'"
-		cursor.execute(query2.format(email))
+		cursor.execute(query2.format(db_email))
 		data2 = cursor.fetchall()
 		cursor.close()
 		session['email'] = email
@@ -342,12 +382,15 @@ def agentloginAuth():
 @app.route('/agentregisterAuth', methods=['GET', 'POST'])
 def agentregisterAuth():
 	email = request.form['email']
+	flag, db_email = check_apostrophe(email)
+	if not flag:
+		db_email = email
 	password = request.form['password']
 	booking_agent_id = request.form['booking_agent_id']
 
 	cursor = conn.cursor()
 	query = "SELECT * FROM booking_agent WHERE email = \'{}\'"
-	cursor.execute(query.format(email))
+	cursor.execute(query.format(db_email))
 	data = cursor.fetchone()
 	if(data):
 		cursor.close()
@@ -355,14 +398,14 @@ def agentregisterAuth():
 		return render_template('agentregister.html', error = error)
 	else:
 		ins = "INSERT INTO booking_agent VALUES(\'{}\', md5(\'{}\'), \'{}\')"
-		cursor.execute(ins.format(email, password, booking_agent_id))
+		cursor.execute(ins.format(db_email, password, booking_agent_id))
 		conn.commit()
 		query1 = "SELECT booking_agent_id FROM booking_agent WHERE email = \'{}\'"
-		cursor.execute(query1.format(email))
+		cursor.execute(query1.format(db_email))
 		data1 = cursor.fetchone()
 		# get view_my_flights info from db
 		query = "SELECT * FROM agent_view_flight WHERE email = \'{}\'"
-		cursor.execute(query.format(email))
+		cursor.execute(query.format(db_email))
 		data2 = cursor.fetchall()
 		cursor.close()
 		session['email'] = email
@@ -372,12 +415,15 @@ def agentregisterAuth():
 @app.route('/agentHome')
 def agentHome():
 	email = session['email']
+	flag, db_email = check_apostrophe(email)
+	if not flag:
+		db_email = email
 	cursor = conn.cursor()
 	query1 = "SELECT booking_agent_id FROM booking_agent WHERE email = \'{}\'"
-	cursor.execute(query1.format(email))
+	cursor.execute(query1.format(db_email))
 	data1 = cursor.fetchone()
 	query2 = "SELECT * FROM agent_view_flight WHERE email = \'{}\'"
-	cursor.execute(query2.format(email))
+	cursor.execute(query2.format(db_email))
 	data2 = cursor.fetchall()
 	cursor.close()
 	return render_template('agenthome.html', email=email, emailName=email.split('@')[0], view_my_flights=data2, booking_agent_id=data1)
@@ -390,13 +436,16 @@ def agentSearchPurchase():
 @app.route('/agentCommission', methods=['POST', 'GET'])
 def agentCommission():
 	email = session['email']
+	flag, db_email = check_apostrophe(email)
+	if not flag:
+		db_email = email
+
 	cursor = conn.cursor()
 	duration = request.form.get("duration")
 	if duration is None:
 		duration = "30"
-
 	query = 'select sum(ticket_price * 0.1), avg(ticket_price * 0.1), count(ticket_price * 0.1) from agent_commission where email = \'{}\' and (purchase_date between DATE_ADD(NOW(), INTERVAL -\'{}\' DAY) and NOW())'
-	cursor.execute(query.format(email, duration))
+	cursor.execute(query.format(db_email, duration))
 	commission_data = cursor.fetchone()
 	total_com, avg_com, count_ticket = commission_data
 	cursor.close()
@@ -405,9 +454,13 @@ def agentCommission():
 @app.route('/agentTopCustomers')
 def agentTopCustomers():
 	email = session['email']
+	flag, db_email = check_apostrophe(email)
+	if not flag:
+		db_email = email
+
 	cursor = conn.cursor()
 	query = "select customer_email, count(ticket_id) from agent_commission where email = \'{}\' and datediff(CURDATE(), DATE(purchase_date)) < 183 group by customer_email order by count(ticket_id) desc"
-	cursor.execute(query.format(email))
+	cursor.execute(query.format(db_email))
 	ticket_data = cursor.fetchall() # [('alison@gmail.com', 5), ('Alison1234@gmail.com', 2), ('clark@gmail.com', 1)]
 	cursor.close()
 
@@ -424,7 +477,7 @@ def agentTopCustomers():
 	
 	cursor = conn.cursor()
 	query2 = "select customer_email, sum(ticket_price) from agent_commission where email = \'{}\' and datediff(CURDATE(), DATE(purchase_date)) < 365 group by customer_email order by sum(ticket_price) desc"
-	cursor.execute(query2.format(email))
+	cursor.execute(query2.format(db_email))
 	commission_data = cursor.fetchall()
 	cursor.close()
 
@@ -443,6 +496,9 @@ def agentTopCustomers():
 @app.route('/agentSearchFlight', methods=['GET', 'POST'])
 def agentSearchFlight():
 	email = session['email']
+	flag, db_email = check_apostrophe(email)
+	if not flag:
+		db_email = email
 	departure_city = request.form['departure_city']
 	departure_airport = request.form['departure_airport']
 	arrival_city = request.form['arrival_city']
@@ -453,7 +509,7 @@ def agentSearchFlight():
 	# validate booking agent email
 	cursor = conn.cursor()
 	query = " select booking_agent_id from booking_agent where email = \'{}\'"
-	cursor.execute(query.format(email))
+	cursor.execute(query.format(db_email))
 	agent_data = cursor.fetchone() # tuple (98765,)
 	booking_agent_id = agent_data[0]
 	cursor.close()
@@ -486,13 +542,16 @@ def agentSearchFlight():
 @app.route('/agentBuyTickets', methods=['GET', 'POST'])
 def agentBuyTickets():
 	email = session['email']
+	flag, db_email = check_apostrophe(email)
+	if not flag:
+		db_email = email
 	flight_num = request.form.get("flight_num")
 	customer_email = request.form['customer_email']
 
 	# validate booking agent email
 	cursor = conn.cursor()
 	query = " select booking_agent_id from booking_agent where email = \'{}\'"
-	cursor.execute(query.format(email))
+	cursor.execute(query.format(db_email))
 	agent_data = cursor.fetchone() # tuple (98765,)
 	booking_agent_id = agent_data[0]
 	cursor.close()
@@ -554,26 +613,22 @@ def staffregister():
 #Authenticates the login
 @app.route('/staffloginAuth', methods=['GET', 'POST'])
 def staffloginAuth():
-	#grabs information from the forms
 	username = request.form['username']
+	flag, db_username = check_apostrophe(username)
+	if not flag:
+		db_username = username
 	password = request.form['password']
 
-	#cursor used to send queries
 	cursor = conn.cursor()
-	#executes query
 	query = "SELECT * FROM airline_staff WHERE username = \'{}\' and password = md5(\'{}\')"
-	cursor.execute(query.format(username, password))
-	#stores the results in a variable
+	cursor.execute(query.format(db_username, password))
 	data = cursor.fetchone()
-	#use fetchall() if you are expecting more than 1 data row
 
 	query1 = "SELECT username, airline_name, airplane_id, flight_num, departure_airport, arrival_airport, departure_time, arrival_time FROM flight NATURAL JOIN airline_staff WHERE username = \'{}\' and status = 'upcoming' and datediff(CURDATE(), DATE(departure_time)) < 30 "
-	cursor.execute(query1.format(username))
+	cursor.execute(query1.format(db_username))
 	data1 = cursor.fetchall()
 	cursor.close()
 	if(data):
-		#creates a session for the the user
-		#session is a built in
 		session['username'] = username
 		return render_template('staffhome.html', username=username, posts = data1)
 	else:
@@ -586,27 +641,29 @@ def staffloginAuth():
 def staffregisterAuth():
 	#grabs information from the forms
 	username = request.form['username']
+	flag, db_username = check_apostrophe(username)
+	if not flag:
+		db_username = username
 	password = request.form['password']
 	first_name = request.form['first_name']
+	flag, db_first_name = check_apostrophe(first_name)
+	if not flag:
+		db_first_name = first_name
 	last_name = request.form['last_name']
+	flag, db_last_name = check_apostrophe(last_name)
+	if not flag:
+		db_last_name = last_name
 	date_of_birth = request.form['date_of_birth']
 	airline_name = request.form['airline_name']
 
-	#cursor used to send queries
 	cursor = conn.cursor()
-	#executes query
 	query = "SELECT * FROM airline_staff WHERE username = \'{}\'"
-	cursor.execute(query.format(username))
-	#stores the results in a variable
+	cursor.execute(query.format(db_username))
 	data = cursor.fetchone()
-	#use fetchall() if you are expecting more than 1 data row
-	error = None
 	if(data):
-		#If the previous query returns data, then user exists
 		error = "This user already exists"
 		return render_template('staffregister.html', error = error)
 	
-	#executes query
 	query = "SELECT airline_name FROM airline WHERE airline_name = \'{}\'"
 	cursor.execute(query.format(airline_name))
 	#stores the results in a variable
@@ -616,11 +673,11 @@ def staffregisterAuth():
 	
 	if(data):
 		ins = "INSERT INTO airline_staff VALUES(\'{}\', md5(\'{}\'), \'{}\', \'{}\', \'{}\', \'{}\')"
-		cursor.execute(ins.format(username, password, first_name, last_name, date_of_birth, airline_name))
+		cursor.execute(ins.format(db_username, password, db_first_name, db_last_name, date_of_birth, airline_name))
 		conn.commit()
 
 		query1 = "SELECT username, airline_name, airplane_id, flight_num, departure_airport, arrival_airport, departure_time, arrival_time FROM flight NATURAL JOIN airline_staff WHERE username = \'{}\' and status = 'upcoming' and datediff(DATE(departure_time), CURDATE()) < 30 "
-		cursor.execute(query1.format(username))
+		cursor.execute(query1.format(db_username))
 		data1 = cursor.fetchall()
 
 		cursor.close()
@@ -636,10 +693,13 @@ def staffregisterAuth():
 @app.route('/staffhome')
 def staffhome():
 	username = session['username']
+	flag, db_username = check_apostrophe(username)
+	if not flag:
+		db_username = username
 	# airline_name = session['airline_name']
 	cursor = conn.cursor();
 	query = "SELECT username, airline_name, airplane_id, flight_num, departure_airport, arrival_airport, departure_time, arrival_time FROM flight NATURAL JOIN airline_staff WHERE username = \'{}\' and status = 'upcoming' and datediff(CURDATE(), DATE(departure_time)) < 30 "
-	cursor.execute(query.format(username))
+	cursor.execute(query.format(db_username))
 	data1 = cursor.fetchall()
 	cursor.close()
 	return render_template('staffhome.html', username=username, posts=data1)
@@ -653,6 +713,9 @@ def staffSearchFlight():
 	departure_date = request.form['departure_date']
 	arrival_date = request.form['arrival_date']
 	username = session['username']
+	flag, db_username = check_apostrophe(username)
+	if not flag:
+		db_username = username
 
 	cursor = conn.cursor()
 	query = "SELECT airline_name, airplane_id, flight_num, D.airport_city, departure_airport, A.airport_city, arrival_airport, departure_time, arrival_time, \
@@ -667,8 +730,7 @@ def staffSearchFlight():
 		date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\')and \
 		date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\') and \
 		username = \'{}\'"
-
-	cursor.execute(query.format(departure_city, departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date,arrival_date,username))
+	cursor.execute(query.format(departure_city, departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date,arrival_date,db_username))
 	data = cursor.fetchall()
 	cursor.close()
 	
@@ -686,9 +748,12 @@ def staffflight():
 @app.route('/staffaddinfo')
 def staffaddinfo():
 	username = session['username'] 
+	flag, db_username = check_apostrophe(username)
+	if not flag:
+		db_username = username
 	cursor = conn.cursor();
 	query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
-	cursor.execute(query.format(username))
+	cursor.execute(query.format(db_username))
 	data1 = cursor.fetchall()
 	cursor.close()
 
@@ -697,7 +762,6 @@ def staffaddinfo():
 @app.route('/edit_status', methods=['GET', 'POST'])
 def edit_status():
 	status = request.form['edit_status']
-
 	flight_num = request.form['flight_num']
 	
 	cursor = conn.cursor()
@@ -712,6 +776,9 @@ def edit_status():
 @app.route('/create_flight', methods=['GET', 'POST'])
 def create_flight():
 	username = session['username']
+	flag, db_username = check_apostrophe(username)
+	if not flag:
+		db_username = username
 	#grabs information from the forms
 	airline_name = request.form['airline_name']
 	flight_num = request.form['flight_num']
@@ -727,7 +794,7 @@ def create_flight():
 	cursor = conn.cursor()
 	#executes query
 	query = "SELECT username, airline_name FROM airline_staff WHERE username = \'{}\' and airline_name = \'{}\'"
-	cursor.execute(query.format(username, airline_name))
+	cursor.execute(query.format(db_username, airline_name))
 	#stores the results in a variable
 	data = cursor.fetchall()
 	#use fetchall() if you are expecting more than 1 data row
@@ -736,7 +803,7 @@ def create_flight():
 		#If the previous query returns data, then user exists
 		error1 = "Wrong airline"
 		query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
-		cursor.execute(query.format(username))
+		cursor.execute(query.format(db_username))
 		data1 = cursor.fetchall()
 		return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1)
 
@@ -812,6 +879,9 @@ def create_flight():
 @app.route('/add_airplane', methods=['GET', 'POST'])
 def add_airplane():
 	username = session['username']
+	flag, db_username = check_apostrophe(username)
+	if not flag:
+		db_username = username
 	#grabs information from the forms
 	airline_name = request.form['airline_name']
 	airplane_id = request.form['airplane_id']
@@ -821,7 +891,7 @@ def add_airplane():
 	cursor = conn.cursor()
 	#executes query
 	query = "SELECT username, airline_name FROM airline_staff WHERE username = \'{}\' and airline_name = \'{}\'"
-	cursor.execute(query.format(username, airline_name))
+	cursor.execute(query.format(db_username, airline_name))
 	#stores the results in a variable
 	data = cursor.fetchone()
 	#use fetchall() if you are expecting more than 1 data row
@@ -831,7 +901,7 @@ def add_airplane():
 		#If the previous query returns data, then user exists
 		error2 = "Wrong airline"
 		query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
-		cursor.execute(query.format(username))
+		cursor.execute(query.format(db_username))
 		data1 = cursor.fetchall()
 		return render_template('staffaddinfo.html', error2 = error2, username=username, airplane = data1)
 
@@ -868,6 +938,9 @@ def add_airplane():
 @app.route('/add_airport', methods=['GET', 'POST'])
 def add_airport():
 	username = session['username']
+	flag, db_username = check_apostrophe(username)
+	if not flag:
+		db_username = username
 	#grabs information from the forms
 	airport_name = request.form['airport_name']
 	airport_city = request.form['airport_city']
@@ -879,7 +952,7 @@ def add_airport():
 	#stores the results in a variable
 	airportdata = cursor.fetchone()
 	query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
-	cursor.execute(query.format(username))
+	cursor.execute(query.format(db_username))
 	data1 = cursor.fetchall()
 	cursor.close()
 	error3 = None
@@ -900,6 +973,9 @@ def add_airport():
 @app.route('/staffagent')
 def staffagent():
 	username = session['username']
+	flag, db_username = check_apostrophe(username)
+	if not flag:
+		db_username = username
 	# airline_name = session['airline_name']
 	cursor = conn.cursor();
 	query1 = "SELECT email, booking_agent_id, count(DISTINCT customer_email) as commission FROM booking_agent NATURAL JOIN purchases \
@@ -908,7 +984,7 @@ def staffagent():
 			GROUP BY email, booking_agent_id \
 				ORDER BY commission DESC\
 					LIMIT 5 "
-	cursor.execute(query1.format(username))
+	cursor.execute(query1.format(db_username))
 	# cursor.execute(query1)
 	data1 = cursor.fetchall()
 
@@ -918,7 +994,7 @@ def staffagent():
 		WHERE username = \'{}\' and airline_staff.airline_name = T.airline_name and MONTH(purchase_date) =  MONTH(CURDATE()) - 1 \
 			GROUP BY email, booking_agent_id \
 				ORDER BY ticket DESC LIMIT 5 "
-	cursor.execute(query2.format(username))
+	cursor.execute(query2.format(db_username))
 	# cursor.execute(query2)
 	data2 = cursor.fetchall()
 
@@ -928,47 +1004,52 @@ def staffagent():
 		WHERE username = \'{}\' and airline_staff.airline_name = T.airline_name and YEAR(purchase_date) =  YEAR(CURDATE()) - 1 \
 			GROUP BY email, booking_agent_id \
 				ORDER BY ticket DESC LIMIT 5 "
-	cursor.execute(query3.format(username))
+	cursor.execute(query3.format(db_username))
 	# cursor.execute(query3)
 	data3 = cursor.fetchall()
 
 	cursor = conn.cursor();
 	query = "SELECT email, booking_agent_id FROM booking_agent"
-	# cursor.execute(query.format(username))
 	cursor.execute(query)
 	data = cursor.fetchall()
 	cursor.close()
-	# return render_template('staffhome.html', posts=data1)
 	return render_template('staffagent.html', username=username, commission = data1, month = data2, year = data3, posts = data)
 
 @app.route('/staffcus')
 def staffcus():
 	username = session['username']
+	flag, db_username = check_apostrophe(username)
+	if not flag:
+		db_username = username
 	# airline_name = session['airline_name']
 	cursor = conn.cursor();
 	query1 = "SELECT email, name, count(ticket_id) as ticket FROM customer, purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff \
 		WHERE email = customer_email AND username = \'{}\'\
 		GROUP BY email, name\
 		ORDER BY ticket DESC LIMIT 1"
-	cursor.execute(query1.format(username))
+	cursor.execute(query1.format(db_username))
 	# cursor.execute(query1)
 	data1 = cursor.fetchall()
 	cursor.close()
 	return render_template('staffcus.html', frequent = data1, username = username)
 
-	# cursor = conn.cursor();
-
 @app.route('/staffcusflight', methods=['GET', 'POST'])
 def staffcusflight():
 	username = session['username']
+	flag, db_username = check_apostrophe(username)
+	if not flag:
+		db_username = username
 	email = request.form['customer_email']
+	flag, db_email = check_apostrophe(email)
+	if not flag:
+		db_email = email
 	cursor = conn.cursor();
 	query2 = "SELECT DISTINCT airplane_id, flight_num, \
 		departure_airport, arrival_airport, departure_time, arrival_time, \
 			status FROM customer, \
 				purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
 		WHERE email = \'{}\' and email = customer_email and username = \'{}\'"
-	cursor.execute(query2.format(email, username))
+	cursor.execute(query2.format(db_email, db_username))
 	# cursor.execute(query2)
 	data2 = cursor.fetchall()
 
@@ -976,7 +1057,7 @@ def staffcusflight():
 		WHERE email = customer_email AND username = \'{}\'\
 		GROUP BY email, name\
 		ORDER BY ticket DESC LIMIT 1"
-	cursor.execute(query1.format(username))
+	cursor.execute(query1.format(db_username))
 	# cursor.execute(query1)
 	data1 = cursor.fetchall()
 
@@ -987,7 +1068,7 @@ def staffcusflight():
 	else:
 		cursor = conn.cursor();
 		cus = "SELECT email FROM customer WHERE email = \'{}\'"
-		cursor.execute(cus.format(email))
+		cursor.execute(cus.format(db_email))
 		# cursor.execute(query2)
 		cus = cursor.fetchone()
 		cursor.close()
@@ -998,16 +1079,19 @@ def staffcusflight():
 			error = "No Such Customer"
 		return render_template('staffcus.html', error = error, frequent = data1, username = username)
 
-
 @app.route('/staffflightcus', methods=['GET', 'POST'])
 def staffflightcus():
 	username = session['username']
+	flag, db_username = check_apostrophe(username)
+	if not flag:
+		db_username = username
 	flight = request.form['flight_num']
+
 	cursor = conn.cursor();
 	query3 = "SELECT DISTINCT email, name FROM customer, \
 				purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
 		WHERE flight_num = \'{}\' and email = customer_email and username = \'{}\'"
-	cursor.execute(query3.format(flight, username))
+	cursor.execute(query3.format(flight, db_username))
 	# cursor.execute(query2)
 	data3 = cursor.fetchall()
 
@@ -1015,7 +1099,7 @@ def staffflightcus():
 		WHERE email = customer_email AND username = \'{}\'\
 		GROUP BY email, name\
 		ORDER BY ticket DESC LIMIT 1"
-	cursor.execute(query1.format(username))
+	cursor.execute(query1.format(db_username))
 	# cursor.execute(query1)
 	data1 = cursor.fetchall()
 
@@ -1027,7 +1111,7 @@ def staffflightcus():
 		cursor = conn.cursor();
 		cus = "SELECT flight_num FROM flight NATURAL JOIN airline_staff WHERE flight_num = \'{}\'\
 			AND username = \'{}\'"
-		cursor.execute(cus.format(flight, username))
+		cursor.execute(cus.format(flight, db_username))
 		# cursor.execute(query2)
 		cus = cursor.fetchone()
 		cursor.close()
@@ -1041,7 +1125,11 @@ def staffflightcus():
 @app.route('/staffDestReve')
 def staffDestReve():
 	username = session['username']
+	flag, db_username = check_apostrophe(username)
+	if not flag:
+		db_username = username
 	# # airline_name = session['airline_name']
+
 	cursor = conn.cursor();
 	query1 = "SELECT airport_city, count(ticket_id) AS ticket FROM \
 		purchases NATURAL JOIN ticket NATURAL JOIN flight, airport \
@@ -1050,7 +1138,6 @@ def staffDestReve():
 		ORDER BY ticket DESC\
 			 LIMIT 3"
 	cursor.execute(query1)
-	# cursor.execute(query1)
 	month = cursor.fetchall()
 
 	query2 = "SELECT airport_city, count(ticket_id) AS ticket FROM \
@@ -1068,7 +1155,7 @@ def staffDestReve():
 	WHERE username = \'{}\' AND booking_agent_id is NULL AND MONTH(purchase_date) =  MONTH(CURDATE()) - 1\
 	GROUP BY airline_name"
 
-	cursor.execute(query3.format(username))
+	cursor.execute(query3.format(db_username))
 	# cursor.execute(query1)
 	mdirect = cursor.fetchall()
 
@@ -1077,7 +1164,7 @@ def staffDestReve():
 	WHERE username = \'{}\' AND booking_agent_id is NOT NULL AND MONTH(purchase_date) =  MONTH(CURDATE()) - 1\
 	GROUP BY airline_name"
 	
-	cursor.execute(query4.format(username))
+	cursor.execute(query4.format(db_username))
 	# cursor.execute(query1)
 	mindirect = cursor.fetchall()
 
@@ -1086,7 +1173,7 @@ def staffDestReve():
 	WHERE username = \'{}\' AND booking_agent_id is NULL AND YEAR(purchase_date) =  YEAR(CURDATE()) - 1\
 	GROUP BY airline_name"
 	
-	cursor.execute(query5.format(username))
+	cursor.execute(query5.format(db_username))
 	# cursor.execute(query1)
 	ydirect = cursor.fetchall()
 
@@ -1095,7 +1182,7 @@ def staffDestReve():
 	WHERE username = \'{}\' AND booking_agent_id is NOT NULL AND YEAR(purchase_date) =  YEAR(CURDATE()) - 1\
 	GROUP BY airline_name"
 	
-	cursor.execute(query6.format(username))
+	cursor.execute(query6.format(db_username))
 	# cursor.execute(query1)
 	yindirect = cursor.fetchall()
 	
@@ -1109,10 +1196,13 @@ def staffTickets():
 @app.route('/staffticket', methods=['GET', 'POST'])
 def staffticket():
 	username = session['username']
-
+	flag, db_username = check_apostrophe(username)
+	if not flag:
+		db_username = username
 	start = request.form['start']
 	duration = request.form.get("duration")
 	end = request.form['end']
+
 	cursor = conn.cursor();
 	if duration == "":
 		ticket = "SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, count(ticket_id) FROM \
@@ -1120,7 +1210,7 @@ def staffticket():
 				WHERE purchase_date > \'{}\'\
 				and purchase_date < \'{}\' AND username = \'{}\' \
 				GROUP BY year, month, airline_name"
-		cursor.execute(ticket.format(start, end, username))
+		cursor.execute(ticket.format(start, end, db_username))
 		# cursor.execute(query2)
 		allticket = cursor.fetchall()
 	elif duration == 'tmonth':
@@ -1129,7 +1219,7 @@ def staffticket():
 				WHERE MONTH(purchase_date) =  MONTH(CURDATE()) - 1 AND username = \'{}\' \
 				GROUP BY year, month, airline_name"
 
-		cursor.execute(ticket.format(username))
+		cursor.execute(ticket.format(db_username))
 		# cursor.execute(query1)
 		allticket = cursor.fetchall()
 	elif duration == 'tyear':
@@ -1138,7 +1228,7 @@ def staffticket():
 				WHERE YEAR(purchase_date) =  YEAR(CURDATE()) - 1 AND username = \'{}\' \
 				GROUP BY year, month, airline_name"
 
-		cursor.execute(ticket.format(username))
+		cursor.execute(ticket.format(db_username))
 		# cursor.execute(query1)
 		allticket = cursor.fetchall()
 
@@ -1177,7 +1267,6 @@ def staffticket():
 	# cursor.execute(query6.format(username))
 	# # cursor.execute(query1)
 	# yindirect = cursor.fetchall()
-
 	cursor.close()
 
 
