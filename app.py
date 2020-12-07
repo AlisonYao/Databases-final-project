@@ -6,15 +6,15 @@ import datetime
 app = Flask(__name__)
 
 #Configure MySQL
-conn = mysql.connector.connect(host='localhost',
-                       user='root',
-                       password='86466491@Alison',
-                       database='air')
-
 # conn = mysql.connector.connect(host='localhost',
-# 					   user='root',
-# 					   password='root',
-# 					   database='air')
+#                        user='root',
+#                        password='86466491@Alison',
+#                        database='air')
+
+conn = mysql.connector.connect(host='localhost',
+					   user='root',
+					   password='root',
+					   database='air')
 
 
 #####################################################################
@@ -52,16 +52,24 @@ def publicSearchFlight():
 	arrival_date = request.form['arrival_date']
 
 	cursor = conn.cursor()
-	query = "select airline_name, flight_num, D.airport_city as departure_city, departure_airport, departure_time, A.airport_city as arrival_city, arrival_airport, arrival_time, price, status, airplane_id \
-			from airport as D, flight, airport as A \
-			where D.airport_name = flight.departure_airport and flight.arrival_airport = A.airport_name and \
-			D.airport_name = if (\'{}\' = '', D.airport_name, \'{}\') and \
-				A.airport_name = if (\'{}\' = '', A.airport_name, \'{}\') and \
-					flight.status = 'upcoming' and \
-			D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\')\
-				 and A.airport_city = if (\'{}\' = '',A.airport_city, \'{}\') and \
-			date(flight.departure_time) = if (\'{}\' = '',date(flight.departure_time), \'{}\')\
-				 and date(flight.arrival_time) = if (\'{}\' = '',date(flight.arrival_time), \'{}\')"
+	# query = "select airline_name, flight_num, D.airport_city as departure_city, departure_airport, departure_time, A.airport_city as arrival_city, arrival_airport, arrival_time, price, status, airplane_id \
+	# 		from airport as D, flight, airport as A \
+	# 		where D.airport_name = flight.departure_airport and flight.arrival_airport = A.airport_name and \
+	# 		D.airport_name = if (\'{}\' = '', D.airport_name, \'{}\') and \
+	# 			A.airport_name = if (\'{}\' = '', A.airport_name, \'{}\') and \
+	# 				flight.status = 'upcoming' and \
+	# 		D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\')\
+	# 			 and A.airport_city = if (\'{}\' = '',A.airport_city, \'{}\') and \
+	# 		date(flight.departure_time) = if (\'{}\' = '',date(flight.departure_time), \'{}\')\
+	# 			 and date(flight.arrival_time) = if (\'{}\' = '',date(flight.arrival_time), \'{}\')"
+	query = "select airline_name, flight_num, departure_city, departure_airport, departure_time, arrival_city, arrival_airport, arrival_time, price, airplane_id from public_search_flight \
+		where departure_airport = if (\'{}\' = '', departure_airport, \'{}\') and \
+			arrival_airport = if (\'{}\' = '', arrival_airport, \'{}\') and \
+				status = 'upcoming' and \
+		departure_city = if (\'{}\' = '', departure_city, \'{}\')\
+				and arrival_city = if (\'{}\' = '',arrival_city, \'{}\') and \
+		date(departure_time) = if (\'{}\' = '',date(departure_time), \'{}\')\
+				and date(arrival_time) = if (\'{}\' = '',date(arrival_time), \'{}\')"
 	cursor.execute(query.format(departure_airport, departure_airport, arrival_airport, arrival_airport, departure_city, departure_city, arrival_city, arrival_city, departure_date, departure_date, arrival_date, arrival_date))
 	data = cursor.fetchall() 
 	cursor.close()
@@ -994,8 +1002,8 @@ def staffagent():
 		db_username = username
 	# airline_name = session['airline_name']
 	cursor = conn.cursor();
-	query1 = "SELECT email, booking_agent_id, count(DISTINCT customer_email) as commission FROM booking_agent NATURAL JOIN purchases \
-		NATURAL JOIN ticket AS T, airline_staff \
+	query1 = "SELECT email, booking_agent_id, sum(price) * 0.1 as commission FROM booking_agent NATURAL JOIN purchases \
+		NATURAL JOIN flight NATURAL JOIN ticket AS T, airline_staff \
 		WHERE username = \'{}\' and airline_staff.airline_name = T.airline_name and YEAR(purchase_date) =  YEAR(CURDATE()) - 1  \
 			GROUP BY email, booking_agent_id \
 				ORDER BY commission DESC\
@@ -1174,6 +1182,10 @@ def staffDestReve():
 	cursor.execute(query3.format(db_username))
 	# cursor.execute(query1)
 	mdirect = cursor.fetchall()
+	if(mdirect):
+		mdirect = [int(mdirect[0][0])]
+	else:
+		mdirect = [0]
 
 	query4 = "SELECT sum(price)\
 	FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
@@ -1183,6 +1195,10 @@ def staffDestReve():
 	cursor.execute(query4.format(db_username))
 	# cursor.execute(query1)
 	mindirect = cursor.fetchall()
+	if(mindirect):
+		mindirect = [int(mindirect[0][0])]
+	else:
+		mindirect = [0]
 
 	query5 = "SELECT sum(price)\
 	FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
@@ -1192,6 +1208,10 @@ def staffDestReve():
 	cursor.execute(query5.format(db_username))
 	# cursor.execute(query1)
 	ydirect = cursor.fetchall()
+	if(ydirect):
+		ydirect = [int(ydirect[0][0])]
+	else:
+		ydirect = [0]
 
 	query6 = "SELECT sum(price)\
 	FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
@@ -1201,13 +1221,18 @@ def staffDestReve():
 	cursor.execute(query6.format(db_username))
 	# cursor.execute(query1)
 	yindirect = cursor.fetchall()
+	if(yindirect):
+		yindirect = [int(yindirect[0][0])]
+	else:
+		yindirect = [0]
 	
 	cursor.close()
 	return render_template('staffDestReve.html', month = month, year = year, username = username, mdirect = mdirect, mindirect = mindirect, ydirect = ydirect, yindirect = yindirect)
 
 @app.route('/staffTickets')
 def staffTickets():
-	return render_template('staffTickets.html')
+	username = session['username']
+	return render_template('staffTickets.html', username = username)
 
 @app.route('/staffticket', methods=['GET', 'POST'])
 def staffticket():
@@ -1248,49 +1273,15 @@ def staffticket():
 		# cursor.execute(query1)
 		allticket = cursor.fetchall()
 
-	# query3 = "SELECT sum(price)\
-	# 	FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
-	# 	WHERE username = \'{}\' AND booking_agent_id is NULL AND MONTH(purchase_date) =  MONTH(CURDATE()) - 1\
-	# 	GROUP BY airline_name"
-	
-	# cursor.execute(query3.format(username))
-	# # cursor.execute(query1)
-	# mdirect = cursor.fetchall()
-
-	# query4 = "SELECT sum(price)\
-	# FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
-	# WHERE username = \'{}\' AND booking_agent_id is NOT NULL AND MONTH(purchase_date) =  MONTH(CURDATE()) - 1\
-	# GROUP BY airline_name"
-	
-	# cursor.execute(query4.format(username))
-	# # cursor.execute(query1)
-	# mindirect = cursor.fetchall()
-
-	# query5 = "SELECT sum(price)\
-	# FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
-	# WHERE username = \'{}\' AND booking_agent_id is NULL AND YEAR(purchase_date) =  YEAR(CURDATE()) - 1\
-	# GROUP BY airline_name"
-	
-	# cursor.execute(query5.format(username))
-	# # cursor.execute(query1)
-	# ydirect = cursor.fetchall()
-
-	# query6 = "SELECT sum(price)\
-	# FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
-	# WHERE username = \'{}\' AND booking_agent_id is NOT NULL AND YEAR(purchase_date) =  YEAR(CURDATE()) - 1\
-	# GROUP BY airline_name"
-	
-	# cursor.execute(query6.format(username))
-	# # cursor.execute(query1)
-	# yindirect = cursor.fetchall()
 	cursor.close()
 
 
 	if(allticket):
-		time = [allticket[i][1] for i in range(len(allticket))]
+		time = [str(allticket[i][0]) + '-' + str(allticket[i][1]) for i in range(len(allticket))]
 		monthticket = [allticket[i][2] for i in range(len(allticket))]
-		# print(time)
-		# print(monthticket)
+
+		# time = ['2020-10', '2020-11']
+		# monthticket = [1, 2]
 		return render_template('staffTickets.html', time = time, monthticket = monthticket, ticket = allticket, username = username)
 	else:
 		error = "No ticket sold"

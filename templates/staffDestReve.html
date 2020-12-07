@@ -32,11 +32,9 @@
     <div class="main">
         <h2>View Revenue Earned & Top Destination</h2>
             <h3 style="text-align: center;">Comparison of Revenue Earned</h3>
-            {{mdirect}}
-            {{mindirect}}
-            {{ydirect}}
-            {{yindirect}}
-                <!-- <script type="text/javascript">
+            <div id="revenue_chart" style="width: 800px; height: 300px;"></div>
+            <div id="revenue_chart2" style="width: 800px; height: 300px;"></div>
+                <script type="text/javascript">
                 // store the variables in js first
                     const mdirect = {{mdirect|tojson}};
                     const mindirect = {{mindirect|tojson}};
@@ -44,7 +42,8 @@
                     const yindirect = {{yindirect|tojson}};
                 </script>
                 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-                <script type="text/javascript" src="{{ url_for('static', filename='staffRevenuePie.js') }}"></script> -->
+                <script type="text/javascript" src="{{ url_for('static', filename='staffRevenuePie.js') }}"></script>
+                <script type="text/javascript" src="{{ url_for('static', filename='staffRevenuePie2.js') }}"></script>
 
             <h3 style="text-align: center;">Top 3 Most Popular Destination Last 3 months</h3>
             <table class="table table-bordered table-sm">
