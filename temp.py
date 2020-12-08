@@ -1,13 +1,14 @@
-def check_apostrophe(x):
-	assert type(x) == str
-	if "'" not in x:
-		return x
-	db_x = ''
-	for i in x:
-		if i == "'":
-			db_x += "''"
-		else:
-			db_x += i
-	return db_x
+@app.route('/agentHome')
+def agentHome():
+	if session.get('username'):
+		
+	else:
+		return render_template('404.html')
 
-check_apostrophe("23456")
+
+
+
+if "email" in request.form and 'password' in request.form:
+		
+	else:
+		return render_template('404.html')
