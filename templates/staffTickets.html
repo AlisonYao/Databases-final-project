@@ -25,7 +25,8 @@
         <a href="/staffaddinfo">Create Flight & Airplane & Airport</a>
         <a href="/staffagent">View Booking Agents</a>
         <a href="/staffcus">View Customers</a>
-        <a href="/staffDestReve">View Revenue Earned & Top Destination</a>
+                <a href="/staffDest">View Top Destination</a>
+        <a href="/staffReve">View Revenue Earned</a>
         <a href="/staffTickets" style="color: #2db2ff;">View Tickets Sold</a>
     </div>
 
@@ -40,9 +41,9 @@
                 <label>End of time:</label>
                 
                 <input type="date" name = "end" placeholder="end" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br>
-
+                <h5>OR</h5>
                 <select name="duration" >
-                    <option value=""></option>
+                    <option value="">--select time range--</option>
                     <option value="tmonth">last month</option>
                     <option value="tyear">last year</option>
                 </select>
@@ -57,21 +58,17 @@
                 </br>
                 <table class="table table-bordered table-sm">
                     <thead>
-                        <th>year</th>
-                        <th>month</th>
+                        <th>time range</th>
                         <th>amount of tickets sold</th>
 
                     </thead>
 
                     <tbody>
-                    {% for line in ticket %}
                         <tr>
-                            <td>{{line[0]}}</td>
-                            <td>{{line[1]}}</td>
-                            <td>{{line[2]}}</td>
+                            <td>{{s}} to {{e}}</td>
+                            <td>{{t}}</td>
 
                         </tr>
-                    {% endfor %}
                     </tbody>
                 </table>
 

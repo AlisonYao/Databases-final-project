@@ -9,24 +9,19 @@ import decimal
 app = Flask(__name__)
 
 #Configure MySQL
-conn = mysql.connector.connect(host='localhost',
-                       user='root',
-                       password='86466491@Alison',
-                       database='air')
-
 # conn = mysql.connector.connect(host='localhost',
-# 					   user='root',
-# 					   password='root',
-# 					   database='air')
+#                        user='root',
+#                        password='86466491@Alison',
+#                        database='air')
+
+conn = mysql.connector.connect(host='localhost',
+					   user='root',
+					   password='root',
+					   database='air')
 
 #####################################################################
 #                               HELPER                              #
 #####################################################################
-class DecimalEncoder(json.JSONEncoder):
-    def default(self,o):
-        if isinstance(o,decimal.Decimal):
-            return float(o)
-        super(DecimalEncoder,self).default(o)
 
 # for natural cases such as Dylan O'Brian and malicious cases such as inputing 2' or '1'='1 on purpose
 # add a ' after every ' to escape so that SQL will not have any error
@@ -1060,7 +1055,7 @@ def staffagent():
 		cursor = conn.cursor();
 		query1 = "SELECT email, booking_agent_id, sum(price) * 0.1 as commission FROM booking_agent NATURAL JOIN purchases \
 			NATURAL JOIN flight NATURAL JOIN ticket AS T, airline_staff \
-			WHERE username = \'{}\' and airline_staff.airline_name = T.airline_name and YEAR(purchase_date) =  YEAR(CURDATE()) - 1  \
+			WHERE username = \'{}\' and airline_staff.airline_name = T.airline_name and datediff(CURDATE(), DATE(purchase_date)) < 365  \
 				GROUP BY email, booking_agent_id \
 					ORDER BY commission DESC\
 						LIMIT 5 "
@@ -1069,7 +1064,7 @@ def staffagent():
 
 		query2 = "SELECT booking_agent.email, booking_agent_id, count(ticket_id) as ticket FROM booking_agent NATURAL JOIN purchases \
 			NATURAL JOIN ticket AS T, airline_staff \
-			WHERE username = \'{}\' and airline_staff.airline_name = T.airline_name and MONTH(purchase_date) =  MONTH(CURDATE()) - 1 \
+			WHERE username = \'{}\' and airline_staff.airline_name = T.airline_name and datediff(CURDATE(), DATE(purchase_date)) < 30 \
 				GROUP BY email, booking_agent_id \
 					ORDER BY ticket DESC LIMIT 5 "
 		cursor.execute(query2.format(db_username))
@@ -1077,7 +1072,7 @@ def staffagent():
 
 		query3 = "SELECT email, booking_agent_id, count(ticket_id) as ticket FROM booking_agent NATURAL JOIN purchases \
 			NATURAL JOIN ticket AS T, airline_staff \
-			WHERE username = \'{}\' and airline_staff.airline_name = T.airline_name and YEAR(purchase_date) =  YEAR(CURDATE()) - 1 \
+			WHERE username = \'{}\' and airline_staff.airline_name = T.airline_name and datediff(CURDATE(), DATE(purchase_date)) < 365 \
 				GROUP BY email, booking_agent_id \
 					ORDER BY ticket DESC LIMIT 5 "
 		cursor.execute(query3.format(db_username))
@@ -1204,8 +1199,8 @@ def staffflightcus():
 		session.clear()
 		return render_template('404.html')
 	
-@app.route('/staffDestReve')
-def staffDestReve():
+@app.route('/staffDest')
+def staffDest():
 	if session.get('username'):
 		username = session['username']
 		db_username = check_apostrophe(username)
@@ -1213,7 +1208,7 @@ def staffDestReve():
 		cursor = conn.cursor();
 		query1 = "SELECT airport_city, count(ticket_id) AS ticket FROM \
 			purchases NATURAL JOIN ticket NATURAL JOIN flight, airport \
-			WHERE airport_name = arrival_airport and MONTH(purchase_date) >  MONTH(CURDATE()) - 3\
+			WHERE airport_name = arrival_airport and datediff(CURDATE(), DATE(purchase_date)) < 90\
 			GROUP BY airport_city\
 			ORDER BY ticket DESC\
 				LIMIT 3"
@@ -1222,68 +1217,82 @@ def staffDestReve():
 
 		query2 = "SELECT airport_city, count(ticket_id) AS ticket FROM \
 			purchases NATURAL JOIN ticket NATURAL JOIN flight, airport \
-			WHERE airport_name = arrival_airport and YEAR(purchase_date) =  YEAR(CURDATE()) - 1\
+			WHERE airport_name = arrival_airport and datediff(CURDATE(), DATE(purchase_date)) < 365\
 				GROUP BY airport_city\
 			ORDER BY ticket DESC\
 				LIMIT 3"
 		cursor.execute(query2)
 		# cursor.execute(query1)
 		year = cursor.fetchall()
+		cursor.close()
+		return render_template('staffDest.html', month = month, year = year, username = username)
+
+	else:
+		session.clear()
+		return render_template('404.html')
+
+@app.route('/staffReve')
+def staffReve():
+	if session.get('username'):
+		username = session['username']
+		db_username = check_apostrophe(username)
+
+		cursor = conn.cursor();
 
 		query3 = "SELECT sum(price)\
 		FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
-		WHERE username = \'{}\' AND booking_agent_id is NULL AND MONTH(purchase_date) =  MONTH(CURDATE()) - 1\
+		WHERE username = \'{}\' AND booking_agent_id is NULL AND datediff(CURDATE(), DATE(purchase_date)) < 30\
 		GROUP BY airline_name"
 
 		cursor.execute(query3.format(db_username))
 		# cursor.execute(query1)
 		mdirect = cursor.fetchall()
 		if(mdirect):
-			mdirect = [json.dumps(mdirect[0][0],cls=DecimalEncoder)]
+			mdirect = [int(mdirect[0][0])]
 		else:
 			mdirect = [0]
 
 		query4 = "SELECT sum(price)\
 		FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
-		WHERE username = \'{}\' AND booking_agent_id is NOT NULL AND MONTH(purchase_date) =  MONTH(CURDATE()) - 1\
+		WHERE username = \'{}\' AND booking_agent_id is NOT NULL AND datediff(CURDATE(), DATE(purchase_date)) < 30\
 		GROUP BY airline_name"
 		
 		cursor.execute(query4.format(db_username))
 		# cursor.execute(query1)
 		mindirect = cursor.fetchall()
 		if(mindirect):
-			mindirect = [json.dumps(mindirect[0][0],cls=DecimalEncoder)]
+			mindirect = [int(mindirect[0][0])]
 		else:
 			mindirect = [0]
 
 		query5 = "SELECT sum(price)\
 		FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
-		WHERE username = \'{}\' AND booking_agent_id is NULL AND YEAR(purchase_date) =  YEAR(CURDATE()) - 1\
+		WHERE username = \'{}\' AND booking_agent_id is NULL AND datediff(CURDATE(), DATE(purchase_date)) < 365\
 		GROUP BY airline_name"
 		
 		cursor.execute(query5.format(db_username))
 		# cursor.execute(query1)
 		ydirect = cursor.fetchall()
 		if(ydirect):
-			ydirect = [json.dumps(ydirect[0][0],cls=DecimalEncoder)]
+			ydirect = [int(ydirect[0][0])]
 		else:
 			ydirect = [0]
 
 		query6 = "SELECT sum(price)\
 		FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
-		WHERE username = \'{}\' AND booking_agent_id is NOT NULL AND YEAR(purchase_date) =  YEAR(CURDATE()) - 1\
+		WHERE username = \'{}\' AND booking_agent_id is NOT NULL AND datediff(CURDATE(), DATE(purchase_date)) < 365\
 		GROUP BY airline_name"
 		
 		cursor.execute(query6.format(db_username))
 		# cursor.execute(query1)
 		yindirect = cursor.fetchall()
 		if(yindirect):
-			yindirect = [json.dumps(yindirect[0][0],cls=DecimalEncoder)]
+			yindirect = [int(yindirect[0][0])]
 		else:
 			yindirect = [0]
 		
 		cursor.close()
-		return render_template('staffDestReve.html', month = month, year = year, username = username, mdirect = mdirect, mindirect = mindirect, ydirect = ydirect, yindirect = yindirect)
+		return render_template('staffReve.html', username = username, mdirect = mdirect, mindirect = mindirect, ydirect = ydirect, yindirect = yindirect)
 	else:
 		session.clear()
 		return render_template('404.html')
@@ -1319,7 +1328,7 @@ def staffticket():
 		elif duration == 'tmonth':
 			ticket = "SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, count(ticket_id) FROM \
 					purchases NATURAL JOIN airline_staff NATURAL JOIN flight NATURAL JOIN ticket\
-					WHERE MONTH(purchase_date) =  MONTH(CURDATE()) - 1 AND username = \'{}\' \
+					WHERE datediff(CURDATE(), DATE(purchase_date)) < 30 AND username = \'{}\' \
 					GROUP BY year, month, airline_name"
 
 			cursor.execute(ticket.format(db_username))
@@ -1328,7 +1337,7 @@ def staffticket():
 		elif duration == 'tyear':
 			ticket = "SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, count(ticket_id) FROM \
 					purchases NATURAL JOIN airline_staff NATURAL JOIN flight NATURAL JOIN ticket\
-					WHERE YEAR(purchase_date) =  YEAR(CURDATE()) - 1 AND username = \'{}\' \
+					WHERE datediff(CURDATE(), DATE(purchase_date)) < 365 AND username = \'{}\' \
 					GROUP BY year, month, airline_name"
 
 			cursor.execute(ticket.format(db_username))
@@ -1339,12 +1348,15 @@ def staffticket():
 
 
 		if(allticket):
+			start = str(allticket[0][0]) + '-' + str(allticket[0][1])
+			end = str(allticket[len(allticket) - 1][0]) + '-' + str(allticket[len(allticket) - 1][1])
 			time = [str(allticket[i][0]) + '-' + str(allticket[i][1]) for i in range(len(allticket))]
 			monthticket = [allticket[i][2] for i in range(len(allticket))]
+			total = sum(monthticket)
 
 			# time = ['2020-10', '2020-11']
 			# monthticket = [1, 2]
-			return render_template('staffTickets.html', time = time, monthticket = monthticket, ticket = allticket, username = username)
+			return render_template('staffTickets.html', s = start, e = end, t = total, time = time, monthticket = monthticket, ticket = allticket, username = username)
 		else:
 			error = "No ticket sold"
 			# cursor.close()

@@ -1,9 +1,9 @@
 google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(drawChart);
 
-const mdirect0 = NSDecimalNumber(mdirect[0]);
-const mindirect0 = NSDecimalNumber(mindirect[0]);
-
+const mdirect0 = mdirect[0];
+const mindirect0 = mindirect[0];
+mdirect0
 function drawChart() {
 
   var data = google.visualization.arrayToDataTable([
