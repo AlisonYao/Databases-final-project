@@ -93,27 +93,27 @@
         </br>
         <table class="table table-bordered table-sm">
             <thead>
-                <th>airline_name</th>
-                <th>flight_num</th>
-                <th>airplane_id</th>
-                <th>departure_airport</th>
-                <th>departure_time</th>
-                <th>arrival_airport</th>
-                <th>arrival_time</th>
+                <th>airline name</th>
+                <th>flight num</th>
+                <th>airplane id</th>
+                <th>departure airport</th>
+                <th>departure time</th>
+                <th>arrival airport</th>
+                <th>arrival time</th>
                 <th>status</th>
             </thead>
             
             <tbody>
             {% for status in statuses %}
                 <tr>
-                    <td>{{status[0]}}</td>
                     <td>{{status[1]}}</td>
-                    <td>{{status[8]}}</td>
+                    <td>{{status[0]}}</td>
                     <td>{{status[2]}}</td>
-                    <td>{{status[3]}}</td>
+                    <td>{{status[3]}} {{status[4]}}</td>
                     <td>{{status[4]}}</td>
-                    <td>{{status[5]}}</td>
-                    <td>{{status[7]}}</td>
+                    <td>{{status[6]}} {{status[7]}}</td>
+                    <td>{{status[8]}}</td>
+                    <td>{{status[-1]}}</td>
                 </tr>
             {% endfor %}
             </tbody>

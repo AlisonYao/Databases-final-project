@@ -13,25 +13,24 @@ class DecimalEncoder(json.JSONEncoder):
 app = Flask(__name__)
 
 #Configure MySQL
-# conn = mysql.connector.connect(host='localhost',
-#                        user='root',
-#                        password='86466491@Alison',
-#                        database='air')
-
 conn = mysql.connector.connect(host='localhost',
-					   user='root',
-					   password='root',
-					   database='air')
+                       user='root',
+                       password='86466491@Alison',
+                       database='air')
 
+# conn = mysql.connector.connect(host='localhost',
+# 					   user='root',
+# 					   password='root',
+# 					   database='air')
 
 #####################################################################
 #                               HELPER                              #
 #####################################################################
-# for natural cases such as Dylan O'Brian and malicious cases such as inputting 2' or '1'='1 on purpose
+# for natural cases such as Dylan O'Brian and malicious cases such as inputing 2' or '1'='1 on purpose
 # add a ' after every ' to escape so that SQL will not have any error
 def check_apostrophe(x):
 	if "'" not in x:
-		return False, None
+		return False, x
 	db_x = ''
 	for i in x:
 		if i == "'":
@@ -52,31 +51,26 @@ def publicHome():
 @app.route('/publicSearchFlight', methods=['GET', 'POST'])
 def publicSearchFlight():
 	departure_city = request.form['departure_city']
+	_, departure_city = check_apostrophe(departure_city)
 	departure_airport = request.form['departure_airport']
+	_, departure_airport = check_apostrophe(departure_airport)
 	arrival_city = request.form['arrival_city']
+	_, arrival_city = check_apostrophe(arrival_city)
 	arrival_airport = request.form['arrival_airport']
+	_, arrival_airport = check_apostrophe(arrival_airport)
 	departure_date = request.form['departure_date']
 	arrival_date = request.form['arrival_date']
 
 	cursor = conn.cursor()
-	# query = "select airline_name, flight_num, D.airport_city as departure_city, departure_airport, departure_time, A.airport_city as arrival_city, arrival_airport, arrival_time, price, status, airplane_id \
-	# 		from airport as D, flight, airport as A \
-	# 		where D.airport_name = flight.departure_airport and flight.arrival_airport = A.airport_name and \
-	# 		D.airport_name = if (\'{}\' = '', D.airport_name, \'{}\') and \
-	# 			A.airport_name = if (\'{}\' = '', A.airport_name, \'{}\') and \
-	# 				flight.status = 'upcoming' and \
-	# 		D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\')\
-	# 			 and A.airport_city = if (\'{}\' = '',A.airport_city, \'{}\') and \
-	# 		date(flight.departure_time) = if (\'{}\' = '',date(flight.departure_time), \'{}\')\
-	# 			 and date(flight.arrival_time) = if (\'{}\' = '',date(flight.arrival_time), \'{}\')"
-	query = "select airline_name, flight_num, departure_city, departure_airport, departure_time, arrival_city, arrival_airport, arrival_time, price, airplane_id from public_search_flight \
-		where departure_airport = if (\'{}\' = '', departure_airport, \'{}\') and \
-			arrival_airport = if (\'{}\' = '', arrival_airport, \'{}\') and \
-				status = 'upcoming' and \
-		departure_city = if (\'{}\' = '', departure_city, \'{}\')\
-				and arrival_city = if (\'{}\' = '',arrival_city, \'{}\') and \
-		date(departure_time) = if (\'{}\' = '',date(departure_time), \'{}\')\
-				and date(arrival_time) = if (\'{}\' = '',date(arrival_time), \'{}\')"
+	query = "select airline_name, flight_num, departure_city, departure_airport, departure_time, arrival_city, arrival_airport, arrival_time, price, airplane_id \
+			from public_search_flight \
+			where departure_airport = if (\'{}\' = '', departure_airport, \'{}\') and \
+					arrival_airport = if (\'{}\' = '', arrival_airport, \'{}\') and \
+					status = 'upcoming' and \
+					departure_city = if (\'{}\' = '', departure_city, \'{}\') and \
+					arrival_city = if (\'{}\' = '',arrival_city, \'{}\') and \
+					date(departure_time) = if (\'{}\' = '',date(departure_time), \'{}\') and \
+					date(arrival_time) = if (\'{}\' = '',date(arrival_time), \'{}\')"
 	cursor.execute(query.format(departure_airport, departure_airport, arrival_airport, arrival_airport, departure_city, departure_city, arrival_city, arrival_city, departure_date, departure_date, arrival_date, arrival_date))
 	data = cursor.fetchall() 
 	cursor.close()
@@ -89,14 +83,19 @@ def publicSearchFlight():
 
 @app.route('/publicSearchStatus', methods=['GET', 'POST'])
 def publicSearchStatus():
-	# do not need to check input bc if the input is wrong the worst is no reult
+	airline_name = request.form['airline_name']
+	_, airline_name = check_apostrophe(airline_name)
 	flight_num = request.form['flight_num']
 	arrival_date = request.form['arrival_date']
 	departure_date = request.form['departure_date']
-	airline_name = request.form['airline_name']
 
 	cursor = conn.cursor()
-	query = "select * from flight where flight_num = if (\'{}\' = '', flight_num, \'{}\') and date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\') and date(arrival_time) = if (\'{}\' = '', date(arrival_time), \'{}\') and airline_name = if (\'{}\' = '', airline_name, \'{}\')"
+	query = "select * \
+			from public_search_flight \
+			where flight_num = if (\'{}\' = '', flight_num, \'{}\') and \
+					date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\') and \
+					date(arrival_time) = if (\'{}\' = '', date(arrival_time), \'{}\') and \
+					airline_name = if (\'{}\' = '', airline_name, \'{}\')"
 	cursor.execute(query.format(flight_num, flight_num, arrival_date, arrival_date, departure_date, departure_date, airline_name, airline_name))
 	data = cursor.fetchall() 
 	cursor.close()
@@ -166,13 +165,19 @@ def cusregisterAuth():
 		db_name = name
 	password = request.form['password']
 	building_number = request.form['building_number']
+	_, building_number = check_apostrophe(building_number)
 	street = request.form['street']
+	_, street = check_apostrophe(street)
 	city = request.form['city']
+	_, city = check_apostrophe(city)
 	state = request.form['state']
+	_, state = check_apostrophe(state)
 	phone_number = request.form['phone_number']
 	passport_number = request.form['passport_number']
+	_, passport_number = check_apostrophe(passport_number)
 	passport_expiration = request.form['passport_expiration']
 	passport_country = request.form['passport_country']
+	_, passport_country = check_apostrophe(passport_country)
 	date_of_birth = request.form['date_of_birth']
 
 	cursor = conn.cursor()
@@ -206,6 +211,7 @@ def cushome():
 	flag, db_email = check_apostrophe(email)
 	if not flag:
 		db_email = email
+
 	cursor = conn.cursor()
 	query = "SELECT ticket_id, airline_name, airplane_id, flight_num, \
 		D.airport_city, \
@@ -290,51 +296,35 @@ def cusSearchFlight():
 	if not flag:
 		db_email = email
 	departure_city = request.form['departure_city']
+	_, departure_city = check_apostrophe(departure_city)
 	departure_airport = request.form['departure_airport']
+	_, departure_airport = check_apostrophe(departure_airport)
 	arrival_city = request.form['arrival_city']
+	_, arrival_city = check_apostrophe(arrival_city)
 	arrival_airport = request.form['arrival_airport']
+	_, arrival_airport = check_apostrophe(arrival_airport)
 	departure_date = request.form['departure_date']
 	arrival_date = request.form['arrival_date']
 
 	cursor = conn.cursor()
-	# flights with tickets left
-	query1 = "SELECT airline_name, airplane_id, flight_num, D.airport_city, departure_airport, \
-		A.airport_city, arrival_airport, departure_time, arrival_time, \
-			price, status, num_tickets_left\
-		FROM airport as D, flight, airport AS A WHERE \
-		D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\') and \
-		D.airport_name = departure_airport and \
-		departure_airport = if (\'{}\' = '', departure_airport, \'{}\') and \
-		A.airport_city = if (\'{}\' = '', A.airport_city, \'{}\')and \
-		A.airport_name = arrival_airport and \
-		arrival_airport =  if (\'{}\' = '', arrival_airport, \'{}\')and \
-		date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\')and \
-		date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\')"
-	# query1 = "SELECT airline_name, airplane_id, flight_num, D.airport_city, departure_airport, \
-	# 	A.airport_city, arrival_airport, departure_time, arrival_time, \
-	# 		price, status, count(ticket_id)\
-	# 	FROM airport as D, flight NATURAL JOIN ticket, airport AS A WHERE \
-	# 	D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\') and \
-	# 	D.airport_name = departure_airport and \
-	# 	departure_airport = if (\'{}\' = '', departure_airport, \'{}\') and \
-	# 	A.airport_city = if (\'{}\' = '', A.airport_city, \'{}\')and \
-	# 	A.airport_name = arrival_airport and \
-	# 	arrival_airport =  if (\'{}\' = '', arrival_airport, \'{}\')and \
-	# 	date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\')and \
-	# 	date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\') and \
-	# 	ticket_id NOT IN (SELECT ticket_id FROM flight NATURAL JOIN ticket NATURAL JOIN purchases) \
-	# 	GROUP BY airline_name, airplane_id, flight_num, D.airport_city, departure_airport, \
-	# 	A.airport_city, arrival_airport, departure_time, arrival_time, price"
-	# cursor.execute(query1.format(departure_city,departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date,arrival_date))
+	query1 = "SELECT airline_name, airplane_id, flight_num, D.airport_city, departure_airport, A.airport_city, arrival_airport, departure_time, arrival_time, price, status, num_tickets_left\
+			FROM airport as D, flight, airport AS A \
+			WHERE D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\') and \
+					D.airport_name = departure_airport and \
+					departure_airport = if (\'{}\' = '', departure_airport, \'{}\') and \
+					A.airport_city = if (\'{}\' = '', A.airport_city, \'{}\')and \
+					A.airport_name = arrival_airport and \
+					arrival_airport =  if (\'{}\' = '', arrival_airport, \'{}\')and \
+					date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\')and \
+					date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\')"
 	cursor.execute(query1.format(departure_city,departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date,arrival_date))
 	data = cursor.fetchall()
 	cursor.close()
-	print('###############', data)
 	
 	if (data):
 		return render_template('cusSearchPurchase.html', email = email, emailName=email.split('@')[0], upcoming_flights=data)
 	else:
-		error = 'Sorry ... Flight does not exist or tickets sold out!'
+		error = 'Sorry ... Flight does not exist!'
 		return render_template('cusSearchPurchase.html', email = email, emailName=email.split('@')[0], error1=error)
 
 @app.route('/cusBuyTickets', methods=['GET', 'POST'])
@@ -344,15 +334,16 @@ def cusBuyTickets():
 	if not flag:
 		db_email = email
 	flight_num = request.form['flight_num']
+
 	cursor = conn.cursor()
+	# this query is an extra failsafe in case triggers went wrong.
 	query = "SELECT ticket_id FROM flight NATURAL JOIN ticket\
-	WHERE flight_num = \'{}\' \
-		AND ticket_id NOT IN (SELECT ticket_id FROM flight NATURAL JOIN ticket NATURAL JOIN purchases)\
-	AND flight_num = \'{}\'"
+			WHERE flight_num = \'{}\' AND \
+				ticket_id NOT IN (SELECT ticket_id \
+									FROM flight NATURAL JOIN ticket NATURAL JOIN purchases)\
+				AND flight_num = \'{}\'"
 	cursor.execute(query.format(flight_num, flight_num))
-	#stores the results in a variable
 	data = cursor.fetchall()
-	#use fetchall() if you are expecting more than 1 data row
 	cursor.close()
 
 	if(data):
@@ -449,6 +440,7 @@ def agentHome():
 	flag, db_email = check_apostrophe(email)
 	if not flag:
 		db_email = email
+		
 	cursor = conn.cursor()
 	query1 = "SELECT booking_agent_id FROM booking_agent WHERE email = \'{}\'"
 	cursor.execute(query1.format(db_email))
@@ -531,9 +523,13 @@ def agentSearchFlight():
 	if not flag:
 		db_email = email
 	departure_city = request.form['departure_city']
+	_, departure_city = check_apostrophe(departure_city)
 	departure_airport = request.form['departure_airport']
+	_, departure_airport = check_apostrophe(departure_airport)
 	arrival_city = request.form['arrival_city']
+	_, arrival_city = check_apostrophe(arrival_city)
 	arrival_airport = request.form['arrival_airport']
+	_, arrival_airport = check_apostrophe(arrival_airport)
 	departure_date = request.form['departure_date']
 	arrival_date = request.form['arrival_date']
 
@@ -578,6 +574,7 @@ def agentBuyTickets():
 		db_email = email
 	flight_num = request.form.get("flight_num")
 	customer_email = request.form['customer_email']
+	_, customer_email = check_apostrophe(customer_email)
 
 	# validate booking agent email
 	cursor = conn.cursor()
@@ -686,6 +683,7 @@ def staffregisterAuth():
 		db_last_name = last_name
 	date_of_birth = request.form['date_of_birth']
 	airline_name = request.form['airline_name']
+	_, airline_name = check_apostrophe(airline_name)
 
 	cursor = conn.cursor()
 	query = "SELECT * FROM airline_staff WHERE username = \'{}\'"
@@ -727,9 +725,11 @@ def staffhome():
 	flag, db_username = check_apostrophe(username)
 	if not flag:
 		db_username = username
-	# airline_name = session['airline_name']
+
 	cursor = conn.cursor();
-	query = "SELECT username, airline_name, airplane_id, flight_num, departure_airport, arrival_airport, departure_time, arrival_time FROM flight NATURAL JOIN airline_staff WHERE username = \'{}\' and status = 'upcoming' and datediff(CURDATE(), DATE(departure_time)) < 30 "
+	query = "SELECT username, airline_name, airplane_id, flight_num, departure_airport, arrival_airport, departure_time, arrival_time \
+			FROM flight NATURAL JOIN airline_staff \
+			WHERE username = \'{}\' and status = 'upcoming' and datediff(CURDATE(), DATE(departure_time)) < 30 "
 	cursor.execute(query.format(db_username))
 	data1 = cursor.fetchall()
 	cursor.close()
@@ -738,9 +738,13 @@ def staffhome():
 @app.route('/staffSearchFlight', methods=['GET', 'POST'])
 def staffSearchFlight():
 	departure_city = request.form['departure_city']
+	_, departure_city = check_apostrophe(departure_city)
 	departure_airport = request.form['departure_airport']
+	_, departure_airport = check_apostrophe(departure_airport)
 	arrival_city = request.form['arrival_city']
+	_, arrival_city = check_apostrophe(arrival_city)
 	arrival_airport = request.form['arrival_airport']
+	_, arrival_airport = check_apostrophe(arrival_airport)
 	departure_date = request.form['departure_date']
 	arrival_date = request.form['arrival_date']
 	username = session['username']
@@ -749,18 +753,17 @@ def staffSearchFlight():
 		db_username = username
 
 	cursor = conn.cursor()
-	query = "SELECT airline_name, airplane_id, flight_num, D.airport_city, departure_airport, A.airport_city, arrival_airport, departure_time, arrival_time, \
-			status, price\
-		FROM airport as D, flight NATURAL JOIN airline_staff, airport AS A WHERE \
-		D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\') and \
-		D.airport_name = departure_airport and \
-		departure_airport = if (\'{}\' = '', departure_airport, \'{}\') and \
-		A.airport_city = if (\'{}\' = '', A.airport_city, \'{}\')and \
-		A.airport_name = arrival_airport and \
-		arrival_airport =  if (\'{}\' = '', arrival_airport, \'{}\')and \
-		date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\')and \
-		date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\') and \
-		username = \'{}\'"
+	query = "SELECT airline_name, airplane_id, flight_num, D.airport_city, departure_airport, A.airport_city, arrival_airport, departure_time, arrival_time, status, price\
+			FROM airport as D, flight NATURAL JOIN airline_staff, airport AS A \
+			WHERE D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\') and \
+					D.airport_name = departure_airport and \
+					departure_airport = if (\'{}\' = '', departure_airport, \'{}\') and \
+					A.airport_city = if (\'{}\' = '', A.airport_city, \'{}\')and \
+					A.airport_name = arrival_airport and \
+					arrival_airport =  if (\'{}\' = '', arrival_airport, \'{}\')and \
+					date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\')and \
+					date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\') and \
+					username = \'{}\'"
 	cursor.execute(query.format(departure_city, departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date,arrival_date,db_username))
 	data = cursor.fetchall()
 	cursor.close()
@@ -782,6 +785,7 @@ def staffaddinfo():
 	flag, db_username = check_apostrophe(username)
 	if not flag:
 		db_username = username
+	
 	cursor = conn.cursor();
 	query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
 	cursor.execute(query.format(db_username))
@@ -796,7 +800,6 @@ def edit_status():
 	flight_num = request.form['flight_num']
 	
 	cursor = conn.cursor()
-	#executes query
 	upd = "UPDATE flight set status = \'{}\' WHERE flight_num = \'{}\'"
 	cursor.execute(upd.format(status, flight_num))
 	conn.commit()
@@ -810,25 +813,26 @@ def create_flight():
 	flag, db_username = check_apostrophe(username)
 	if not flag:
 		db_username = username
-	#grabs information from the forms
 	airline_name = request.form['airline_name']
+	_, airline_name = check_apostrophe(airline_name)
 	flight_num = request.form['flight_num']
 	departure_airport = request.form['departure_airport']
+	_, departure_airport = check_apostrophe(departure_airport)
 	departure_date = request.form['departure_date']
 	departure_time = request.form['departure_time']
 	arrival_airport = request.form['arrival_airport']
+	_, arrival_airport = check_apostrophe(arrival_airport)
 	arrival_date = request.form['arrival_date']
 	arrival_time = request.form['arrival_time']
 	price = request.form['price']
 	status = request.form['status']
 	airplane_id = request.form['airplane_id']
 
-	#cursor used to send queries
 	cursor = conn.cursor()
-	#executes query
-	query = "SELECT username, airline_name FROM airline_staff WHERE username = \'{}\' and airline_name = \'{}\'"
+	query = "SELECT username, airline_name \
+			FROM airline_staff \
+			WHERE username = \'{}\' and airline_name = \'{}\'"
 	cursor.execute(query.format(db_username, airline_name))
-	#stores the results in a variable
 	data = cursor.fetchall()
 	#use fetchall() if you are expecting more than 1 data row
 	error1 = None
@@ -898,7 +902,7 @@ def create_flight():
 		return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1)		
 
 	else:
-		ins = "INSERT INTO flight VALUES(\'{}\', \'{}\', \'{}\', \'{},{}\', \'{}\', \'{}, {}\', \'{}\', \'{}\', \'{}\', NULL)"
+		ins = "INSERT INTO flight VALUES(\'{}\', \'{}\', \'{}\', \'{},{}\', \'{}\', \'{}, {}\', \'{}\', \'{}\', \'{}\', 0)"
 		cursor.execute(ins.format(airline_name, flight_num, departure_airport, departure_date, departure_time, arrival_airport, arrival_date, arrival_time, price, status, airplane_id))
 		conn.commit()
 		query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
@@ -917,6 +921,7 @@ def add_airplane():
 		db_username = username
 	#grabs information from the forms
 	airline_name = request.form['airline_name']
+	_, airline_name = check_apostrophe(airline_name)
 	airplane_id = request.form['airplane_id']
 	seats = request.form['seats']
 
@@ -976,13 +981,13 @@ def add_airport():
 		db_username = username
 	#grabs information from the forms
 	airport_name = request.form['airport_name']
+	_, airline_name = check_apostrophe(airline_name)
 	airport_city = request.form['airport_city']
-	#cursor used to send queries
+	_, airport_city = check_apostrophe(airport_city)
+
 	cursor = conn.cursor()
-	#executes query
 	airport = "SELECT airport_name FROM airport WHERE airport_name = \'{}\'"
 	cursor.execute(airport.format(airport_name))
-	#stores the results in a variable
 	airportdata = cursor.fetchone()
 	query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
 	cursor.execute(query.format(db_username))
@@ -990,7 +995,6 @@ def add_airport():
 	cursor.close()
 	error3 = None
 	if(airportdata):
-		#If the previous query returns data, then exists
 		error3 = "This airport already exists"
 		return render_template('staffaddinfo.html', error3 = error3, username=username, airplane = data1)
 
@@ -1018,7 +1022,6 @@ def staffagent():
 				ORDER BY commission DESC\
 					LIMIT 5 "
 	cursor.execute(query1.format(db_username))
-	# cursor.execute(query1)
 	data1 = cursor.fetchall()
 
 	cursor = conn.cursor();
@@ -1028,7 +1031,6 @@ def staffagent():
 			GROUP BY email, booking_agent_id \
 				ORDER BY ticket DESC LIMIT 5 "
 	cursor.execute(query2.format(db_username))
-	# cursor.execute(query2)
 	data2 = cursor.fetchall()
 
 	cursor = conn.cursor();
@@ -1038,7 +1040,6 @@ def staffagent():
 			GROUP BY email, booking_agent_id \
 				ORDER BY ticket DESC LIMIT 5 "
 	cursor.execute(query3.format(db_username))
-	# cursor.execute(query3)
 	data3 = cursor.fetchall()
 
 	cursor = conn.cursor();
@@ -1076,7 +1077,8 @@ def staffcusflight():
 	flag, db_email = check_apostrophe(email)
 	if not flag:
 		db_email = email
-	cursor = conn.cursor();
+
+	cursor = conn.cursor()
 	query2 = "SELECT DISTINCT airplane_id, flight_num, \
 		departure_airport, arrival_airport, departure_time, arrival_time, \
 			status FROM customer, \
@@ -1161,7 +1163,6 @@ def staffDestReve():
 	flag, db_username = check_apostrophe(username)
 	if not flag:
 		db_username = username
-	# # airline_name = session['airline_name']
 
 	cursor = conn.cursor();
 	query1 = "SELECT airport_city, count(ticket_id) AS ticket FROM \
@@ -1253,7 +1254,7 @@ def staffticket():
 	duration = request.form.get("duration")
 	end = request.form['end']
 
-	cursor = conn.cursor();
+	cursor = conn.cursor()
 	if duration == "":
 		ticket = "SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, count(ticket_id) FROM \
 				purchases NATURAL JOIN airline_staff NATURAL JOIN flight NATURAL JOIN ticket\
@@ -1305,7 +1306,7 @@ def staffticket():
 @app.route('/logout')
 def logout():
 	session.pop('username')
-	return redirect('/cuslogin')
+	return redirect('/stafflogin')
 
 @app.route('/logoutEmail')
 def logoutEmail():

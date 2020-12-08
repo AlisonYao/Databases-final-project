@@ -27,7 +27,7 @@ for each row
     set num_tickets_left = num_tickets_left - 1
     where flight.airline_name = old.airline_name and flight.flight_num = old.flight_num;
 
-DELETE FROM ticket where ticket_id = '74373';
+-- DELETE FROM ticket where ticket_id = '74373';
 
 
 -- if you delete from purchases, # should go up
@@ -38,7 +38,7 @@ for each row
     set num_tickets_left = num_tickets_left + 1
     where old.ticket_id = ticket.ticket_id;
 
-DELETE FROM purchases where ticket_id = '12345';
+-- DELETE FROM purchases where ticket_id = '12345';
 
 
 -- check all your triggers

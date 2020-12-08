@@ -36,10 +36,10 @@ Backend:
 
 Frontend:
 
-- [ ] show number of tickets left when searching for flights
+- [x] show number of tickets left when searching for flights
 - [ ] a few optional tasks
 
 Testing:
 
-- [ ] use sample data from the professor to test and debug our system
-- [ ] Cross check each other's work
+- [x] use sample data from the professor to test and debug our system
+- [x] Cross check each other's work
