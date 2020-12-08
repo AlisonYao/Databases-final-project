@@ -32,56 +32,6 @@
         <h2>Search & Change Flight </h2>
 
         <div style="text-align: center;">
-            <h3>Change flight status</h3>
-            <form action="/edit_status" method="POST">				
-                <label for="flight_num">Flight Number:</label>
-				<select name="flight_num" required>
-					<option value="" disabled>--please search first--</option>
-					{% if upcoming_flights%}
-					{% for line in upcoming_flights %}
-					<option value="{{line[2]}}">{{line[2]}}</option>
-					{% endfor %}
-                    {% endif %}
-                </select>
-				<!-- <label>Flight Number:</label> -->
-				<!-- <input type="text" name = "flight_num" placeholder="flight_num" required/> -->
-				<label for="flight_status">Change Status:</label>
-                <!-- <input type="text" name = "edit_status" placeholder="edit_status" required/> -->
-                <select name="edit_status" required>
-                    <option value="upcoming">upcoming</option>
-                    <option value="delayed">delayed</option>
-                    <option value="in-progress">in-progress</option>
-                </select>
-				<button type="submit" class="btn btn-primary">Change</button>
-				{% if error2 %}
-				<p class="text-danger"><strong>No Result:</strong> {{error2}}</p>
-                {% endif %}
-
-                {% if message %}
-                <p class="text-success">{{message}}</p>
-                {% endif %}
-            </form>
-            
-
-				<!-- </select>
-
-				<label>Customer Email: </label>
-				<input type="text" name = "customer_email" placeholder="customer_email" required/>
-				<button type="submit" class="btn btn-primary">Buy</button>
-				{% if error2 %}
-				<p class="text-danger"><strong>Sorry!</strong> {{error2}}</p>
-				{% endif %}
-			  </form>
-
-			  {% if message %}
-			  <p class="text-success">{{message}}</p>
-			  {% endif %} -->
-
-        </div>
-        
-        <hr>
-
-        <div style="text-align: center;">
 			<h3>Search for flight</h3>
 			<form action="/staffSearchFlight" method="POST">
 				<label>Departure City:</label>
@@ -139,7 +89,56 @@
 			</table>
 			{% endif %}
 		</div>
+
+		<hr>
 		
+        <div style="text-align: center;">
+            <h3>Change flight status</h3>
+            <form action="/edit_status" method="POST">				
+                <label for="flight_num">Flight Number:</label>
+				<select name="flight_num" required>
+					<option value="" disabled>--please search first--</option>
+					{% if upcoming_flights%}
+					{% for line in upcoming_flights %}
+					<option value="{{line[2]}}">{{line[2]}}</option>
+					{% endfor %}
+                    {% endif %}
+                </select>
+				<!-- <label>Flight Number:</label> -->
+				<!-- <input type="text" name = "flight_num" placeholder="flight_num" required/> -->
+				<label for="flight_status">Change Status:</label>
+                <!-- <input type="text" name = "edit_status" placeholder="edit_status" required/> -->
+                <select name="edit_status" required>
+                    <option value="upcoming">upcoming</option>
+                    <option value="delayed">delayed</option>
+                    <option value="in-progress">in-progress</option>
+                </select>
+				<button type="submit" class="btn btn-primary">Change</button>
+				{% if error2 %}
+				<p class="text-danger"><strong>No Result:</strong> {{error2}}</p>
+                {% endif %}
+
+                {% if message %}
+                <p class="text-success">{{message}}</p>
+                {% endif %}
+            </form>
+            
+
+				<!-- </select>
+
+				<label>Customer Email: </label>
+				<input type="text" name = "customer_email" placeholder="customer_email" required/>
+				<button type="submit" class="btn btn-primary">Buy</button>
+				{% if error2 %}
+				<p class="text-danger"><strong>Sorry!</strong> {{error2}}</p>
+				{% endif %}
+			  </form>
+
+			  {% if message %}
+			  <p class="text-success">{{message}}</p>
+			  {% endif %} -->
+
+        </div>
 
     </div>
 

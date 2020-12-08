@@ -1,6 +1,13 @@
 from flask import Flask, render_template, request, session, url_for, redirect, flash
 import mysql.connector
 import datetime
+import json
+import decimal
+class DecimalEncoder(json.JSONEncoder):
+    def default(self,o):
+        if isinstance(o,decimal.Decimal):
+            return float(o)
+        super(DecimalEncoder,self).default(o)
 
 #Initialize the app from Flask
 app = Flask(__name__)
@@ -807,8 +814,10 @@ def create_flight():
 	airline_name = request.form['airline_name']
 	flight_num = request.form['flight_num']
 	departure_airport = request.form['departure_airport']
+	departure_date = request.form['departure_date']
 	departure_time = request.form['departure_time']
 	arrival_airport = request.form['arrival_airport']
+	arrival_date = request.form['arrival_date']
 	arrival_time = request.form['arrival_time']
 	price = request.form['price']
 	status = request.form['status']
@@ -889,8 +898,8 @@ def create_flight():
 		return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1)		
 
 	else:
-		ins = "INSERT INTO flight VALUES(\'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\', \'{}\')"
-		cursor.execute(ins.format(airline_name, flight_num, departure_airport, departure_time, arrival_airport, arrival_time, price, status, airplane_id))
+		ins = "INSERT INTO flight VALUES(\'{}\', \'{}\', \'{}\', \'{},{}\', \'{}\', \'{}, {}\', \'{}\', \'{}\', \'{}\', NULL)"
+		cursor.execute(ins.format(airline_name, flight_num, departure_airport, departure_date, departure_time, arrival_airport, arrival_date, arrival_time, price, status, airplane_id))
 		conn.commit()
 		query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
 		cursor.execute(query.format(username))
@@ -1183,7 +1192,7 @@ def staffDestReve():
 	# cursor.execute(query1)
 	mdirect = cursor.fetchall()
 	if(mdirect):
-		mdirect = [int(mdirect[0][0])]
+		mdirect = [json.dumps(mdirect[0][0],cls=DecimalEncoder)]
 	else:
 		mdirect = [0]
 
@@ -1196,7 +1205,7 @@ def staffDestReve():
 	# cursor.execute(query1)
 	mindirect = cursor.fetchall()
 	if(mindirect):
-		mindirect = [int(mindirect[0][0])]
+		mindirect = [json.dumps(mindirect[0][0],cls=DecimalEncoder)]
 	else:
 		mindirect = [0]
 
@@ -1209,7 +1218,7 @@ def staffDestReve():
 	# cursor.execute(query1)
 	ydirect = cursor.fetchall()
 	if(ydirect):
-		ydirect = [int(ydirect[0][0])]
+		ydirect = [json.dumps(ydirect[0][0],cls=DecimalEncoder)]
 	else:
 		ydirect = [0]
 
@@ -1222,7 +1231,7 @@ def staffDestReve():
 	# cursor.execute(query1)
 	yindirect = cursor.fetchall()
 	if(yindirect):
-		yindirect = [int(yindirect[0][0])]
+		yindirect = [json.dumps(yindirect[0][0],cls=DecimalEncoder)]
 	else:
 		yindirect = [0]
 	
