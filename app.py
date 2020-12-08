@@ -9,20 +9,19 @@ import decimal
 app = Flask(__name__)
 
 #Configure MySQL
-# conn = mysql.connector.connect(host='localhost',
-#                        user='root',
-#                        password='86466491@Alison',
-#                        database='air')
-
 conn = mysql.connector.connect(host='localhost',
-					   user='root',
-					   password='root',
-					   database='air')
+                       user='root',
+                       password='86466491@Alison',
+                       database='air')
+
+# conn = mysql.connector.connect(host='localhost',
+# 					   user='root',
+# 					   password='root',
+# 					   database='air')
 
 #####################################################################
 #                               HELPER                              #
 #####################################################################
-
 # for natural cases such as Dylan O'Brian and malicious cases such as inputing 2' or '1'='1 on purpose
 # add a ' after every ' to escape so that SQL will not have any error
 def check_apostrophe(x):

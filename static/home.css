@@ -20,7 +20,7 @@
 }
 
 .sidenav h1 {
-  padding: 6px 8px 6px 16px;
+  padding: 8px 0px 8px 6px;
   text-decoration: none;
   font-size: 17px;
   color: white;
@@ -29,7 +29,7 @@
 
 /* The navigation menu links */
 .sidenav a {
-  padding: 6px 8px 6px 16px;
+  padding: 8px 0px 8px 6px;
   text-decoration: none;
   font-size: 15px;
   color: grey;

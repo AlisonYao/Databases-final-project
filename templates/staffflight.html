@@ -60,10 +60,10 @@
                     <th>airline name</th>
 					<th>airplane id</th>
 					<th>flight num</th>
-					<th>departure city&sirport</th>
-					<th>departure_time</th>
+					<th>departure city&airport</th>
+					<th>departure time</th>
 					<th>arrival city&airport</th>
-					<th>arrival_time</th>
+					<th>arrival time</th>
 					<th>status</th>
 					<th>price</th>
 				</thead>
@@ -108,7 +108,7 @@
                 <select name="edit_status" required>
                     <option value="upcoming">Upcoming</option>
                     <option value="delayed">Delayed</option>
-                    <option value="in-progress">in-progress</option>
+                    <option value="in-progress">In-progress</option>
                 </select>
 				<button type="submit" class="btn btn-primary">Change</button>
 				{% if error2 %}
@@ -119,27 +119,7 @@
                 <p class="text-success">{{message}}</p>
                 {% endif %}
             </form>
-            
-
-				<!-- </select>
-
-				<label>Customer Email: </label>
-				<input type="text" name = "customer_email" placeholder="customer_email" required/>
-				<button type="submit" class="btn btn-primary">Buy</button>
-				{% if error2 %}
-				<p class="text-danger"><strong>Sorry!</strong> {{error2}}</p>
-				{% endif %}
-			  </form>
-
-			  {% if message %}
-			  <p class="text-success">{{message}}</p>
-			  {% endif %} -->
-
         </div>
-
     </div>
-
-
-<!-- <a href="/staffhome">Go back</a> -->
 </body>
 </html>

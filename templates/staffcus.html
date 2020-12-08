@@ -53,34 +53,22 @@
                 <form action="/staffcusflight" method="POST">
                     <label>Customer email:</label>
                     <input type="email" name = "customer_email" placeholder="customer_email" maxlength="50" required/> </br>
-                    <!-- <label>Departure Airport:</label>
-                    <input type="text" name = "departure_airport" placeholder="departure_airport" /></br>
-                    <label>Departure Date:</label>
-                    <input type="date" name = "departure_date" placeholder="departure_date" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br>
-                    <label>Arrival City:</label>
-                    <input type="text" name = "arrival_city" placeholder="arrival_city" /> </br>
-                    <label>Arrival Airport:</label>
-                    <input type="text" name = "arrival_airport" placeholder="arrival_airport" /></br>
-                    <label>Arrival Date:</label>
-                    <input type="date" name = "arrival_date" placeholder="arrival_date" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br> -->
-                    <button type="submit" class="btn btn-primary">Search</button>
+                    <button type="submit" class="btn btn-primary">Search</button></br>
+                    </br>
                     {% if error %}
                     <p class="text-danger"><strong>Sorry:</strong> {{error}}</p>
                     {% endif %}
                 </form>
 
-                <!-- {% if cusflight %} -->
-                <!-- </br> -->
+                {% if cusflight %}
                 <table class="table table-bordered table-sm">
                     <thead>
-                        <th>airplane_id</th>
-                        <th>flight_num</th>
-
-                        <th>departure_airport</th>
-
-                        <th>arrival_airport</th>
-                        <th>departure_time</th>
-                        <th>arrival_time</th>
+                        <th>airplane id</th>
+                        <th>flight num</th>
+                        <th>departure airport</th>
+                        <th>arrival airport</th>
+                        <th>departure time</th>
+                        <th>arrival time</th>
                         <th>status</th>
                     </thead>
 
@@ -98,7 +86,7 @@
                     {% endfor %}
                     </tbody>
                 </table>
-                <!-- {% endif %} -->
+                {% endif %}
             </div>
 
             <div style="text-align: center;">
@@ -111,16 +99,6 @@
                         type = "number" placeholder="flight_num" 
                         maxlength = "9" 
                         required/></br>
-                    <!-- <label>Departure Airport:</label>
-                    <input type="text" name = "departure_airport" placeholder="departure_airport" /></br>
-                    <label>Departure Date:</label>
-                    <input type="date" name = "departure_date" placeholder="departure_date" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br>
-                    <label>Arrival City:</label>
-                    <input type="text" name = "arrival_city" placeholder="arrival_city" /> </br>
-                    <label>Arrival Airport:</label>
-                    <input type="text" name = "arrival_airport" placeholder="arrival_airport" /></br>
-                    <label>Arrival Date:</label>
-                    <input type="date" name = "arrival_date" placeholder="arrival_date" onfocus="(this.type='date')"  onblur="(this.type='text')" /> </br> -->
                     <button type="submit" class="btn btn-primary">Search</button>
                     {% if error3 %}
                     <p class="text-danger"><strong>Sorry:</strong> {{error3}}</p>
@@ -140,7 +118,6 @@
                         <tr>
                             <td>{{line[0]}}</td>
                             <td>{{line[1]}}</td>
-
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -148,6 +125,5 @@
                 {% endif %}
             </div>
 
-<!-- <a href="/staffhome">Go back</a> -->
 </body>
 </html>
