@@ -9,15 +9,15 @@ import decimal
 app = Flask(__name__)
 
 #Configure MySQL
-conn = mysql.connector.connect(host='localhost',
-                       user='root',
-                       password='86466491@Alison',
-                       database='air')
-
 # conn = mysql.connector.connect(host='localhost',
-# 					   user='root',
-# 					   password='root',
-# 					   database='air')
+#                        user='root',
+#                        password='86466491@Alison',
+#                        database='air')
+
+conn = mysql.connector.connect(host='localhost',
+					   user='root',
+					   password='root',
+					   database='air')
 
 #####################################################################
 #                               HELPER                              #
@@ -1305,26 +1305,19 @@ def staffTickets():
 		session.clear()
 		return render_template('404.html')
 
-@app.route('/staffticket', methods=['GET', 'POST'])
-def staffticket():
+@app.route('/stafffixticket', methods=['GET', 'POST'])
+def stafffixticket():
 	if session.get('username'):
 		username = session['username']
 		db_username = check_apostrophe(username)
-		start = request.form['start']
 		duration = request.form.get("duration")
-		end = request.form['end']
-
+		fallticket = None
+		
 		cursor = conn.cursor()
-		if duration == "":
-			ticket = "SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, count(ticket_id) FROM \
-					purchases NATURAL JOIN airline_staff NATURAL JOIN flight NATURAL JOIN ticket\
-					WHERE purchase_date > \'{}\'\
-					and purchase_date < \'{}\' AND username = \'{}\' \
-					GROUP BY year, month, airline_name"
-			cursor.execute(ticket.format(start, end, db_username))
-			# cursor.execute(query2)
-			allticket = cursor.fetchall()
-		elif duration == 'tmonth':
+		# if duration == "":
+			# error = "No range selected"
+			# return render_template('staffTickets.html', error = error, username = username)
+		if duration == 'tmonth':
 			ticket = "SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, count(ticket_id) FROM \
 					purchases NATURAL JOIN airline_staff NATURAL JOIN flight NATURAL JOIN ticket\
 					WHERE datediff(CURDATE(), DATE(purchase_date)) < 30 AND username = \'{}\' \
@@ -1332,7 +1325,7 @@ def staffticket():
 
 			cursor.execute(ticket.format(db_username))
 			# cursor.execute(query1)
-			allticket = cursor.fetchall()
+			fallticket = cursor.fetchall()
 		elif duration == 'tyear':
 			ticket = "SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, count(ticket_id) FROM \
 					purchases NATURAL JOIN airline_staff NATURAL JOIN flight NATURAL JOIN ticket\
@@ -1341,21 +1334,81 @@ def staffticket():
 
 			cursor.execute(ticket.format(db_username))
 			# cursor.execute(query1)
-			allticket = cursor.fetchall()
+			fallticket = cursor.fetchall()
+
+		cursor.close()
+
+
+		if(fallticket):
+			fs = str(fallticket[0][0]) + '-' + str(fallticket[0][1])
+			fe = str(fallticket[len(fallticket) - 1][0]) + '-' + str(fallticket[len(fallticket) - 1][1])
+			ftime = [str(fallticket[i][0]) + '-' + str(fallticket[i][1]) for i in range(len(fallticket))]
+			fmonthticket = [fallticket[i][2] for i in range(len(fallticket))]
+			ftotal = sum(fmonthticket)
+
+			# time = ['2020-10', '2020-11']
+			# monthticket = [1, 2]
+			return render_template('staffTickets.html', fs = fs, fe = fe, ft = ftotal, ftime = ftime, fmonthticket = fmonthticket, fticket = fallticket, username = username)
+		else:
+			ferror = "No ticket sold!"
+			# cursor.close()
+			return render_template('staffTickets.html', ferror = ferror, username = username)
+	else:
+		session.clear()
+		return render_template('404.html')
+
+@app.route('/staffticket', methods=['GET', 'POST'])
+def staffticket():
+	if session.get('username'):
+		username = session['username']
+		db_username = check_apostrophe(username)
+		# duration = request.form.get("duration")
+		start = request.form['start']
+		end = request.form['end']
+		cursor = conn.cursor()
+		# if duration == "":
+		# if request.form['start'] and request.form['end']:
+
+		ticket = "SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, count(ticket_id) FROM \
+				purchases NATURAL JOIN airline_staff NATURAL JOIN flight NATURAL JOIN ticket\
+				WHERE purchase_date > \'{}\'\
+				and purchase_date < \'{}\' AND username = \'{}\' \
+				GROUP BY year, month, airline_name"
+		cursor.execute(ticket.format(start, end, db_username))
+		# cursor.execute(query2)
+		allticket = cursor.fetchall()
+		# elif duration == 'tmonth':
+		# 	ticket = "SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, count(ticket_id) FROM \
+		# 			purchases NATURAL JOIN airline_staff NATURAL JOIN flight NATURAL JOIN ticket\
+		# 			WHERE datediff(CURDATE(), DATE(purchase_date)) < 30 AND username = \'{}\' \
+		# 			GROUP BY year, month, airline_name"
+
+		# 	cursor.execute(ticket.format(db_username))
+		# 	# cursor.execute(query1)
+		# 	allticket = cursor.fetchall()
+		# elif duration == 'tyear':
+		# 	ticket = "SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, count(ticket_id) FROM \
+		# 			purchases NATURAL JOIN airline_staff NATURAL JOIN flight NATURAL JOIN ticket\
+		# 			WHERE datediff(CURDATE(), DATE(purchase_date)) < 365 AND username = \'{}\' \
+		# 			GROUP BY year, month, airline_name"
+
+		# 	cursor.execute(ticket.format(db_username))
+		# 	# cursor.execute(query1)
+		# 	allticket = cursor.fetchall()
 
 		cursor.close()
 
 
 		if(allticket):
-			start = str(allticket[0][0]) + '-' + str(allticket[0][1])
-			end = str(allticket[len(allticket) - 1][0]) + '-' + str(allticket[len(allticket) - 1][1])
+			s = str(allticket[0][0]) + '-' + str(allticket[0][1])
+			e = str(allticket[len(allticket) - 1][0]) + '-' + str(allticket[len(allticket) - 1][1])
 			time = [str(allticket[i][0]) + '-' + str(allticket[i][1]) for i in range(len(allticket))]
 			monthticket = [allticket[i][2] for i in range(len(allticket))]
 			total = sum(monthticket)
 
 			# time = ['2020-10', '2020-11']
 			# monthticket = [1, 2]
-			return render_template('staffTickets.html', s = start, e = end, t = total, time = time, monthticket = monthticket, ticket = allticket, username = username)
+			return render_template('staffTickets.html', s = s, e = e, t = total, time = time, monthticket = monthticket, ticket = allticket, username = username)
 		else:
 			error = "No ticket sold"
 			# cursor.close()
