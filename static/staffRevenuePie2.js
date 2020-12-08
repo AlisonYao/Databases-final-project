@@ -9,8 +9,8 @@ function drawChart() {
 
   var data = google.visualization.arrayToDataTable([
     ['Sales', 'Amount'],
-    ['Direct', ydirect0],
-    ['Indirect', yindirect0],
+    ['Direct(bought by customer)', ydirect0],
+    ['Indirect(bought through agent)', yindirect0],
 
   ]);
 
