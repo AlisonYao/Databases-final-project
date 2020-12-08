@@ -9,15 +9,15 @@ import decimal
 app = Flask(__name__)
 
 #Configure MySQL
-# conn = mysql.connector.connect(host='localhost',
-#                        user='root',
-#                        password='86466491@Alison',
-#                        database='air')
-
 conn = mysql.connector.connect(host='localhost',
-					   user='root',
-					   password='root',
-					   database='air')
+                       user='root',
+                       password='86466491@Alison',
+                       database='air')
+
+# conn = mysql.connector.connect(host='localhost',
+# 					   user='root',
+# 					   password='root',
+# 					   database='air')
 
 #####################################################################
 #                               HELPER                              #
@@ -303,7 +303,7 @@ def cusSpending():
 
 @app.route('/cusSearchFlight', methods=['GET', 'POST'])
 def cusSearchFlight():
-	if session.get('BA_email'):
+	if session.get('email'):
 		email = session['email']
 		db_email = check_apostrophe(email)
 		departure_city = check_apostrophe(request.form['departure_city'])
@@ -339,7 +339,7 @@ def cusSearchFlight():
 
 @app.route('/cusBuyTickets', methods=['GET', 'POST'])
 def cusBuyTickets():
-	if session.get('BA_email'):
+	if session.get('email'):
 		email = session['email']
 		db_email = check_apostrophe(email)
 		flight_num = request.form['flight_num']
