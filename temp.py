@@ -1,13 +1,13 @@
-import datetime
-period = 24
+def check_apostrophe(x):
+	assert type(x) == str
+	if "'" not in x:
+		return x
+	db_x = ''
+	for i in x:
+		if i == "'":
+			db_x += "''"
+		else:
+			db_x += i
+	return db_x
 
-
-today = datetime.date.today()
-print(today)
-past_day = today.day
-past_month = (today.month - int(period)) % 12
-if past_month == 0:
-    past_month = 12
-past_year = today.year + ((today.month - int(period) - 1) // 12)
-
-print(past_year, past_month, past_day)
+check_apostrophe("23456")

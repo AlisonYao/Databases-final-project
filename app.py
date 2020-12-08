@@ -29,15 +29,16 @@ conn = mysql.connector.connect(host='localhost',
 # for natural cases such as Dylan O'Brian and malicious cases such as inputing 2' or '1'='1 on purpose
 # add a ' after every ' to escape so that SQL will not have any error
 def check_apostrophe(x):
+	assert type(x) == str
 	if "'" not in x:
-		return False, x
+		return x
 	db_x = ''
 	for i in x:
 		if i == "'":
 			db_x += "''"
 		else:
 			db_x += i
-	return True, db_x
+	return db_x
 
 
 #####################################################################
@@ -50,14 +51,10 @@ def publicHome():
 
 @app.route('/publicSearchFlight', methods=['GET', 'POST'])
 def publicSearchFlight():
-	departure_city = request.form['departure_city']
-	_, departure_city = check_apostrophe(departure_city)
-	departure_airport = request.form['departure_airport']
-	_, departure_airport = check_apostrophe(departure_airport)
-	arrival_city = request.form['arrival_city']
-	_, arrival_city = check_apostrophe(arrival_city)
-	arrival_airport = request.form['arrival_airport']
-	_, arrival_airport = check_apostrophe(arrival_airport)
+	departure_city = check_apostrophe(request.form['departure_city'])
+	departure_airport = check_apostrophe(request.form['departure_airport'])
+	arrival_city = check_apostrophe(request.form['arrival_city'])
+	arrival_airport = check_apostrophe(request.form['arrival_airport'])
 	departure_date = request.form['departure_date']
 	arrival_date = request.form['arrival_date']
 
@@ -83,8 +80,7 @@ def publicSearchFlight():
 
 @app.route('/publicSearchStatus', methods=['GET', 'POST'])
 def publicSearchStatus():
-	airline_name = request.form['airline_name']
-	_, airline_name = check_apostrophe(airline_name)
+	airline_name = check_apostrophe(request.form['airline_name'])
 	flight_num = request.form['flight_num']
 	arrival_date = request.form['arrival_date']
 	departure_date = request.form['departure_date']
@@ -111,23 +107,21 @@ def publicSearchStatus():
 #                              CUSTOMER                             #
 #               all operations from the customer side               #
 #####################################################################
-#Define route for login
+# Define route for login
 @app.route('/cuslogin')
 def cuslogin():
 	return render_template('cuslogin.html')
 
-#Define route for register
+# Define route for register
 @app.route('/cusregister')
 def cusregister():
 	return render_template('cusregister.html')
 
-#Authenticates the login
+# Authenticates the login
 @app.route('/cusloginAuth', methods=['GET', 'POST'])
 def cusloginAuth():
 	email = request.form['email']
-	flag, db_email = check_apostrophe(email)
-	if not flag:
-		db_email = email
+	db_email = check_apostrophe(email)
 	password = request.form['password']
 
 	cursor = conn.cursor()
@@ -151,33 +145,23 @@ def cusloginAuth():
 		error = 'Invalid login or email'
 		return render_template('cuslogin.html', error=error)
 
-#Authenticates the register
+# Authenticates the register
 @app.route('/cusregisterAuth', methods=['GET', 'POST'])
 def cusregisterAuth():
 	#grabs information from the forms
 	email = request.form['email']
-	flag, db_email = check_apostrophe(email)
-	if not flag:
-		db_email = email
+	db_email = check_apostrophe(email)
 	name = request.form['name']
-	flag, db_name = check_apostrophe(name)
-	if not flag:
-		db_name = name
+	db_name = check_apostrophe(name)
 	password = request.form['password']
-	building_number = request.form['building_number']
-	_, building_number = check_apostrophe(building_number)
-	street = request.form['street']
-	_, street = check_apostrophe(street)
-	city = request.form['city']
-	_, city = check_apostrophe(city)
-	state = request.form['state']
-	_, state = check_apostrophe(state)
+	building_number = check_apostrophe(request.form['building_number'])
+	street = check_apostrophe(request.form['street'])
+	city = check_apostrophe(request.form['city'])
+	state = check_apostrophe(request.form['state'])
 	phone_number = request.form['phone_number']
-	passport_number = request.form['passport_number']
-	_, passport_number = check_apostrophe(passport_number)
+	passport_number = check_apostrophe(request.form['passport_number'])
 	passport_expiration = request.form['passport_expiration']
-	passport_country = request.form['passport_country']
-	_, passport_country = check_apostrophe(passport_country)
+	passport_country = check_apostrophe(request.form['passport_country'])
 	date_of_birth = request.form['date_of_birth']
 
 	cursor = conn.cursor()
@@ -208,9 +192,7 @@ def cusregisterAuth():
 @app.route('/cushome')
 def cushome():
 	email = session['email']
-	flag, db_email = check_apostrophe(email)
-	if not flag:
-		db_email = email
+	db_email = check_apostrophe(email)
 
 	cursor = conn.cursor()
 	query = "SELECT ticket_id, airline_name, airplane_id, flight_num, \
@@ -232,9 +214,7 @@ def cusSearchPurchase():
 @app.route('/cusSpending', methods=['POST', 'GET'])
 def cusSpending():
 	email = session['email']
-	flag, db_email = check_apostrophe(email)
-	if not flag:
-		db_email = email
+	db_email = check_apostrophe(email)
 
 	# show total spending in the past period of time
 	duration = request.form.get("duration")
@@ -292,17 +272,11 @@ def cusSpending():
 @app.route('/cusSearchFlight', methods=['GET', 'POST'])
 def cusSearchFlight():
 	email = session['email']
-	flag, db_email = check_apostrophe(email)
-	if not flag:
-		db_email = email
-	departure_city = request.form['departure_city']
-	_, departure_city = check_apostrophe(departure_city)
-	departure_airport = request.form['departure_airport']
-	_, departure_airport = check_apostrophe(departure_airport)
-	arrival_city = request.form['arrival_city']
-	_, arrival_city = check_apostrophe(arrival_city)
-	arrival_airport = request.form['arrival_airport']
-	_, arrival_airport = check_apostrophe(arrival_airport)
+	db_email = check_apostrophe(email)
+	departure_city = check_apostrophe(request.form['departure_city'])
+	departure_airport = check_apostrophe(request.form['departure_airport'])
+	arrival_city = check_apostrophe(request.form['arrival_city'])
+	arrival_airport = check_apostrophe(request.form['arrival_airport'])
 	departure_date = request.form['departure_date']
 	arrival_date = request.form['arrival_date']
 
@@ -330,9 +304,7 @@ def cusSearchFlight():
 @app.route('/cusBuyTickets', methods=['GET', 'POST'])
 def cusBuyTickets():
 	email = session['email']
-	flag, db_email = check_apostrophe(email)
-	if not flag:
-		db_email = email
+	db_email = check_apostrophe(email)
 	flight_num = request.form['flight_num']
 
 	cursor = conn.cursor()
@@ -376,9 +348,7 @@ def agentregister():
 @app.route('/agentloginAuth', methods=['GET', 'POST'])
 def agentloginAuth():
 	email = request.form['email']
-	flag, db_email = check_apostrophe(email)
-	if not flag:
-		db_email = email
+	db_email = check_apostrophe(email)
 	password = request.form['password']
 
 	cursor = conn.cursor()
@@ -404,9 +374,7 @@ def agentloginAuth():
 @app.route('/agentregisterAuth', methods=['GET', 'POST'])
 def agentregisterAuth():
 	email = request.form['email']
-	flag, db_email = check_apostrophe(email)
-	if not flag:
-		db_email = email
+	db_email = check_apostrophe(email)
 	password = request.form['password']
 	booking_agent_id = request.form['booking_agent_id']
 
@@ -437,9 +405,7 @@ def agentregisterAuth():
 @app.route('/agentHome')
 def agentHome():
 	email = session['email']
-	flag, db_email = check_apostrophe(email)
-	if not flag:
-		db_email = email
+	db_email = check_apostrophe(email)
 		
 	cursor = conn.cursor()
 	query1 = "SELECT booking_agent_id FROM booking_agent WHERE email = \'{}\'"
@@ -459,9 +425,7 @@ def agentSearchPurchase():
 @app.route('/agentCommission', methods=['POST', 'GET'])
 def agentCommission():
 	email = session['email']
-	flag, db_email = check_apostrophe(email)
-	if not flag:
-		db_email = email
+	db_email = check_apostrophe(email)
 
 	cursor = conn.cursor()
 	duration = request.form.get("duration")
@@ -477,9 +441,7 @@ def agentCommission():
 @app.route('/agentTopCustomers')
 def agentTopCustomers():
 	email = session['email']
-	flag, db_email = check_apostrophe(email)
-	if not flag:
-		db_email = email
+	db_email = check_apostrophe(email)
 
 	cursor = conn.cursor()
 	query = "select customer_email, count(ticket_id) from agent_commission where email = \'{}\' and datediff(CURDATE(), DATE(purchase_date)) < 183 group by customer_email order by count(ticket_id) desc"
@@ -519,17 +481,11 @@ def agentTopCustomers():
 @app.route('/agentSearchFlight', methods=['GET', 'POST'])
 def agentSearchFlight():
 	email = session['email']
-	flag, db_email = check_apostrophe(email)
-	if not flag:
-		db_email = email
-	departure_city = request.form['departure_city']
-	_, departure_city = check_apostrophe(departure_city)
-	departure_airport = request.form['departure_airport']
-	_, departure_airport = check_apostrophe(departure_airport)
-	arrival_city = request.form['arrival_city']
-	_, arrival_city = check_apostrophe(arrival_city)
-	arrival_airport = request.form['arrival_airport']
-	_, arrival_airport = check_apostrophe(arrival_airport)
+	db_email = check_apostrophe(email)
+	departure_city = check_apostrophe(request.form['departure_city'])
+	departure_airport = check_apostrophe(request.form['departure_airport'])
+	arrival_city = check_apostrophe(request.form['arrival_city'])
+	arrival_airport = check_apostrophe(request.form['arrival_airport'])
 	departure_date = request.form['departure_date']
 	arrival_date = request.form['arrival_date']
 
@@ -569,12 +525,9 @@ def agentSearchFlight():
 @app.route('/agentBuyTickets', methods=['GET', 'POST'])
 def agentBuyTickets():
 	email = session['email']
-	flag, db_email = check_apostrophe(email)
-	if not flag:
-		db_email = email
+	db_email = check_apostrophe(email)
 	flight_num = request.form.get("flight_num")
-	customer_email = request.form['customer_email']
-	_, customer_email = check_apostrophe(customer_email)
+	customer_email = check_apostrophe(request.form['customer_email'])
 
 	# validate booking agent email
 	cursor = conn.cursor()
@@ -642,9 +595,7 @@ def staffregister():
 @app.route('/staffloginAuth', methods=['GET', 'POST'])
 def staffloginAuth():
 	username = request.form['username']
-	flag, db_username = check_apostrophe(username)
-	if not flag:
-		db_username = username
+	db_username = check_apostrophe(username)
 	password = request.form['password']
 
 	cursor = conn.cursor()
@@ -669,21 +620,14 @@ def staffloginAuth():
 def staffregisterAuth():
 	#grabs information from the forms
 	username = request.form['username']
-	flag, db_username = check_apostrophe(username)
-	if not flag:
-		db_username = username
+	db_username = check_apostrophe(username)
 	password = request.form['password']
 	first_name = request.form['first_name']
-	flag, db_first_name = check_apostrophe(first_name)
-	if not flag:
-		db_first_name = first_name
+	db_first_name = check_apostrophe(first_name)
 	last_name = request.form['last_name']
-	flag, db_last_name = check_apostrophe(last_name)
-	if not flag:
-		db_last_name = last_name
+	db_last_name = check_apostrophe(last_name)
 	date_of_birth = request.form['date_of_birth']
-	airline_name = request.form['airline_name']
-	_, airline_name = check_apostrophe(airline_name)
+	airline_name = check_apostrophe(request.form['airline_name'])
 
 	cursor = conn.cursor()
 	query = "SELECT * FROM airline_staff WHERE username = \'{}\'"
@@ -722,9 +666,7 @@ def staffregisterAuth():
 @app.route('/staffhome')
 def staffhome():
 	username = session['username']
-	flag, db_username = check_apostrophe(username)
-	if not flag:
-		db_username = username
+	db_username = check_apostrophe(username)
 
 	cursor = conn.cursor();
 	query = "SELECT username, airline_name, airplane_id, flight_num, departure_airport, arrival_airport, departure_time, arrival_time \
@@ -737,20 +679,14 @@ def staffhome():
 
 @app.route('/staffSearchFlight', methods=['GET', 'POST'])
 def staffSearchFlight():
-	departure_city = request.form['departure_city']
-	_, departure_city = check_apostrophe(departure_city)
-	departure_airport = request.form['departure_airport']
-	_, departure_airport = check_apostrophe(departure_airport)
-	arrival_city = request.form['arrival_city']
-	_, arrival_city = check_apostrophe(arrival_city)
-	arrival_airport = request.form['arrival_airport']
-	_, arrival_airport = check_apostrophe(arrival_airport)
+	departure_city = check_apostrophe(request.form['departure_city'])
+	departure_airport = check_apostrophe(request.form['departure_airport'])
+	arrival_city = check_apostrophe(request.form['arrival_city'])
+	arrival_airport = check_apostrophe(request.form['arrival_airport'])
 	departure_date = request.form['departure_date']
 	arrival_date = request.form['arrival_date']
 	username = session['username']
-	flag, db_username = check_apostrophe(username)
-	if not flag:
-		db_username = username
+	db_username = check_apostrophe(username)
 
 	cursor = conn.cursor()
 	query = "SELECT airline_name, airplane_id, flight_num, D.airport_city, departure_airport, A.airport_city, arrival_airport, departure_time, arrival_time, status, price\
@@ -782,9 +718,7 @@ def staffflight():
 @app.route('/staffaddinfo')
 def staffaddinfo():
 	username = session['username'] 
-	flag, db_username = check_apostrophe(username)
-	if not flag:
-		db_username = username
+	db_username = check_apostrophe(username)
 	
 	cursor = conn.cursor();
 	query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
@@ -810,18 +744,13 @@ def edit_status():
 @app.route('/create_flight', methods=['GET', 'POST'])
 def create_flight():
 	username = session['username']
-	flag, db_username = check_apostrophe(username)
-	if not flag:
-		db_username = username
-	airline_name = request.form['airline_name']
-	_, airline_name = check_apostrophe(airline_name)
+	db_username = check_apostrophe(username)
+	airline_name = check_apostrophe(request.form['airline_name'])
 	flight_num = request.form['flight_num']
-	departure_airport = request.form['departure_airport']
-	_, departure_airport = check_apostrophe(departure_airport)
+	departure_airport = check_apostrophe(request.form['departure_airport'])
 	departure_date = request.form['departure_date']
 	departure_time = request.form['departure_time']
-	arrival_airport = request.form['arrival_airport']
-	_, arrival_airport = check_apostrophe(arrival_airport)
+	arrival_airport = check_apostrophe(request.form['arrival_airport'])
 	arrival_date = request.form['arrival_date']
 	arrival_time = request.form['arrival_time']
 	price = request.form['price']
@@ -916,12 +845,10 @@ def create_flight():
 @app.route('/add_airplane', methods=['GET', 'POST'])
 def add_airplane():
 	username = session['username']
-	flag, db_username = check_apostrophe(username)
-	if not flag:
-		db_username = username
+	db_username = check_apostrophe(username)
+	
 	#grabs information from the forms
-	airline_name = request.form['airline_name']
-	_, airline_name = check_apostrophe(airline_name)
+	airline_name = check_apostrophe(request.form['airline_name'])
 	airplane_id = request.form['airplane_id']
 	seats = request.form['seats']
 
@@ -976,14 +903,9 @@ def add_airplane():
 @app.route('/add_airport', methods=['GET', 'POST'])
 def add_airport():
 	username = session['username']
-	flag, db_username = check_apostrophe(username)
-	if not flag:
-		db_username = username
-	#grabs information from the forms
-	airport_name = request.form['airport_name']
-	_, airline_name = check_apostrophe(airline_name)
-	airport_city = request.form['airport_city']
-	_, airport_city = check_apostrophe(airport_city)
+	db_username = check_apostrophe(username)
+	airport_name = check_apostrophe(request.form['airport_name'])
+	airport_city = check_apostrophe(request.form['airport_city'])
 
 	cursor = conn.cursor()
 	airport = "SELECT airport_name FROM airport WHERE airport_name = \'{}\'"
@@ -1010,9 +932,7 @@ def add_airport():
 @app.route('/staffagent')
 def staffagent():
 	username = session['username']
-	flag, db_username = check_apostrophe(username)
-	if not flag:
-		db_username = username
+	db_username = check_apostrophe(username)
 	# airline_name = session['airline_name']
 	cursor = conn.cursor();
 	query1 = "SELECT email, booking_agent_id, sum(price) * 0.1 as commission FROM booking_agent NATURAL JOIN purchases \
@@ -1052,9 +972,7 @@ def staffagent():
 @app.route('/staffcus')
 def staffcus():
 	username = session['username']
-	flag, db_username = check_apostrophe(username)
-	if not flag:
-		db_username = username
+	db_username = check_apostrophe(username)
 	# airline_name = session['airline_name']
 	cursor = conn.cursor();
 	query1 = "SELECT email, name, count(ticket_id) as ticket FROM customer, purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff \
@@ -1070,13 +988,9 @@ def staffcus():
 @app.route('/staffcusflight', methods=['GET', 'POST'])
 def staffcusflight():
 	username = session['username']
-	flag, db_username = check_apostrophe(username)
-	if not flag:
-		db_username = username
+	db_username = check_apostrophe(username)
 	email = request.form['customer_email']
-	flag, db_email = check_apostrophe(email)
-	if not flag:
-		db_email = email
+	db_email = check_apostrophe(email)
 
 	cursor = conn.cursor()
 	query2 = "SELECT DISTINCT airplane_id, flight_num, \
@@ -1117,9 +1031,7 @@ def staffcusflight():
 @app.route('/staffflightcus', methods=['GET', 'POST'])
 def staffflightcus():
 	username = session['username']
-	flag, db_username = check_apostrophe(username)
-	if not flag:
-		db_username = username
+	db_username = check_apostrophe(username)
 	flight_num = request.form['flight_num']
 
 	cursor = conn.cursor();
@@ -1160,9 +1072,7 @@ def staffflightcus():
 @app.route('/staffDestReve')
 def staffDestReve():
 	username = session['username']
-	flag, db_username = check_apostrophe(username)
-	if not flag:
-		db_username = username
+	db_username = check_apostrophe(username)
 
 	cursor = conn.cursor();
 	query1 = "SELECT airport_city, count(ticket_id) AS ticket FROM \
@@ -1247,9 +1157,7 @@ def staffTickets():
 @app.route('/staffticket', methods=['GET', 'POST'])
 def staffticket():
 	username = session['username']
-	flag, db_username = check_apostrophe(username)
-	if not flag:
-		db_username = username
+	db_username = check_apostrophe(username)
 	start = request.form['start']
 	duration = request.form.get("duration")
 	end = request.form['end']
