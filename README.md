@@ -31,8 +31,8 @@ Backend:
 - [x] password hashing
 - [x] Stored procedures & stored functions & triggers
 - [ ] clean up views & grants
-- [ ] enforcing complex constraints such as preventing unauthorized users to add flight information
-- [ ] prevent cross-site scripting vulnerabilities
+- [x] enforcing complex constraints such as preventing unauthorized users to add flight information
+- [x] prevent cross-site scripting vulnerabilities
 
 Frontend:
 

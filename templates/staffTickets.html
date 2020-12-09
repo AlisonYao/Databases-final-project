@@ -35,6 +35,7 @@
 
         <div style="text-align: center;">
             <h3>Amounts of Ticket Sold</h3>
+        </br>
             <form action="/staffticket" method="POST">
                 <label>Start date:</label>
                 <input type="date" name = "start" placeholder="start" onfocus="(this.type='date')"  onblur="(this.type='text')" required/> </br>
@@ -45,8 +46,9 @@
                 {% if error %}
                 <p class="text-danger"><strong>Sorry:</strong> {{error}}</p>
                 {% endif %}
+                </br></br>
             </form>
-                <h5>OR</h5>
+            <h5>OR</h5>
             <form action="/stafffixticket" method="POST">
                 <select name="duration" required>
                     <option value="">--select time range--</option>

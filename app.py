@@ -1362,9 +1362,7 @@ def stafffixticket():
 					GROUP BY year, month, airline_name"
 
 			cursor.execute(ticket.format(db_username))
-			# cursor.execute(query1)
 			fallticket = cursor.fetchall()
-
 		cursor.close()
 
 
@@ -1375,12 +1373,9 @@ def stafffixticket():
 			fmonthticket = [fallticket[i][2] for i in range(len(fallticket))]
 			ftotal = sum(fmonthticket)
 
-			# time = ['2020-10', '2020-11']
-			# monthticket = [1, 2]
 			return render_template('staffTickets.html', fs = fs, fe = fe, ft = ftotal, ftime = ftime, fmonthticket = fmonthticket, fticket = fallticket, username = username)
 		else:
 			ferror = "No ticket sold!"
-			# cursor.close()
 			return render_template('staffTickets.html', ferror = ferror, username = username)
 	else:
 		session.clear()
@@ -1451,26 +1446,10 @@ def staffticket():
 #                             COMMON                                #
 #                   all operations from all sides                   #
 #####################################################################
-# staff logout
 @app.route('/logout')
 def logout():
-	# session.pop('username')
-	session.clear()
-	return redirect('/stafflogin')
-
-# cus logout
-@app.route('/logoutEmail')
-def logoutEmail():
-	# session.pop('email')
 	session.clear()
 	return redirect('/cuslogin')
-
-# booking agent logout
-@app.route('/BAlogoutEmail')
-def BAlogoutEmail():
-	# session.pop('BA_email')
-	session.clear()
-	return redirect('/agentlogin')
 
 
 app.secret_key = 'some key that you will never guess'
