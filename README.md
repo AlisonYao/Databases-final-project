@@ -29,10 +29,10 @@ Once you have a basic working webapp that you can see, it is time to move on to 
 Backend:
 
 - [x] password hashing
-- [x] Stored procedures & stored functions & triggers
-- [ ] clean up views & grants
+- [x] Stored procedures/stored functions/triggers
 - [x] enforcing complex constraints such as preventing unauthorized users to add flight information
 - [x] prevent cross-site scripting vulnerabilities
+- [ ] clean up views & grants
 
 Frontend:
 
