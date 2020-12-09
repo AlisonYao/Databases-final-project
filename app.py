@@ -9,15 +9,15 @@ import decimal
 app = Flask(__name__)
 
 #Configure MySQL
-conn = mysql.connector.connect(host='localhost',
-                       user='root',
-                       password='86466491@Alison',
-                       database='air')
-
 # conn = mysql.connector.connect(host='localhost',
-# 					   user='root',
-# 					   password='root',
-# 					   database='air')
+#                        user='root',
+#                        password='86466491@Alison',
+#                        database='air')
+
+conn = mysql.connector.connect(host='localhost',
+					   user='root',
+					   password='root',
+					   database='air')
 
 #####################################################################
 #                               HELPER                              #
@@ -879,7 +879,7 @@ def create_flight():
 	if session.get('username'):
 		username = session['username']
 		db_username = check_apostrophe(username)
-		airline_name = check_apostrophe(request.form['airline_name'])
+		# airline_name = check_apostrophe(request.form['airline_name'])
 		flight_num = request.form['flight_num']
 		departure_airport = check_apostrophe(request.form['departure_airport'])
 		departure_date = request.form['departure_date']
@@ -888,24 +888,30 @@ def create_flight():
 		arrival_date = request.form['arrival_date']
 		arrival_time = request.form['arrival_time']
 		price = request.form['price']
+		number = request.form['number']
 		status = request.form['status']
 		airplane_id = request.form['airplane_id']
 
 		cursor = conn.cursor()
-		query = "SELECT username, airline_name \
-				FROM airline_staff \
-				WHERE username = \'{}\' and airline_name = \'{}\'"
-		cursor.execute(query.format(db_username, airline_name))
-		data = cursor.fetchall()
-		#use fetchall() if you are expecting more than 1 data row
-		error1 = None
-		if not (data):
-			#If the previous query returns data, then user exists
-			error1 = "Wrong airline"
-			query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
-			cursor.execute(query.format(db_username))
-			data1 = cursor.fetchall()
-			return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1)
+		airline = "SELECT airline_name \
+		FROM airline_staff \
+		WHERE username = \'{}\'"
+		cursor.execute(airline.format(db_username))
+
+		airline_name = cursor.fetchone()
+		airline_name = airline_name[0]
+
+		# cursor.execute(query.format(db_username, airline_name))
+		# data = cursor.fetchall()
+		# #use fetchall() if you are expecting more than 1 data row
+		# error1 = None
+		# if not (data):
+		# 	#If the previous query returns data, then user exists
+		# 	error1 = "Wrong airline"
+		# 	query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
+		# 	cursor.execute(query.format(db_username))
+		# 	data1 = cursor.fetchall()
+		# 	return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1)
 
 		query = "SELECT airport_name FROM airport WHERE airport_name = \'{}\'"
 		cursor.execute(query.format(departure_airport))
@@ -933,8 +939,8 @@ def create_flight():
 			data1 = cursor.fetchall()
 			return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1)
 
-		query = "SELECT airplane_id FROM airplane WHERE airplane_id = \'{}\'"
-		cursor.execute(query.format(airplane_id))
+		query = "SELECT airplane_id FROM airplane WHERE airline_name = \'{}\' and airplane_id = \'{}\'"
+		cursor.execute(query.format(airline_name, airplane_id))
 		#stores the results in a variable
 		data = cursor.fetchall()
 		error1 = None
@@ -948,6 +954,16 @@ def create_flight():
 		# cursor.close()
 		#executes query
 		# cursor = conn.cursor()
+		num = "SELECT seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\' and airplane_id = \'{}\'"
+		cursor.execute(num.format(db_username, airplane_id))
+		num = cursor.fetchone()
+		if int(number) > int(num[0]):
+			numerror = "Not enough seats"
+			query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
+			cursor.execute(query.format(db_username))
+			data1 = cursor.fetchall()
+			return render_template('staffaddinfo.html', error1 = numerror, username=username, airplane = data1)
+
 		query = "SELECT airline_name, flight_num FROM flight WHERE airline_name = \'{}\' and flight_num = \'{}\'"
 		cursor.execute(query.format(airline_name, flight_num))
 		#stores the results in a variable
@@ -965,11 +981,11 @@ def create_flight():
 			return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1)		
 
 		else:
-			ins = "INSERT INTO flight VALUES(\'{}\', \'{}\', \'{}\', \'{},{}\', \'{}\', \'{}, {}\', \'{}\', \'{}\', \'{}\', 0)"
-			cursor.execute(ins.format(airline_name, flight_num, departure_airport, departure_date, departure_time, arrival_airport, arrival_date, arrival_time, price, status, airplane_id))
+			ins = "INSERT INTO flight VALUES(\'{}\', \'{}\', \'{}\', \'{},{}\', \'{}\', \'{}, {}\', \'{}\', \'{}\', \'{}\', \'{}\')"
+			cursor.execute(ins.format(airline_name, flight_num, departure_airport, departure_date, departure_time, arrival_airport, arrival_date, arrival_time, price, status, airplane_id, number))
 			conn.commit()
 			query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
-			cursor.execute(query.format(username))
+			cursor.execute(query.format(db_username))
 			data1 = cursor.fetchall()
 			cursor.close()
 			message1 = "New flight added"
@@ -986,27 +1002,34 @@ def add_airplane():
 		db_username = check_apostrophe(username)
 		
 		#grabs information from the forms
-		airline_name = check_apostrophe(request.form['airline_name'])
+		# airline_name = check_apostrophe(request.form['airline_name'])
 		airplane_id = request.form['airplane_id']
 		seats = request.form['seats']
 
 		#cursor used to send queries
 		cursor = conn.cursor()
-		#executes query
-		query = "SELECT username, airline_name FROM airline_staff WHERE username = \'{}\' and airline_name = \'{}\'"
-		cursor.execute(query.format(db_username, airline_name))
-		#stores the results in a variable
-		data = cursor.fetchone()
-		#use fetchall() if you are expecting more than 1 data row
-		error2 = None	
+		airline = "SELECT airline_name \
+		FROM airline_staff \
+		WHERE username = \'{}\'"
+		cursor.execute(airline.format(db_username))
 
-		if not (data):
-			#If the previous query returns data, then user exists
-			error2 = "Wrong airline"
-			query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
-			cursor.execute(query.format(db_username))
-			data1 = cursor.fetchall()
-			return render_template('staffaddinfo.html', error2 = error2, username=username, airplane = data1)
+		airline_name = cursor.fetchone()
+		airline_name = airline_name[0]
+		#executes query
+		# query = "SELECT username, airline_name FROM airline_staff WHERE username = \'{}\' and airline_name = \'{}\'"
+		# cursor.execute(query.format(db_username, airline_name))
+		# #stores the results in a variable
+		# data = cursor.fetchone()
+		# #use fetchall() if you are expecting more than 1 data row
+		# error2 = None	
+
+		# if not (data):
+		# 	#If the previous query returns data, then user exists
+		# 	error2 = "Wrong airline"
+		# 	query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
+		# 	cursor.execute(query.format(db_username))
+		# 	data1 = cursor.fetchall()
+		# 	return render_template('staffaddinfo.html', error2 = error2, username=username, airplane = data1)
 
 		#executes query
 
@@ -1029,7 +1052,7 @@ def add_airplane():
 			cursor.execute(ins.format(airline_name, airplane_id, seats))
 
 			query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
-			cursor.execute(query.format(username))
+			cursor.execute(query.format(db_username))
 			data1 = cursor.fetchall()
 
 			conn.commit()
@@ -1350,7 +1373,8 @@ def stafffixticket():
 			ticket = "SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, count(ticket_id) FROM \
 					purchases NATURAL JOIN airline_staff NATURAL JOIN flight NATURAL JOIN ticket\
 					WHERE datediff(CURDATE(), DATE(purchase_date)) < 30 AND username = \'{}\' \
-					GROUP BY year, month, airline_name"
+					GROUP BY year, month, airline_name\
+					ORDER BY year, month"
 
 			cursor.execute(ticket.format(db_username))
 			# cursor.execute(query1)
@@ -1359,7 +1383,8 @@ def stafffixticket():
 			ticket = "SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, count(ticket_id) FROM \
 					purchases NATURAL JOIN airline_staff NATURAL JOIN flight NATURAL JOIN ticket\
 					WHERE datediff(CURDATE(), DATE(purchase_date)) < 365 AND username = \'{}\' \
-					GROUP BY year, month, airline_name"
+					GROUP BY year, month, airline_name\
+						ORDER BY year, month"
 
 			cursor.execute(ticket.format(db_username))
 			fallticket = cursor.fetchall()
@@ -1397,7 +1422,8 @@ def staffticket():
 				purchases NATURAL JOIN airline_staff NATURAL JOIN flight NATURAL JOIN ticket\
 				WHERE purchase_date > \'{}\'\
 				and purchase_date < \'{}\' AND username = \'{}\' \
-				GROUP BY year, month, airline_name"
+				GROUP BY year, month, airline_name\
+					ORDER BY year, month"
 		cursor.execute(ticket.format(start, end, db_username))
 		# cursor.execute(query2)
 		allticket = cursor.fetchall()
