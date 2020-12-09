@@ -75,11 +75,11 @@ INSERT INTO `customer` (`email`, `name`, `password`, `building_number`, `street`
 --
 
 INSERT INTO `flight` (`airline_name`, `flight_num`, `departure_airport`, `departure_time`, `arrival_airport`, `arrival_time`, `price`, `status`, `airplane_id`, `num_tickets_left`) VALUES
-('Jet Blue', 139, 'SFO', '2020-12-20 23:50:00', 'JFK', '2020-12-21 08:50:00', '200', 'Upcoming', 1, 0),
-('Jet Blue', 296, 'O\'Hare', '2021-01-01 12:00:00', 'SFO', '2021-01-01 14:00:00', '420', 'Upcoming', 1, 0),
-('Jet Blue', 307, 'La Guardia', '2020-12-19 22:00:00', 'SFO', '2020-12-20 02:00:00', '600', 'Upcoming', 1, 0),
-('Jet Blue', 455, 'JFK', '2020-12-25 05:00:00', 'Louisville SDF', '2020-12-25 07:00:00', '97', 'Upcoming', 3, 0),
-('Jet Blue', 915, 'O\'Hare', '2020-09-01 00:00:00', 'SFO', '2020-09-01 04:00:00', '500', 'Delayed', 2, 0);
+('Jet Blue', 139, 'SFO', '2020-12-20 23:50:00', 'JFK', '2020-12-21 08:50:00', '200', 'Upcoming', 1, 100),
+('Jet Blue', 296, 'O\'Hare', '2021-01-01 12:00:00', 'SFO', '2021-01-01 14:00:00', '420', 'Upcoming', 1, 200),
+('Jet Blue', 307, 'La Guardia', '2020-12-19 22:00:00', 'SFO', '2020-12-20 02:00:00', '600', 'Upcoming', 1, 150),
+('Jet Blue', 455, 'JFK', '2020-12-25 05:00:00', 'Louisville SDF', '2020-12-25 07:00:00', '97', 'Upcoming', 3, 180),
+('Jet Blue', 915, 'O\'Hare', '2020-09-01 00:00:00', 'SFO', '2020-09-01 04:00:00', '500', 'Delayed', 2, 250);
 
 --
 -- Dumping data for table `ticket`

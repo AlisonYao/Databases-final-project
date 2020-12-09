@@ -2,12 +2,12 @@
 -- DO NOT RUN TESTING TRIGGERS!!!
 
 -- only the first two are acutally useful
-drop trigger if exists add_tickets;
-create trigger add_tickets before insert on ticket
-for each row
-	update flight
-    set num_tickets_left = num_tickets_left + 1
-    where flight.airline_name = NEW.airline_name and flight.flight_num = NEW.flight_num;
+-- drop trigger if exists add_tickets;
+-- create trigger add_tickets before insert on ticket
+-- for each row
+-- 	update flight
+--     set num_tickets_left = num_tickets_left + 1
+--     where flight.airline_name = NEW.airline_name and flight.flight_num = NEW.flight_num;
 
 
 drop trigger if exists delete_tickets;
@@ -20,23 +20,23 @@ for each row
 -- for testing purposes, in case you are modifying DB manually plz also use the following ones
 
 -- if you delete from tickets # goes down
-drop trigger if exists delete_tickets_DB;
-create trigger delete_tickets_DB after delete on ticket
-for each row
-	update flight
-    set num_tickets_left = num_tickets_left - 1
-    where flight.airline_name = old.airline_name and flight.flight_num = old.flight_num;
+-- drop trigger if exists delete_tickets_DB;
+-- create trigger delete_tickets_DB after delete on ticket
+-- for each row
+-- 	update flight
+--     set num_tickets_left = num_tickets_left - 1
+--     where flight.airline_name = old.airline_name and flight.flight_num = old.flight_num;
 
 -- DELETE FROM ticket where ticket_id = '74373';
 
 
 -- if you delete from purchases, # should go up
-drop trigger if exists add_tickets_DB;
-create trigger add_tickets_DB before delete on purchases
-for each row 
-	update flight natural join ticket natural join purchases
-    set num_tickets_left = num_tickets_left + 1
-    where old.ticket_id = ticket.ticket_id;
+-- drop trigger if exists add_tickets_DB;
+-- create trigger add_tickets_DB before delete on purchases
+-- for each row 
+-- 	update flight natural join ticket natural join purchases
+--     set num_tickets_left = num_tickets_left + 1
+--     where old.ticket_id = ticket.ticket_id;
 
 -- DELETE FROM purchases where ticket_id = '12345';
 

@@ -337,30 +337,47 @@ def cusBuyTickets():
 	if session.get('email'):
 		email = session['email']
 		db_email = check_apostrophe(email)
+		airline_name = check_apostrophe(request.form['airline_name'])
 		flight_num = request.form['flight_num']
 
 		cursor = conn.cursor()
-		# this query is an extra failsafe in case triggers went wrong.
-		query = "SELECT ticket_id FROM flight NATURAL JOIN ticket\
-				WHERE flight_num = \'{}\' AND \
-					ticket_id NOT IN (SELECT ticket_id \
-										FROM flight NATURAL JOIN ticket NATURAL JOIN purchases)\
-					AND flight_num = \'{}\'"
-		cursor.execute(query.format(flight_num, flight_num))
+		# query = "SELECT ticket_id \
+		# 		FROM flight NATURAL JOIN ticket \
+		# 		WHERE flight_num = \'{}\' AND \
+		# 			ticket_id NOT IN (SELECT ticket_id \
+		# 								FROM flight NATURAL JOIN ticket NATURAL JOIN purchases)\
+		# 			AND flight_num = \'{}\'"
+		# there is no extra failsafe anymore 
+		query = "SELECT * \
+				FROM flight \
+				WHERE airline_name = \'{}\' AND flight_num = \'{}\' AND num_tickets_left > 0"
+		cursor.execute(query.format(airline_name, flight_num))
+		# cursor.execute(query.format(flight_num, flight_num))
 		data = cursor.fetchall()
 		cursor.close()
 
 		if(data):
 			cursor = conn.cursor()
-			ticket = int(data[0][0])
+			# calc the new ticket id = biggest id + 1
+			cursor = conn.cursor()
+			query_id = "SELECT ticket_id \
+						FROM ticket \
+						ORDER BY ticket_id DESC \
+						LIMIT 1"
+			cursor.execute(query_id)
+			ticket_id_data = cursor.fetchone() # (74373,)
+			new_ticket_id = int(ticket_id_data[0]) + 1
+			# first insert into ticket
+			ins1 = "INSERT INTO ticket VALUES (\'{}\', \'{}\', \'{}\')"
+			cursor.execute(ins1.format(new_ticket_id, airline_name, flight_num))
+			# then insert into purchases
 			ins = "INSERT INTO purchases VALUES (\'{}\', \'{}\', NULL, CURDATE())"
-			cursor.execute(ins.format(ticket, db_email))
+			cursor.execute(ins.format(new_ticket_id, db_email))
 			conn.commit()
 			cursor.close()
 			message1 = 'Ticket bought successfully!'
 			return render_template('cusSearchPurchase.html', email = email, message1 = message1)
 		else:
-			#returns an error message to the html page
 			error = 'No ticket'
 			return render_template('cusSearchPurchase.html', error2=error, email = email, emailName=email.split('@')[0])
 	else:
@@ -590,6 +607,7 @@ def agentSearchFlight():
 def agentBuyTickets():
 	if session.get('BA_email'):
 		email = session['BA_email']
+		airline_name = check_apostrophe(request.form.get("airline_name"))
 		db_email = check_apostrophe(email)
 		flight_num = request.form.get("flight_num")
 		customer_email = check_apostrophe(request.form['customer_email'])
@@ -619,24 +637,40 @@ def agentBuyTickets():
 
 		# customer_email is validated	
 		cursor = conn.cursor()
-		query = "SELECT ticket_id \
-				FROM flight NATURAL JOIN ticket\
-				WHERE flight_num = \'{}\' \
-				AND ticket_id NOT IN (SELECT ticket_id \
-										FROM flight NATURAL JOIN ticket NATURAL JOIN purchases)\
-				AND flight_num = \'{}\'"
-		cursor.execute(query.format(flight_num, flight_num))
-		ticket_data = cursor.fetchall()
+		query = "SELECT * \
+				FROM flight \
+				WHERE airline_name = \'{}\' AND flight_num = \'{}\' AND num_tickets_left > 0"
+		cursor.execute(query.format(airline_name, flight_num))
+		# query = "SELECT ticket_id \
+		# 		FROM flight NATURAL JOIN ticket\
+		# 		WHERE flight_num = \'{}\' \
+		# 		AND ticket_id NOT IN (SELECT ticket_id \
+		# 								FROM flight NATURAL JOIN ticket NATURAL JOIN purchases)\
+		# 		AND flight_num = \'{}\'"
+		# cursor.execute(query.format(flight_num, flight_num))
+		flight_data = cursor.fetchall()
 		cursor.close()
 
-		if not (ticket_data):
-			ticket_error = 'No ticket left'
+		if not (flight_data):
+			ticket_error = 'No ticket'
 			return render_template('agentSearchPurchase.html', error2=ticket_error, email=email, emailName=email.split('@')[0])
 		else:
 			cursor = conn.cursor()
-			ticket_id = int(ticket_data[0][0])
+			# calc the new ticket id = biggest id + 1
+			cursor = conn.cursor()
+			query_id = "SELECT ticket_id \
+						FROM ticket \
+						ORDER BY ticket_id DESC \
+						LIMIT 1"
+			cursor.execute(query_id)
+			ticket_id_data = cursor.fetchone() # (74373,)
+			new_ticket_id = int(ticket_id_data[0]) + 1
+			# first insert into ticket
+			ins1 = "INSERT INTO ticket VALUES (\'{}\', \'{}\', \'{}\')"
+			cursor.execute(ins1.format(new_ticket_id, airline_name, flight_num))
+			# then insert into purchases
 			ins = "INSERT INTO purchases VALUES (\'{}\', \'{}\', \'{}\', CURDATE())"
-			cursor.execute(ins.format(ticket_id, customer_email, booking_agent_id))
+			cursor.execute(ins.format(new_ticket_id, customer_email, booking_agent_id))
 			conn.commit()
 			cursor.close()
 			message = 'Ticket bought successfully!'
@@ -935,7 +969,7 @@ def create_flight():
 			cursor.execute(ins.format(airline_name, flight_num, departure_airport, departure_date, departure_time, arrival_airport, arrival_date, arrival_time, price, status, airplane_id))
 			conn.commit()
 			query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
-			cursor.execute(query.format(db_username))
+			cursor.execute(query.format(username))
 			data1 = cursor.fetchall()
 			cursor.close()
 			message1 = "New flight added"
