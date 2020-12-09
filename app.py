@@ -882,7 +882,7 @@ def create_flight():
 			#If the previous query returns data, then user exists
 			error1 = "Departure airport doesn't exist"
 			query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
-			cursor.execute(query.format(username))
+			cursor.execute(query.format(db_username))
 			data1 = cursor.fetchall()
 			return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1)
 
@@ -895,7 +895,7 @@ def create_flight():
 			#If the previous query returns data, then user exists
 			error1 = "Arrival airport doesn't exist"
 			query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
-			cursor.execute(query.format(username))
+			cursor.execute(query.format(db_username))
 			data1 = cursor.fetchall()
 			return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1)
 
@@ -908,7 +908,7 @@ def create_flight():
 			#If the previous query returns data, then user exists
 			error1 = "Airplane doesn't exist"
 			query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
-			cursor.execute(query.format(username))
+			cursor.execute(query.format(db_username))
 			data1 = cursor.fetchall()
 			return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1)
 		# cursor.close()
@@ -925,7 +925,7 @@ def create_flight():
 			#If the previous query returns data, then user exists
 			error1 = "This flight already exists"
 			query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
-			cursor.execute(query.format(username))
+			cursor.execute(query.format(db_username))
 			data1 = cursor.fetchall()
 			cursor.close()
 			return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1)		
@@ -935,7 +935,7 @@ def create_flight():
 			cursor.execute(ins.format(airline_name, flight_num, departure_airport, departure_date, departure_time, arrival_airport, arrival_date, arrival_time, price, status, airplane_id))
 			conn.commit()
 			query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
-			cursor.execute(query.format(username))
+			cursor.execute(query.format(db_username))
 			data1 = cursor.fetchall()
 			cursor.close()
 			message1 = "New flight added"
