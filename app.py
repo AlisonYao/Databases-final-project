@@ -69,11 +69,6 @@ def publicSearchFlight():
 	cursor.close()
 	
 	if (data): # has data
-		# session['upcoming_flights'] = data
-		print('######################################################################')
-		print('data type:', type(data))
-		print(data)
-		print('######################################################################')
 		return render_template('publicHome.html', upcoming_flights=data)
 	else: # does not have data
 		error = 'Sorry ... Cannot find this flight!'
@@ -1425,19 +1420,22 @@ def staffticket():
 # staff logout
 @app.route('/logout')
 def logout():
-	session.pop('username')
+	# session.pop('username')
+	session.clear()
 	return redirect('/stafflogin')
 
 # cus logout
 @app.route('/logoutEmail')
 def logoutEmail():
-	session.pop('email')
+	# session.pop('email')
+	session.clear()
 	return redirect('/cuslogin')
 
 # booking agent logout
 @app.route('/BAlogoutEmail')
 def BAlogoutEmail():
-	session.pop('BA_email')
+	# session.pop('BA_email')
+	session.clear()
 	return redirect('/agentlogin')
 
 
