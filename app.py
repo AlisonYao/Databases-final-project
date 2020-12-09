@@ -9,15 +9,15 @@ import decimal
 app = Flask(__name__)
 
 #Configure MySQL
-# conn = mysql.connector.connect(host='localhost',
-#                        user='root',
-#                        password='86466491@Alison',
-#                        database='air')
-
 conn = mysql.connector.connect(host='localhost',
-					   user='root',
-					   password='root',
-					   database='air')
+                       user='root',
+                       password='86466491@Alison',
+                       database='air')
+
+# conn = mysql.connector.connect(host='localhost',
+# 					   user='root',
+# 					   password='root',
+# 					   database='air')
 
 #####################################################################
 #                               HELPER                              #
@@ -55,15 +55,16 @@ def publicSearchFlight():
 	arrival_date = request.form['arrival_date']
 
 	cursor = conn.cursor()
-	query = "select airline_name, flight_num, departure_city, departure_airport, departure_time, arrival_city, arrival_airport, arrival_time, price, airplane_id \
-			from public_search_flight \
-			where departure_airport = if (\'{}\' = '', departure_airport, \'{}\') and \
-					arrival_airport = if (\'{}\' = '', arrival_airport, \'{}\') and \
-					status = 'upcoming' and \
-					departure_city = if (\'{}\' = '', departure_city, \'{}\') and \
-					arrival_city = if (\'{}\' = '',arrival_city, \'{}\') and \
-					date(departure_time) = if (\'{}\' = '',date(departure_time), \'{}\') and \
-					date(arrival_time) = if (\'{}\' = '',date(arrival_time), \'{}\')"
+	query = "SELECT airline_name, flight_num, departure_city, departure_airport, departure_time, arrival_city, arrival_airport, arrival_time, price, airplane_id \
+			FROM public_search_flight \
+			WHERE departure_airport = if (\'{}\' = '', departure_airport, \'{}\') AND \
+					arrival_airport = if (\'{}\' = '', arrival_airport, \'{}\') AND \
+					status = 'upcoming' AND \
+					departure_city = if (\'{}\' = '', departure_city, \'{}\') AND \
+					arrival_city = if (\'{}\' = '',arrival_city, \'{}\') AND \
+					date(departure_time) = if (\'{}\' = '',date(departure_time), \'{}\') AND \
+					date(arrival_time) = if (\'{}\' = '',date(arrival_time), \'{}\') \
+			ORDER BY airline_name, flight_num"
 	cursor.execute(query.format(departure_airport, departure_airport, arrival_airport, arrival_airport, departure_city, departure_city, arrival_city, arrival_city, departure_date, departure_date, arrival_date, arrival_date))
 	data = cursor.fetchall() 
 	cursor.close()
@@ -82,12 +83,13 @@ def publicSearchStatus():
 	departure_date = request.form['departure_date']
 
 	cursor = conn.cursor()
-	query = "select * \
-			from public_search_flight \
-			where flight_num = if (\'{}\' = '', flight_num, \'{}\') and \
+	query = "SELECT * \
+			FROM public_search_flight \
+			WHERE flight_num = if (\'{}\' = '', flight_num, \'{}\') and \
 					date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\') and \
 					date(arrival_time) = if (\'{}\' = '', date(arrival_time), \'{}\') and \
-					airline_name = if (\'{}\' = '', airline_name, \'{}\')"
+					airline_name = if (\'{}\' = '', airline_name, \'{}\') \
+			ORDER BY airline_name, flight_num"
 	cursor.execute(query.format(flight_num, flight_num, arrival_date, arrival_date, departure_date, departure_date, airline_name, airline_name))
 	data = cursor.fetchall() 
 	cursor.close()
@@ -318,7 +320,8 @@ def cusSearchFlight():
 						A.airport_name = arrival_airport and \
 						arrival_airport =  if (\'{}\' = '', arrival_airport, \'{}\')and \
 						date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\')and \
-						date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\')"
+						date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\') \
+						ORDER BY airline_name, flight_num"
 		cursor.execute(query1.format(departure_city,departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date,arrival_date))
 		data = cursor.fetchall()
 		cursor.close()
@@ -589,7 +592,8 @@ def agentSearchFlight():
 					A.airport_name = arrival_airport and \
 					arrival_airport =  if (\'{}\' = '', arrival_airport, \'{}\')and \
 					date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\')and \
-					date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\')"
+					date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\') \
+					ORDER BY airline_name, flight_num"
 		cursor.execute(query.format(departure_city, departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date, arrival_date))
 		data = cursor.fetchall()
 		cursor.close()
@@ -816,7 +820,8 @@ def staffSearchFlight():
 						arrival_airport =  if (\'{}\' = '', arrival_airport, \'{}\')and \
 						date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\')and \
 						date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\') and \
-						username = \'{}\'"
+						username = \'{}\' \
+				ORDER BY airline_name, flight_num"
 		cursor.execute(query.format(departure_city, departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date,arrival_date,db_username))
 		data = cursor.fetchall()
 		cursor.close()
