@@ -247,9 +247,9 @@ def cusSpending():
 		if duration is None:
 			duration = "365"
 		cursor = conn.cursor()
-		query = 'select sum(price)\
+		query = "select sum(price)\
 					from customer_spending \
-					where customer_email = \'{}\' and (purchase_date between DATE_ADD(NOW(), INTERVAL -\'{}\' DAY) and NOW())'
+					where customer_email = \'{}\' and (purchase_date between DATE_ADD(NOW(), INTERVAL -\'{}\' DAY) and NOW())"
 		cursor.execute(query.format(db_email, duration))
 		total_spending_data = cursor.fetchone()
 		cursor.close()
@@ -520,7 +520,11 @@ def agentTopCustomers():
 		db_email = check_apostrophe(email)
 
 		cursor = conn.cursor()
-		query = "select customer_email, count(ticket_id) from agent_commission where email = \'{}\' and datediff(CURDATE(), DATE(purchase_date)) < 183 group by customer_email order by count(ticket_id) desc"
+		query = "select customer_email, count(ticket_id) \
+				from agent_commission where email = \'{}\' and \
+				datediff(CURDATE(), DATE(purchase_date)) < 183 \
+				group by customer_email \
+				order by count(ticket_id) desc"
 		cursor.execute(query.format(db_email))
 		ticket_data = cursor.fetchall() # [('alison@gmail.com', 5), ('Alison1234@gmail.com', 2), ('clark@gmail.com', 1)]
 		cursor.close()
@@ -537,7 +541,11 @@ def agentTopCustomers():
 				tickets.append(0)
 		
 		cursor = conn.cursor()
-		query2 = "select customer_email, sum(ticket_price) * 0.1 from agent_commission where email = \'{}\' and datediff(CURDATE(), DATE(purchase_date)) < 365 group by customer_email order by sum(ticket_price) desc"
+		query2 = "select customer_email, sum(ticket_price) * 0.1 \
+				from agent_commission where email = \'{}\' and \
+				datediff(CURDATE(), DATE(purchase_date)) < 365 \
+				group by customer_email \
+				order by sum(ticket_price) desc"
 		cursor.execute(query2.format(db_email))
 		commission_data = cursor.fetchall()
 		cursor.close()
@@ -571,7 +579,7 @@ def agentSearchFlight():
 
 		# validate booking agent email
 		cursor = conn.cursor()
-		query = " select booking_agent_id from booking_agent where email = \'{}\'"
+		query = "select booking_agent_id from booking_agent where email = \'{}\'"
 		cursor.execute(query.format(db_email))
 		agent_data = cursor.fetchone() # tuple (98765,)
 		booking_agent_id = agent_data[0]
@@ -584,8 +592,8 @@ def agentSearchFlight():
 		# booking agent email has been validated
 		cursor = conn.cursor()
 		query = "SELECT airplane_id, flight_num, D.airport_city, departure_airport, A.airport_city, arrival_airport, departure_time, arrival_time, status, price, airline_name, num_tickets_left \
-					FROM airport as D, flight, airport AS A \
-					WHERE D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\') and \
+				FROM airport as D, flight, airport AS A \
+				WHERE D.airport_city = if (\'{}\' = '',D.airport_city, \'{}\') and \
 					D.airport_name = departure_airport and \
 					departure_airport = if (\'{}\' = '', departure_airport, \'{}\') and \
 					A.airport_city = if (\'{}\' = '', A.airport_city, \'{}\')and \
@@ -593,7 +601,7 @@ def agentSearchFlight():
 					arrival_airport =  if (\'{}\' = '', arrival_airport, \'{}\')and \
 					date(departure_time) = if (\'{}\' = '', date(departure_time), \'{}\')and \
 					date(arrival_time) =  if (\'{}\' = '', date(arrival_time), \'{}\') \
-					ORDER BY airline_name, flight_num"
+				ORDER BY airline_name, flight_num"
 		cursor.execute(query.format(departure_city, departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date, arrival_date))
 		data = cursor.fetchall()
 		cursor.close()
@@ -618,7 +626,7 @@ def agentBuyTickets():
 
 		# validate booking agent email
 		cursor = conn.cursor()
-		query = " select booking_agent_id from booking_agent where email = \'{}\'"
+		query = "select booking_agent_id from booking_agent where email = \'{}\'"
 		cursor.execute(query.format(db_email))
 		agent_data = cursor.fetchone() # tuple (98765,)
 		booking_agent_id = agent_data[0]
@@ -630,7 +638,7 @@ def agentBuyTickets():
 
 		# validate customer_email is registered
 		cursor = conn.cursor()
-		query = " select * from customer where email = \'{}\'"
+		query = "select * from customer where email = \'{}\'"
 		cursor.execute(query.format(customer_email))
 		cus_data = cursor.fetchone()
 		cursor.close()
@@ -645,13 +653,6 @@ def agentBuyTickets():
 				FROM flight \
 				WHERE airline_name = \'{}\' AND flight_num = \'{}\' AND num_tickets_left > 0"
 		cursor.execute(query.format(airline_name, flight_num))
-		# query = "SELECT ticket_id \
-		# 		FROM flight NATURAL JOIN ticket\
-		# 		WHERE flight_num = \'{}\' \
-		# 		AND ticket_id NOT IN (SELECT ticket_id \
-		# 								FROM flight NATURAL JOIN ticket NATURAL JOIN purchases)\
-		# 		AND flight_num = \'{}\'"
-		# cursor.execute(query.format(flight_num, flight_num))
 		flight_data = cursor.fetchall()
 		cursor.close()
 
@@ -785,7 +786,7 @@ def staffhome():
 		username = session['username']
 		db_username = check_apostrophe(username)
 
-		cursor = conn.cursor();
+		cursor = conn.cursor()
 		query = "SELECT username, airline_name, airplane_id, flight_num, departure_airport, arrival_airport, departure_time, arrival_time \
 				FROM flight NATURAL JOIN airline_staff \
 				WHERE username = \'{}\' and status = 'upcoming' and datediff(CURDATE(), DATE(departure_time)) < 30 "
@@ -847,7 +848,7 @@ def staffflight():
 		username = session['username'] 
 		db_username = check_apostrophe(username)
 		
-		cursor = conn.cursor();
+		cursor = conn.cursor()
 		query = "SELECT username, airline_name FROM airline_staff \
 				WHERE username = \'{}\'"
 		cursor.execute(query.format(db_username))
@@ -864,7 +865,7 @@ def staffaddinfo():
 	if session.get('username'):
 		username = session['username'] 
 		db_username = check_apostrophe(username)
-		cursor = conn.cursor();
+		cursor = conn.cursor()
 
 		query = "SELECT username, airline_name FROM airline_staff \
 		WHERE username = \'{}\'"
@@ -1150,7 +1151,7 @@ def staffagent():
 		username = session['username']
 		db_username = check_apostrophe(username)
 		# airline_name = session['airline_name']
-		cursor = conn.cursor();
+		cursor = conn.cursor()
 
 		query = "SELECT username, airline_name FROM airline_staff \
 		WHERE username = \'{}\'"
@@ -1252,7 +1253,7 @@ def staffcusflight():
 		if(data2):
 			return render_template('staffcus.html', cusflight = data2, frequent = data1, username = username, cdata = cdata)
 		else:
-			cursor = conn.cursor();
+			cursor = conn.cursor()
 			cus = "SELECT email FROM customer WHERE email = \'{}\'"
 			cursor.execute(cus.format(db_email))
 			# cursor.execute(query2)
@@ -1275,7 +1276,7 @@ def staffflightcus():
 		db_username = check_apostrophe(username)
 		flight_num = request.form['flight_num']
 
-		cursor = conn.cursor();
+		cursor = conn.cursor()
 		cursor = conn.cursor()
 		query = "SELECT username, airline_name FROM airline_staff \
 		WHERE username = \'{}\'"
@@ -1302,7 +1303,7 @@ def staffflightcus():
 		if(data3):
 			return render_template('staffcus.html', flightcus = data3, frequent = data1, username = username, cdata = cdata)
 		else:
-			cursor = conn.cursor();
+			cursor = conn.cursor()
 			cus = "SELECT flight_num FROM flight NATURAL JOIN airline_staff WHERE flight_num = \'{}\'\
 				AND username = \'{}\'"
 			cursor.execute(cus.format(flight_num, db_username))
@@ -1325,7 +1326,7 @@ def staffDest():
 		username = session['username']
 		db_username = check_apostrophe(username)
 
-		cursor = conn.cursor();
+		cursor = conn.cursor()
 
 		query = "SELECT username, airline_name FROM airline_staff \
 		WHERE username = \'{}\'"
@@ -1363,7 +1364,7 @@ def staffReve():
 		username = session['username']
 		db_username = check_apostrophe(username)
 
-		cursor = conn.cursor();
+		cursor = conn.cursor()
 		
 		query = "SELECT username, airline_name FROM airline_staff \
 		WHERE username = \'{}\'"
