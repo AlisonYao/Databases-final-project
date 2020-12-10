@@ -537,7 +537,7 @@ def agentTopCustomers():
 				tickets.append(0)
 		
 		cursor = conn.cursor()
-		query2 = "select customer_email, sum(ticket_price) from agent_commission where email = \'{}\' and datediff(CURDATE(), DATE(purchase_date)) < 365 group by customer_email order by sum(ticket_price) desc"
+		query2 = "select customer_email, sum(ticket_price) * 0.1 from agent_commission where email = \'{}\' and datediff(CURDATE(), DATE(purchase_date)) < 365 group by customer_email order by sum(ticket_price) desc"
 		cursor.execute(query2.format(db_email))
 		commission_data = cursor.fetchall()
 		cursor.close()
