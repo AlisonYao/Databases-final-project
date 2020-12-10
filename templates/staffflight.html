@@ -30,7 +30,13 @@
     </div>
     
     <div class="main">
-        <h2>Search & Change Flight </h2>
+		{% if posts %}
+			</br>
+			<h2>Search & Change Flight for <strong style="color: #028ada;">{{posts[0][1]}}</strong></h2>
+		{% else %}
+			<h2>Search & Change Flight </h2>
+		{% endif %}
+        
 
         <div style="text-align: center;">
 			<h3>Search for flight</h3>

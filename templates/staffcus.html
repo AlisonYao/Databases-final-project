@@ -31,7 +31,13 @@
     </div>
 
     <div class="main">
-        <h2>View Customers</h2>
+        {% if cdata %}
+            </br>
+            <h2>View Customers for <strong style="color: #028ada;">{{cdata[0][1]}}</strong></h2>
+        {% else %}
+            <h2>View Customers</h2>
+        {% endif %}
+        
         <div style="text-align: center;"></div>
             <h3 style="text-align: center;">Most Frequent Customer Last Year</h3>
             <table class="table table-bordered table-sm">
@@ -49,7 +55,7 @@
             </table>
 
             <div style="text-align: center;">
-                <h3>Flights Taken by Customer</h3>
+                <h3>Flights Bought by Customer</h3>
                 <form action="/staffcusflight" method="POST">
                     <label>Customer email:</label>
                     <input type="email" name = "customer_email" placeholder="customer_email" maxlength="50" required/> </br>

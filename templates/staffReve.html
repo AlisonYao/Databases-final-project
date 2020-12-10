@@ -31,7 +31,14 @@
     </div>
 
     <div class="main">
-        <h2>View Revenue Earned</h2>
+        {% if posts %}
+            </br>
+            <h2>View Revenue Earned for <strong style="color: #028ada;">{{posts[0][1]}}</strong></h2>
+        {% else %}
+            <h2>View Revenue Earned</h2>
+        {% endif %}
+
+        
             <h3 style="text-align: center;">Comparison of Revenue Earned</h3>
             <div id="revenue_chart" style="width: 800px; height: 300px;"></div>
             <div id="revenue_chart2" style="width: 800px; height: 300px;"></div>

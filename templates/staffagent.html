@@ -31,7 +31,14 @@
     </div>
 
     <div class="main">
-        <h2>View Booking Agents</h2>
+        {% if adata %}
+            </br>
+            <h2>View Booking Agents for <strong style="color: #028ada;">{{adata[0][1]}}</strong></h2>
+        {% else %}
+            <h2>View Booking Agents</h2>
+        {% endif %}
+        
+
         <div style="text-align: center;">
 
 

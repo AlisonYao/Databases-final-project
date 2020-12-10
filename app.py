@@ -9,15 +9,15 @@ import decimal
 app = Flask(__name__)
 
 #Configure MySQL
-conn = mysql.connector.connect(host='localhost',
-                       user='root',
-                       password='86466491@Alison',
-                       database='air')
-
 # conn = mysql.connector.connect(host='localhost',
-# 					   user='root',
-# 					   password='root',
-# 					   database='air')
+#                        user='root',
+#                        password='86466491@Alison',
+#                        database='air')
+
+conn = mysql.connector.connect(host='localhost',
+					   user='root',
+					   password='root',
+					   database='air')
 
 #####################################################################
 #                               HELPER                              #
@@ -824,13 +824,19 @@ def staffSearchFlight():
 				ORDER BY airline_name, flight_num"
 		cursor.execute(query.format(departure_city, departure_city,departure_airport,departure_airport, arrival_city, arrival_city, arrival_airport, arrival_airport, departure_date, departure_date, arrival_date,arrival_date,db_username))
 		data = cursor.fetchall()
+
+		query = "SELECT username, airline_name FROM airline_staff \
+				WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		data1 = cursor.fetchall()
+
 		cursor.close()
 		
 		if (data): # has data
-			return render_template('staffflight.html', username=username, upcoming_flights=data)
+			return render_template('staffflight.html', username=username, upcoming_flights=data, posts = data1)
 		else: # does not have data
 			error = 'Sorry ... Cannot find this flight!'
-			return render_template('staffflight.html', username=username, error1=error)
+			return render_template('staffflight.html', username=username, error1=error, posts = data1)
 	else:
 		session.clear()
 		return render_template('404.html')
@@ -839,7 +845,16 @@ def staffSearchFlight():
 def staffflight():
 	if session.get('username'):
 		username = session['username'] 
-		return render_template('staffflight.html', username=username)
+		db_username = check_apostrophe(username)
+		
+		cursor = conn.cursor();
+		query = "SELECT username, airline_name FROM airline_staff \
+				WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		data1 = cursor.fetchall()
+		cursor.close()
+
+		return render_template('staffflight.html', username=username, posts = data1)
 	else:
 		session.clear()
 		return render_template('404.html')
@@ -849,14 +864,19 @@ def staffaddinfo():
 	if session.get('username'):
 		username = session['username'] 
 		db_username = check_apostrophe(username)
-		
 		cursor = conn.cursor();
+
+		query = "SELECT username, airline_name FROM airline_staff \
+		WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		data2 = cursor.fetchall()
+
 		query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
 		cursor.execute(query.format(db_username))
 		data1 = cursor.fetchall()
 		cursor.close()
 
-		return render_template('staffaddinfo.html', username=username, airplane = data1)
+		return render_template('staffaddinfo.html', username=username, airplane = data1, posts = data2)
 	else:
 		session.clear()
 		return render_template('404.html')
@@ -865,6 +885,7 @@ def staffaddinfo():
 def edit_status():
 	if session.get('username'):
 		username = session['username'] 
+		db_username = check_apostrophe(username)
 		status = request.form['edit_status']
 		flight_num = request.form['flight_num']
 		
@@ -872,9 +893,15 @@ def edit_status():
 		upd = "UPDATE flight set status = \'{}\' WHERE flight_num = \'{}\'"
 		cursor.execute(upd.format(status, flight_num))
 		conn.commit()
+
+		query = "SELECT username, airline_name FROM airline_staff \
+				WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		data1 = cursor.fetchall()
+
 		cursor.close()
 		message = 'Status changed successfully!'
-		return render_template('staffflight.html', username=username, message = message)
+		return render_template('staffflight.html', username=username, message = message, posts = data1)
 	else:
 		session.clear()
 		return render_template('404.html')
@@ -898,6 +925,11 @@ def create_flight():
 		airplane_id = request.form['airplane_id']
 
 		cursor = conn.cursor()
+		query = "SELECT username, airline_name FROM airline_staff \
+		WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		data2 = cursor.fetchall()
+
 		airline = "SELECT airline_name \
 		FROM airline_staff \
 		WHERE username = \'{}\'"
@@ -929,7 +961,7 @@ def create_flight():
 			query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
 			cursor.execute(query.format(db_username))
 			data1 = cursor.fetchall()
-			return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1)
+			return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1, posts = data2)
 
 		query = "SELECT airport_name FROM airport WHERE airport_name = \'{}\'"
 		cursor.execute(query.format(arrival_airport))
@@ -942,7 +974,7 @@ def create_flight():
 			query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
 			cursor.execute(query.format(db_username))
 			data1 = cursor.fetchall()
-			return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1)
+			return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1, posts = data2)
 
 		query = "SELECT airplane_id FROM airplane WHERE airline_name = \'{}\' and airplane_id = \'{}\'"
 		cursor.execute(query.format(airline_name, airplane_id))
@@ -955,7 +987,7 @@ def create_flight():
 			query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
 			cursor.execute(query.format(db_username))
 			data1 = cursor.fetchall()
-			return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1)
+			return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1, posts = data2)
 		# cursor.close()
 		#executes query
 		# cursor = conn.cursor()
@@ -967,7 +999,7 @@ def create_flight():
 			query = "SELECT airplane_id, seats FROM airplane NATURAL JOIN airline_staff WHERE username = \'{}\'"
 			cursor.execute(query.format(db_username))
 			data1 = cursor.fetchall()
-			return render_template('staffaddinfo.html', error1 = numerror, username=username, airplane = data1)
+			return render_template('staffaddinfo.html', error1 = numerror, username=username, airplane = data1, posts = data2)
 
 		query = "SELECT airline_name, flight_num FROM flight WHERE airline_name = \'{}\' and flight_num = \'{}\'"
 		cursor.execute(query.format(airline_name, flight_num))
@@ -983,7 +1015,7 @@ def create_flight():
 			cursor.execute(query.format(db_username))
 			data1 = cursor.fetchall()
 			cursor.close()
-			return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1)		
+			return render_template('staffaddinfo.html', error1 = error1, username=username, airplane = data1, posts = data2)		
 
 		else:
 			ins = "INSERT INTO flight VALUES(\'{}\', \'{}\', \'{}\', \'{},{}\', \'{}\', \'{}, {}\', \'{}\', \'{}\', \'{}\', \'{}\')"
@@ -995,7 +1027,7 @@ def create_flight():
 			cursor.close()
 			message1 = "New flight added"
 			# flash()
-			return render_template('staffaddinfo.html', message1 = message1, username=username, airplane = data1)
+			return render_template('staffaddinfo.html', message1 = message1, username=username, airplane = data1, posts = data2)
 	else:
 		session.clear()
 		return render_template('404.html')
@@ -1013,6 +1045,11 @@ def add_airplane():
 
 		#cursor used to send queries
 		cursor = conn.cursor()
+		query = "SELECT username, airline_name FROM airline_staff \
+		WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		data2 = cursor.fetchall()
+
 		airline = "SELECT airline_name \
 		FROM airline_staff \
 		WHERE username = \'{}\'"
@@ -1051,7 +1088,7 @@ def add_airplane():
 			cursor.execute(query.format(username))
 			data1 = cursor.fetchall()
 			cursor.close()
-			return render_template('staffaddinfo.html', error2 = error2, username=username, airplane = data1)
+			return render_template('staffaddinfo.html', error2 = error2, username=username, airplane = data1, posts = data2)
 		else:		
 			ins = "INSERT INTO airplane VALUES(\'{}\', \'{}\', \'{}\')"
 			cursor.execute(ins.format(airline_name, airplane_id, seats))
@@ -1064,7 +1101,7 @@ def add_airplane():
 			cursor.close()
 			message2 = "New airplane added"
 			# flash()
-			return render_template('staffaddinfo.html', message2 = message2, username=username, airplane = data1)
+			return render_template('staffaddinfo.html', message2 = message2, username=username, airplane = data1, posts = data2)
 	else:
 		session.clear()
 		return render_template('404.html')
@@ -1078,6 +1115,11 @@ def add_airport():
 		airport_city = check_apostrophe(request.form['airport_city'])
 
 		cursor = conn.cursor()
+		query = "SELECT username, airline_name FROM airline_staff \
+		WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		data2 = cursor.fetchall()
+
 		airport = "SELECT airport_name FROM airport WHERE airport_name = \'{}\'"
 		cursor.execute(airport.format(airport_name))
 		airportdata = cursor.fetchone()
@@ -1088,7 +1130,7 @@ def add_airport():
 		error3 = None
 		if(airportdata):
 			error3 = "This airport already exists"
-			return render_template('staffaddinfo.html', error3 = error3, username=username, airplane = data1)
+			return render_template('staffaddinfo.html', error3 = error3, username=username, airplane = data1, posts = data2)
 
 		else:
 			cursor = conn.cursor()
@@ -1097,7 +1139,7 @@ def add_airport():
 			conn.commit()
 			cursor.close()
 			message3 = "New airport added"
-			return render_template('staffaddinfo.html', message3 = message3, username=username, airplane = data1)
+			return render_template('staffaddinfo.html', message3 = message3, username=username, airplane = data1, posts = data2)
 	else:
 		session.clear()
 		return render_template('404.html')
@@ -1109,6 +1151,12 @@ def staffagent():
 		db_username = check_apostrophe(username)
 		# airline_name = session['airline_name']
 		cursor = conn.cursor();
+
+		query = "SELECT username, airline_name FROM airline_staff \
+		WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		adata = cursor.fetchall()
+
 		query1 = "SELECT email, booking_agent_id, sum(price) * 0.1 as commission FROM booking_agent NATURAL JOIN purchases \
 			NATURAL JOIN flight NATURAL JOIN ticket AS T, airline_staff \
 			WHERE username = \'{}\' and airline_staff.airline_name = T.airline_name and datediff(CURDATE(), DATE(purchase_date)) < 365  \
@@ -1138,7 +1186,7 @@ def staffagent():
 		cursor.execute(query)
 		data = cursor.fetchall()
 		cursor.close()
-		return render_template('staffagent.html', username=username, commission = data1, month = data2, year = data3, posts = data)
+		return render_template('staffagent.html', username=username, commission = data1, month = data2, year = data3, posts = data, adata = adata)
 	else:
 		session.clear()
 		return render_template('404.html')
@@ -1150,6 +1198,11 @@ def staffcus():
 		db_username = check_apostrophe(username)
 		# airline_name = session['airline_name']
 		cursor = conn.cursor()
+		query = "SELECT username, airline_name FROM airline_staff \
+		WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		data2 = cursor.fetchall()
+
 		query1 = "SELECT email, name, count(ticket_id) as ticket FROM customer, purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff \
 			WHERE email = customer_email AND username = \'{}\'\
 			GROUP BY email, name\
@@ -1158,7 +1211,7 @@ def staffcus():
 		# cursor.execute(query1)
 		data1 = cursor.fetchall()
 		cursor.close()
-		return render_template('staffcus.html', frequent = data1, username = username)
+		return render_template('staffcus.html', frequent = data1, username = username, cdata = data2)
 	else:
 		session.clear()
 		return render_template('404.html')
@@ -1172,6 +1225,11 @@ def staffcusflight():
 		db_email = check_apostrophe(email)
 
 		cursor = conn.cursor()
+		query = "SELECT username, airline_name FROM airline_staff \
+		WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		cdata = cursor.fetchall()
+
 		query2 = "SELECT DISTINCT airplane_id, flight_num, \
 			departure_airport, arrival_airport, departure_time, arrival_time, \
 				status FROM customer, \
@@ -1192,7 +1250,7 @@ def staffcusflight():
 
 		error = None
 		if(data2):
-			return render_template('staffcus.html', cusflight = data2, frequent = data1, username = username)
+			return render_template('staffcus.html', cusflight = data2, frequent = data1, username = username, cdata = cdata)
 		else:
 			cursor = conn.cursor();
 			cus = "SELECT email FROM customer WHERE email = \'{}\'"
@@ -1205,7 +1263,7 @@ def staffcusflight():
 			# cursor.close()
 			else:
 				error = "No Such Customer"
-			return render_template('staffcus.html', error = error, frequent = data1, username = username)
+			return render_template('staffcus.html', error = error, frequent = data1, username = username, cdata = cdata)
 	else:
 		session.clear()
 		return render_template('404.html')
@@ -1218,6 +1276,12 @@ def staffflightcus():
 		flight_num = request.form['flight_num']
 
 		cursor = conn.cursor();
+		cursor = conn.cursor()
+		query = "SELECT username, airline_name FROM airline_staff \
+		WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		cdata = cursor.fetchall()
+
 		query3 = "SELECT DISTINCT email, name FROM customer, \
 					purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
 			WHERE flight_num = \'{}\' and email = customer_email and username = \'{}\'"
@@ -1236,7 +1300,7 @@ def staffflightcus():
 		cursor.close()
 		error3 = None
 		if(data3):
-			return render_template('staffcus.html', flightcus = data3, frequent = data1, username = username)
+			return render_template('staffcus.html', flightcus = data3, frequent = data1, username = username, cdata = cdata)
 		else:
 			cursor = conn.cursor();
 			cus = "SELECT flight_num FROM flight NATURAL JOIN airline_staff WHERE flight_num = \'{}\'\
@@ -1250,7 +1314,7 @@ def staffflightcus():
 			else:
 				error3 = 'No such Flight'
 			# cursor.close()
-			return render_template('staffcus.html', error3 = error3, frequent = data1, username = username)
+			return render_template('staffcus.html', error3 = error3, frequent = data1, username = username, cdata = cdata)
 	else:
 		session.clear()
 		return render_template('404.html')
@@ -1262,6 +1326,12 @@ def staffDest():
 		db_username = check_apostrophe(username)
 
 		cursor = conn.cursor();
+
+		query = "SELECT username, airline_name FROM airline_staff \
+		WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		data1 = cursor.fetchall()
+
 		query1 = "SELECT airport_city, count(ticket_id) AS ticket FROM \
 			purchases NATURAL JOIN ticket NATURAL JOIN flight, airport \
 			WHERE airport_name = arrival_airport and datediff(CURDATE(), DATE(purchase_date)) < 90\
@@ -1281,7 +1351,7 @@ def staffDest():
 		# cursor.execute(query1)
 		year = cursor.fetchall()
 		cursor.close()
-		return render_template('staffDest.html', month = month, year = year, username = username)
+		return render_template('staffDest.html', month = month, year = year, username = username, posts = data1)
 
 	else:
 		session.clear()
@@ -1294,6 +1364,11 @@ def staffReve():
 		db_username = check_apostrophe(username)
 
 		cursor = conn.cursor();
+		
+		query = "SELECT username, airline_name FROM airline_staff \
+		WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		data2 = cursor.fetchall()
 
 		query3 = "SELECT sum(price)\
 		FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff\
@@ -1348,7 +1423,7 @@ def staffReve():
 			yindirect = [0]
 		
 		cursor.close()
-		return render_template('staffReve.html', username = username, mdirect = mdirect, mindirect = mindirect, ydirect = ydirect, yindirect = yindirect)
+		return render_template('staffReve.html', username = username, mdirect = mdirect, mindirect = mindirect, ydirect = ydirect, yindirect = yindirect, posts = data2)
 	else:
 		session.clear()
 		return render_template('404.html')
@@ -1357,7 +1432,16 @@ def staffReve():
 def staffTickets():
 	if session.get('username'):
 		username = session['username']
-		return render_template('staffTickets.html', username = username)
+		db_username = check_apostrophe(username)
+
+		cursor = conn.cursor()
+		query = "SELECT username, airline_name FROM airline_staff \
+		WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		data2 = cursor.fetchall()
+		cursor.close()
+		
+		return render_template('staffTickets.html', username = username, posts = data2)
 	else:
 		session.clear()
 		return render_template('404.html')
@@ -1371,6 +1455,11 @@ def stafffixticket():
 		fallticket = None
 		
 		cursor = conn.cursor()
+		query = "SELECT username, airline_name FROM airline_staff \
+		WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		data2 = cursor.fetchall()
+
 		# if duration == "":
 			# error = "No range selected"
 			# return render_template('staffTickets.html', error = error, username = username)
@@ -1403,10 +1492,10 @@ def stafffixticket():
 			fmonthticket = [fallticket[i][2] for i in range(len(fallticket))]
 			ftotal = sum(fmonthticket)
 
-			return render_template('staffTickets.html', fs = fs, fe = fe, ft = ftotal, ftime = ftime, fmonthticket = fmonthticket, fticket = fallticket, username = username)
+			return render_template('staffTickets.html', fs = fs, fe = fe, ft = ftotal, ftime = ftime, fmonthticket = fmonthticket, fticket = fallticket, username = username, posts = data2)
 		else:
 			ferror = "No ticket sold!"
-			return render_template('staffTickets.html', ferror = ferror, username = username)
+			return render_template('staffTickets.html', ferror = ferror, username = username, posts = data2)
 	else:
 		session.clear()
 		return render_template('404.html')
@@ -1420,6 +1509,10 @@ def staffticket():
 		start = request.form['start']
 		end = request.form['end']
 		cursor = conn.cursor()
+		query = "SELECT username, airline_name FROM airline_staff \
+		WHERE username = \'{}\'"
+		cursor.execute(query.format(db_username))
+		data2 = cursor.fetchall()
 		# if duration == "":
 		# if request.form['start'] and request.form['end']:
 
@@ -1463,11 +1556,11 @@ def staffticket():
 
 			# time = ['2020-10', '2020-11']
 			# monthticket = [1, 2]
-			return render_template('staffTickets.html', s = s, e = e, t = total, time = time, monthticket = monthticket, ticket = allticket, username = username)
+			return render_template('staffTickets.html', s = s, e = e, t = total, time = time, monthticket = monthticket, ticket = allticket, username = username, posts = data2)
 		else:
 			error = "No ticket sold"
 			# cursor.close()
-			return render_template('staffTickets.html', error = error, username = username)
+			return render_template('staffTickets.html', error = error, username = username, posts = data2)
 	else:
 		session.clear()
 		return render_template('404.html')
