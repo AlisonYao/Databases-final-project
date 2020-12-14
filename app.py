@@ -1204,7 +1204,7 @@ def staffcus():
 		data2 = cursor.fetchall()
 
 		query1 = "SELECT email, name, count(ticket_id) as ticket FROM customer, purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff \
-			WHERE email = customer_email AND username = \'{}\'\
+			WHERE email = customer_email AND username = \'{}\' and datediff(CURDATE(), DATE(purchase_date)) < 365\
 			GROUP BY email, name\
 			ORDER BY ticket DESC LIMIT 1"
 		cursor.execute(query1.format(db_username))
@@ -1240,7 +1240,7 @@ def staffcusflight():
 		data2 = cursor.fetchall()
 
 		query1 = "SELECT email, name, count(ticket_id) as ticket FROM customer, purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff \
-			WHERE email = customer_email AND username = \'{}\'\
+			WHERE email = customer_email AND username = \'{}\' and datediff(CURDATE(), DATE(purchase_date)) < 365\
 			GROUP BY email, name\
 			ORDER BY ticket DESC LIMIT 1"
 		cursor.execute(query1.format(db_username))
@@ -1290,7 +1290,7 @@ def staffflightcus():
 		data3 = cursor.fetchall()
 
 		query1 = "SELECT email, name, count(ticket_id) as ticket FROM customer, purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN airline_staff \
-			WHERE email = customer_email AND username = \'{}\'\
+			WHERE email = customer_email AND username = \'{}\' and datediff(CURDATE(), DATE(purchase_date)) < 365\
 			GROUP BY email, name\
 			ORDER BY ticket DESC LIMIT 1"
 		cursor.execute(query1.format(db_username))
@@ -1467,7 +1467,7 @@ def stafffixticket():
 			ticket = "SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, count(ticket_id) FROM \
 					purchases NATURAL JOIN airline_staff NATURAL JOIN flight NATURAL JOIN ticket\
 					WHERE datediff(CURDATE(), DATE(purchase_date)) < 30 AND username = \'{}\' \
-					GROUP BY year, month, airline_name\
+					GROUP BY year, month\
 					ORDER BY year, month"
 
 			cursor.execute(ticket.format(db_username))
@@ -1477,7 +1477,7 @@ def stafffixticket():
 			ticket = "SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, count(ticket_id) FROM \
 					purchases NATURAL JOIN airline_staff NATURAL JOIN flight NATURAL JOIN ticket\
 					WHERE datediff(CURDATE(), DATE(purchase_date)) < 365 AND username = \'{}\' \
-					GROUP BY year, month, airline_name\
+					GROUP BY year, month\
 						ORDER BY year, month"
 
 			cursor.execute(ticket.format(db_username))
@@ -1520,7 +1520,7 @@ def staffticket():
 				purchases NATURAL JOIN airline_staff NATURAL JOIN flight NATURAL JOIN ticket\
 				WHERE purchase_date > \'{}\'\
 				and purchase_date < \'{}\' AND username = \'{}\' \
-				GROUP BY year, month, airline_name\
+				GROUP BY year, month\
 					ORDER BY year, month"
 		cursor.execute(ticket.format(start, end, db_username))
 		# cursor.execute(query2)
