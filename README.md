@@ -24,4 +24,4 @@ Once you have a basic working webapp that you can see, it is time to move on to 
 
 <img src='readme_pics/interface2.png' width='500'>
 
-<img src='readme_pics/interface1.png' width='500'>
+<img src='readme_pics/interface1.png' width='500'> 
