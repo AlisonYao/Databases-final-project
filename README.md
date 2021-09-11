@@ -21,3 +21,7 @@ Create database & insert dummy data according to the relational diagram.
 Please check out `flask/Flask_for_class`. It builds a basic app where you can serve a webapp through flask and pass data/variables between frontend and backend.
 
 Once you have a basic working webapp that you can see, it is time to move on to the security and optimization of the databases. After all, it is a databases class and there is no need to fixate on the frontend design too much. Though the frontend should be easy on the eye and usable.
+
+<img src='readme_pics/interface2.png' width='500'>
+
+<img src='readme_pics/interface1.png' width='500'>
