@@ -22,6 +22,10 @@ Please check out `flask/Flask_for_class`. It builds a basic app where you can se
 
 Once you have a basic working webapp that you can see, it is time to move on to the security and optimization of the databases. After all, it is a databases class and there is no need to fixate on the frontend design too much. Though the frontend should be easy on the eye and usable.
 
+### Demo
+
+[![Watch the video](https://img.youtube.com/vi/kTKhSQULmDQ/0.jpg)](https://www.youtube.com/watch?v=kTKhSQULmDQ)
+
 <img src='readme_pics/interface2.png' width='500'>
 
 <img src='readme_pics/interface1.png' width='500'>
